@@ -1,48 +1,66 @@
 <template>
-	<view class="content">
-		<image class="logo" src="/static/logo.png"></image>
-		<view class="text-area">
-			<text class="title" @click="test">{{title}}</text>
-		</view>
-	</view>
+  <!--index.wxml-->
+  <view @tap="bindViewTap">
+    <view class="container">
+      <view class="userinfo">
+        <image
+          class="userinfo-avatar"
+          :src="userInfo.avatarUrl"
+          background-size="cover"
+        ></image>
+        <text class="userinfo-nickname">{{ userInfo.nickName }}</text>
+      </view>
+      <view class="usermotto">
+        <text class="user-motto">{{ motto }}</text>
+      </view>
+    </view>
+    <view class="jump">
+      <button>跳过</button>
+    </view>
+  </view>
 </template>
 
-<script setup>
-import { ref } from "vue";
-	const title = ref('哈哈哈哈')
-	const test = ()=>{
-		console.log('>>>>>111')
-		uni.WebIM.conn.open({
-			user:'hfp',
-			pwd:'1'
-		})
-	}
+<script>
+// 获取应用实例
+var app = getApp().globalData;
+
+export default {
+  data() {
+    return {
+      motto: '环信即时通讯云',
+      userInfo: {},
+      login: false,
+    };
+  },
+
+  components: {},
+  props: {},
+  onLoad: function () {
+    var me = this;
+    this.timeOut = setTimeout(function () {
+      uni.redirectTo({
+        url: '../login/login',
+      });
+    }, 3000); // 调用应用实例的方法获取全局数据
+
+    getApp().globalData.getUserInfo(function (userInfo) {
+      // 更新数据
+      me.setData({
+        userInfo: userInfo,
+      });
+    });
+  },
+  methods: {
+    // 事件处理函数
+    bindViewTap: function () {
+      clearTimeout(this.timeOut);
+      uni.redirectTo({
+        url: '../login/login',
+      });
+    },
+  },
+};
 </script>
-
 <style>
-	.content {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-	}
-
-	.logo {
-		height: 200rpx;
-		width: 200rpx;
-		margin-top: 200rpx;
-		margin-left: auto;
-		margin-right: auto;
-		margin-bottom: 50rpx;
-	}
-
-	.text-area {
-		display: flex;
-		justify-content: center;
-	}
-
-	.title {
-		font-size: 36rpx;
-		color: #8f8f94;
-	}
+@import './index.css';
 </style>
