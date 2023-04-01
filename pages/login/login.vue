@@ -61,7 +61,6 @@
       <view class="login_btn">
         <button hover-class="btn_hover" @click="loginIM">登录</button>
       </view>
-
       <!-- <view class="login_text">
 		<navigator url="../register/register" open-type="redirect">账号注册</navigator>
 		<navigator url="../resetpassword/resetpassword" open-type="redirect">找回密码</navigator>
