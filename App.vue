@@ -605,6 +605,34 @@ export default {
       }
     },
   },
+  setup() {
+    //登录成功执行页面跳转
+    const loginSuccess = () => {
+      const loginUserEaseId = uni.WebIM.conn.user;
+      uni.hideLoading();
+      uni.redirectTo({
+        url: '../conversation/conversation?myName=' + loginUserEaseId,
+      });
+    };
+    //IM 事件监听
+    const mountEaseIMEventListener = () => {
+      //连接状态变化
+      uni.WebIM.conn.addEventHandler('contectEvent', {
+        onConnected: () => {
+          console.log('>>>>IM 连接');
+          if (
+            getCurrentRoute() == 'pages/login/login' ||
+            getCurrentRoute() == 'pages/login_token/login_token'
+          ) {
+            loginSuccess();
+          }
+        },
+      });
+    };
+    mountEaseIMEventListener();
+
+    return {};
+  },
 };
 </script>
 <style lang="scss">

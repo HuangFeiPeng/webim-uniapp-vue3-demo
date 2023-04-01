@@ -8,7 +8,15 @@
 				"backgroundTextStyle": "dark",
 				"navigationBarTitleText": "环信"
 			}
-		}
+		},
+		{
+			"path": "pages/conversation/conversation",
+			"style": {
+				"navigationBarBackgroundColor": "#f2f2f2",
+				"navigationBarTextStyle": "black",
+				"navigationBarTitleText": "会话列表"
+			}
+		},
 	],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
