@@ -670,7 +670,8 @@ const into_singleChatRoom = (detail) => {
     nameList.yourNickName = friendUserInfoMap.get(nameList.your).nickname;
   }
   uni.navigateTo({
-    url: '../chatroom/chatroom?username=' + JSON.stringify(nameList),
+    url:
+      '../singleChatEntry/singleChatEntry?username=' + JSON.stringify(nameList),
   });
 };
 // 群聊 和 聊天室 （两个概念）

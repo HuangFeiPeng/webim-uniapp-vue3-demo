@@ -1,44 +1,65 @@
 {
-	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
-		{
-			"path": "pages/login/login",
-			"style": {
-				"navigationBarBackgroundColor": "#3E4091",
-				"navigationBarTextStyle": "white",
-				"backgroundTextStyle": "dark",
-				"navigationBarTitleText": "环信"
-			}
-		},
-		{
-			"path": "pages/conversation/conversation",
-			"style": {
-				"navigationBarBackgroundColor": "#f2f2f2",
-				"navigationBarTextStyle": "black",
-				"navigationBarTitleText": "会话列表"
-			}
-		},
-		{
-			"path": "pages/main/main",
-			"style": {
-				"navigationBarBackgroundColor": "#f2f2f2",
-				"navigationBarTextStyle": "black",
-				"navigationBarTitleText": "联系人"
-			}
-		},
-		{
-			"path": "pages/setting/setting",
-			"style": {
-				"navigationBarBackgroundColor": "#f2f2f2",
-				"navigationBarTextStyle": "black",
-				"navigationBarTitleText": "设置"
-			}
-		}
-	],
-	"globalStyle": {
-		"navigationBarTextStyle": "black",
-		"navigationBarTitleText": "uni-app",
-		"navigationBarBackgroundColor": "#F8F8F8",
-		"backgroundColor": "#F8F8F8"
-	},
-	"uniIdRouter": {}
+  "pages": [
+    //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+    {
+      "path": "pages/login/login",
+      "style": {
+        "navigationBarBackgroundColor": "#3E4091",
+        "navigationBarTextStyle": "white",
+        "backgroundTextStyle": "dark",
+        "navigationBarTitleText": "环信"
+      }
+    },
+    {
+      "path": "pages/conversation/conversation",
+      "style": {
+        "navigationBarBackgroundColor": "#f2f2f2",
+        "navigationBarTextStyle": "black",
+        "navigationBarTitleText": "会话列表"
+      }
+    },
+    {
+      "path": "pages/main/main",
+      "style": {
+        "navigationBarBackgroundColor": "#f2f2f2",
+        "navigationBarTextStyle": "black",
+        "navigationBarTitleText": "联系人"
+      }
+    },
+    {
+      "path": "pages/setting/setting",
+      "style": {
+        "navigationBarBackgroundColor": "#f2f2f2",
+        "navigationBarTextStyle": "black",
+        "navigationBarTitleText": "设置"
+      }
+    },
+    {
+      "path": "pages/singleChatEntry/singleChatEntry",
+      "style": {
+        "navigationBarTitleText": "chatting",
+        "backgroundTextStyle": "dark",
+        "enablePullDownRefresh": true,
+        "app-plus": {
+          "titleNView": {
+            "buttons": [
+              {
+                "text": "...",
+                "fontSrc": "./static/iconfont/iconfont.ttf",
+                "fontSize": "24",
+                "float": "right"
+              }
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "uni-app",
+    "navigationBarBackgroundColor": "#F8F8F8",
+    "backgroundColor": "#F8F8F8"
+  },
+  "uniIdRouter": {}
 }

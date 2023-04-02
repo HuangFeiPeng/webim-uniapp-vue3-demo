@@ -414,7 +414,8 @@ const into_room = (event) => {
     nameList.yourNickName = friendUserInfoMap.get(nameList.your).nickname;
   }
   uni.navigateTo({
-    url: '../chatroom/chatroom?username=' + JSON.stringify(nameList),
+    url:
+      '../singleChatEntry/singleChatEntry?username=' + JSON.stringify(nameList),
   });
 };
 const into_info = (event) => {

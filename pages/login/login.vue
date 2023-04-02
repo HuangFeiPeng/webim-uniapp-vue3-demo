@@ -27,7 +27,7 @@
       >
         <input
           type="text"
-          :password="!showPassword"
+          :password="!loginState.showPassword"
           placeholder="请输入密码"
           placeholder-style="color:rgb(173,185,193)"
           @input="bindPassword"
@@ -37,11 +37,11 @@
         <image
           class="psdIcon"
           :src="
-            showPassword
+            loginState.showPassword
               ? '/static/images/eye.png'
               : '/static/images/eye-fill.png'
           "
-          @tap="showPassword = !showPassword"
+          @tap="loginState.showPassword = !loginState.showPassword"
         ></image>
       </view>
 
@@ -81,7 +81,7 @@ let times = 60;
 let timer;
 const WebIM = uni.WebIM;
 const loginState = reactive({
-  usePwdLogin: false, //是否用户名+手机号方式登录
+  usePwdLogin: true, //是否用户名+手机号方式登录
   name: '',
   psd: '',
   grant_type: 'password',
@@ -289,13 +289,13 @@ const loginIM = () => {
       },
     });
   } else {
-    if (!__test_account__ && this.name == '') {
+    if (!__test_account__ && loginState.name == '') {
       uni.showToast({
         title: '请输入用户名！',
         icon: 'none',
       });
       return;
-    } else if (!__test_account__ && this.psd == '') {
+    } else if (!__test_account__ && loginState.psd == '') {
       uni.showToast({
         title: '请输入密码！',
         icon: 'none',
@@ -304,20 +304,20 @@ const loginIM = () => {
     }
     uni.setStorage({
       key: 'myUsername',
-      data: __test_account__ || this.name.toLowerCase(),
+      data: __test_account__ || loginState.name.toLowerCase(),
     });
     console.log(111, {
       apiUrl: WebIM.config.apiURL,
-      user: __test_account__ || this.name.toLowerCase(),
-      pwd: __test_psword__ || this.psd,
-      grant_type: this.grant_type,
+      user: __test_account__ || loginState.name.toLowerCase(),
+      pwd: __test_psword__ || loginState.psd,
+      grant_type: loginState.grant_type,
       appKey: WebIM.config.appkey,
     });
     getApp().globalData.conn.open({
       apiUrl: WebIM.config.apiURL,
-      user: __test_account__ || this.name.toLowerCase(),
-      pwd: __test_psword__ || this.psd,
-      grant_type: this.grant_type,
+      user: __test_account__ || loginState.name.toLowerCase(),
+      pwd: __test_psword__ || loginState.psd,
+      grant_type: loginState.grant_type,
       appKey: WebIM.config.appkey,
     });
   }
