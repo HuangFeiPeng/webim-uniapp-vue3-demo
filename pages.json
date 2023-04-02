@@ -17,6 +17,14 @@
 				"navigationBarTitleText": "会话列表"
 			}
 		},
+		{
+			"path": "pages/main/main",
+			"style": {
+				"navigationBarBackgroundColor": "#f2f2f2",
+				"navigationBarTextStyle": "black",
+				"navigationBarTitleText": "联系人"
+			}
+		}
 	],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
