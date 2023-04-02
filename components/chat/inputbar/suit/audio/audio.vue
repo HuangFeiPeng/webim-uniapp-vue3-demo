@@ -27,19 +27,24 @@
 </template>
 
 <script>
-let WebIM = require("../../../../../utils/WebIM")["default"];
-let msgType = require("../../../msgtype");
-let RECORD_CONST = require("./record_status");
-let RecordStatus = RECORD_CONST.RecordStatus;
-let RecordDesc = RECORD_CONST.RecordDesc;
-let disp = require("../../../../../utils/broadcast");
-let msgStorage = require("../../../msgstorage");
+import msgType from '../../../msgtype';
+import msgStorage from '../../../msgstorage';
+import { RecordStatus, RecordDesc } from './record_status';
+import disp from '@/utils/broadcast';
+const WebIM = uni.WebIM;
+// let WebIM = require("../../../../../utils/WebIM")["default"];
+// let msgType = require('../../../msgtype');
+// let RECORD_CONST = require('./record_status');
+// let RecordStatus = RECORD_CONST.RecordStatus;
+// let RecordDesc = RECORD_CONST.RecordDesc;
+// let disp = require('../../../../../utils/broadcast');
+// let msgStorage = require('../../../msgstorage');
 let RunAnimation = false;
 let recordTimeInterval = null;
 let waveTimer = null;
 const InitHeight = [
   50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
-  50, 50, 50
+  50, 50, 50,
 ];
 export default {
   data() {
@@ -53,19 +58,19 @@ export default {
       recordClicked: false,
       isLongPress: false,
       recordTime: 0,
-      rec: null // h5 audio record
+      rec: null, // h5 audio record
     };
   },
   components: {},
   props: {
     username: {
       type: Object,
-      default: () => ({})
+      default: () => ({}),
     },
     chatType: {
       type: String,
-      default: msgType.chatType.SINGLE_CHAT
-    }
+      default: msgType.chatType.SINGLE_CHAT,
+    },
   },
 
   destroyed() {
@@ -135,7 +140,7 @@ export default {
         this.saveRecordTime();
       });
       recorderManager.start({
-        format: "mp3"
+        format: 'mp3',
       });
     },
 
@@ -146,28 +151,28 @@ export default {
           success: (res) => {
             clearInterval(recordTimeInterval);
             me.recordTime = 0;
-            let recordAuth = res.authSetting["scope.record"];
+            let recordAuth = res.authSetting['scope.record'];
 
             if (recordAuth == false) {
               // 已申请过授权，但是用户拒绝
               uni.openSetting({
                 success: function (res) {
-                  let recordAuth = res.authSetting["scope.record"];
+                  let recordAuth = res.authSetting['scope.record'];
 
                   if (recordAuth == true) {
                     uni.showToast({
-                      title: "授权成功",
-                      icon: "success"
+                      title: '授权成功',
+                      icon: 'success',
                     });
                   } else {
                     uni.showToast({
-                      title: "请授权录音",
-                      icon: "none"
+                      title: '请授权录音',
+                      icon: 'none',
                     });
                   }
 
                   me.isLongPress = false;
-                }
+                },
               });
             } else if (recordAuth == true) {
               // 用户已经同意授权
@@ -175,23 +180,23 @@ export default {
             } else {
               // 第一次进来，未发起授权
               uni.authorize({
-                scope: "scope.record",
+                scope: 'scope.record',
                 success: () => {
                   // 授权成功
                   uni.showToast({
-                    title: "授权成功",
-                    icon: "success"
+                    title: '授权成功',
+                    icon: 'success',
                   });
-                }
+                },
               });
             }
           },
           fail: function () {
             uni.showToast({
-              title: "鉴权失败，请重试",
-              icon: "none"
+              title: '鉴权失败，请重试',
+              icon: 'none',
             });
-          }
+          },
         });
         return;
       } else {
@@ -202,48 +207,50 @@ export default {
 
     handleRecording(e) {
       const sysInfo = uni.getSystemInfoSync();
-      console.log("getSystemInfoSync", sysInfo);
-      if (sysInfo.app === "alipay") {
+      console.log('getSystemInfoSync', sysInfo);
+      if (sysInfo.app === 'alipay') {
         // https://forum.alipay.com/mini-app/post/7301031?ant_source=opendoc_recommend
         uni.showModal({
-          content: "支付宝小程序不支持语音消息，请查看支付宝相关api了解详情"
+          content: '支付宝小程序不支持语音消息，请查看支付宝相关api了解详情',
         });
         return;
       }
       let me = this;
       me.recordClicked = true;
       // h5不支持uni.getRecorderManager, 需要单独处理
-      if (sysInfo.uniPlatform === "web") {
-        import("../../../../../recorderCore/src/recorder-core").then((Recorder) => {
-          require("../../../../../recorderCore/src/engine/mp3");
-          require("../../../../../recorderCore/src/engine/mp3-engine");
-          if (me.recordClicked == true) {
-            clearInterval(recordTimeInterval);
-            me.initStartRecord(e);
-            me.rec = new Recorder.default({
-              type: "mp3"
-            });
-            me.rec.open(
-              () => {
-                me.saveRecordTime();
-                me.rec.start();
-              },
-              (msg, isUserNotAllow) => {
-                if (isUserNotAllow) {
-                  uni.showToast({
-                    title: "鉴权失败，请重试",
-                    icon: "none"
-                  });
-                } else {
-                  uni.showToast({
-                    title: `开启失败，请重试`,
-                    icon: "none"
-                  });
+      if (sysInfo.uniPlatform === 'web') {
+        import('../../../../../recorderCore/src/recorder-core').then(
+          (Recorder) => {
+            require('../../../../../recorderCore/src/engine/mp3');
+            require('../../../../../recorderCore/src/engine/mp3-engine');
+            if (me.recordClicked == true) {
+              clearInterval(recordTimeInterval);
+              me.initStartRecord(e);
+              me.rec = new Recorder.default({
+                type: 'mp3',
+              });
+              me.rec.open(
+                () => {
+                  me.saveRecordTime();
+                  me.rec.start();
+                },
+                (msg, isUserNotAllow) => {
+                  if (isUserNotAllow) {
+                    uni.showToast({
+                      title: '鉴权失败，请重试',
+                      icon: 'none',
+                    });
+                  } else {
+                    uni.showToast({
+                      title: `开启失败，请重试`,
+                      icon: 'none',
+                    });
+                  }
                 }
-              }
-            );
+              );
+            }
           }
-        });
+        );
       } else {
         setTimeout(() => {
           if (me.recordClicked == true) {
@@ -264,20 +271,20 @@ export default {
         this.recordStatus = RecordStatus.HIDE;
         this.recordClicked = false;
       }
-      if (uni.getSystemInfoSync().uniPlatform === "web") {
+      if (uni.getSystemInfoSync().uniPlatform === 'web') {
         this.rec.stop(
           function (blob) {
             clearInterval(recordTimeInterval);
             let duration = me.recordTime * 1000;
             if (me.recordStatus == RecordStatus.RELEASE) {
-              console.log("user canceled");
+              console.log('user canceled');
               me.recordStatus = RecordStatus.HIDE;
               return;
             }
             if (duration <= 1000) {
               uni.showToast({
-                title: "录音时间太短",
-                icon: "none"
+                title: '录音时间太短',
+                icon: 'none',
               });
             } else {
               let blobURL = window.URL.createObjectURL(blob);
@@ -287,7 +294,7 @@ export default {
             me.recordTime = 0;
           },
           function (s) {
-            console.log("结束出错：" + s, 1);
+            console.log('结束出错：' + s, 1);
           },
           true
         );
@@ -296,15 +303,15 @@ export default {
           clearInterval(recordTimeInterval);
           let duration = this.recordTime * 1000;
           if (this.recordStatus == RecordStatus.RELEASE) {
-            console.log("user canceled");
+            console.log('user canceled');
             this.recordStatus = RecordStatus.HIDE;
             return;
           }
 
           if (duration <= 1000) {
             uni.showToast({
-              title: "录音时间太短",
-              icon: "none"
+              title: '录音时间太短',
+              icon: 'none',
             });
           } else {
             // 上传
@@ -328,16 +335,16 @@ export default {
     },
 
     uploadRecord(tempFilePath, dur) {
-      var str = WebIM.config.appkey.split("#");
+      var str = WebIM.config.appkey.split('#');
       var me = this;
       var token = WebIM.conn.context.accessToken;
       uni.uploadFile({
-        url: "https://a1.easemob.com/" + str[0] + "/" + str[1] + "/chatfiles",
+        url: 'https://a1.easemob.com/' + str[0] + '/' + str[1] + '/chatfiles',
         filePath: tempFilePath,
-        fileType: "audio",
-        name: "file",
+        fileType: 'audio',
+        name: 'file',
         header: {
-          Authorization: "Bearer " + token
+          Authorization: 'Bearer ' + token,
         },
 
         success(res) {
@@ -350,23 +357,23 @@ export default {
             accessToken: token,
             body: {
               type: msgType.AUDIO,
-              url: dataObj.uri + "/" + dataObj.entities[0].uuid,
-              filetype: "",
+              url: dataObj.uri + '/' + dataObj.entities[0].uuid,
+              filetype: '',
               filename: `${new Date().getTime()}.mp3`,
               accessToken: token,
-              length: Math.ceil(dur / 1000)
+              length: Math.ceil(dur / 1000),
             },
             from: me.username.myName,
             to: me.getSendToParam(),
             roomType: false,
             chatType: me.chatType,
             success: function (argument) {
-              disp.fire("em.chat.sendSuccess", id);
-            }
+              disp.fire('em.chat.sendSuccess', id);
+            },
           });
 
           if (me.isGroupChat()) {
-            msg.setGroup("groupchat");
+            msg.setGroup('groupchat');
           }
 
           msg.body.length = Math.ceil(dur / 1000); //console.log('发送的语音消息', msg.body)
@@ -374,10 +381,10 @@ export default {
           WebIM.conn.send(msg.body);
           let obj = {
             msg: msg,
-            type: msgType.AUDIO
+            type: msgType.AUDIO,
           };
           me.saveSendMsg(obj);
-        }
+        },
       });
     },
     saveSendMsg(evt) {
@@ -400,10 +407,10 @@ export default {
         clearInterval(waveTimer);
         return;
       }
-    }
-  }
+    },
+  },
 };
 </script>
 <style>
-@import "./audio.css";
+@import './audio.css';
 </style>

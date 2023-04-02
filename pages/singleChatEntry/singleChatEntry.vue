@@ -1,8 +1,8 @@
 <template>
   <chat
     id="chat"
-    :username="username"
     ref="chatComp"
+    :chatParams="chatParams"
     chatType="singleChat"
   ></chat>
 </template>
@@ -13,21 +13,21 @@ import { onLoad, onUnload, onPullDownRefresh } from '@dcloudio/uni-app';
 import disp from '@/utils/broadcast';
 // let disp = require('../../utils/broadcast');
 import chat from '@/components/chat/chat.vue';
-const username = ref('');
-const chatComp = ref(null);
 
+const chatComp = ref(null);
+let chatParams = {};
 const onNavigationBarButtonTap = () => {
   uni.navigateTo({
-    url: `/pages/moreMenu/moreMenu?username=${username.value.your}&type=singleChat`,
+    url: `/pages/moreMenu/moreMenu?username=${username.your}&type=singleChat`,
   });
 };
 onLoad((options) => {
-  let username = JSON.parse(options.username);
-  username.value = options.username;
+  let params = JSON.parse(options.username);
+  chatParams = params;
   // 生成的支付宝小程序在onLoad里获取不到，这里放到全局变量下
-  uni.username = username;
+  uni.username = params;
   uni.setNavigationBarTitle({
-    title: username?.yourNickName || username?.your,
+    title: params?.yourNickName || params?.your,
   });
 });
 onPullDownRefresh(() => {

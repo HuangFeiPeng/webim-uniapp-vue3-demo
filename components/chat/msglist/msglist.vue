@@ -1,15 +1,22 @@
 <template>
   <view
     scroll-y="true"
-    :class="view + ' wrap ' + (isIPX?'scroll_view_X': '')"
+    :class="view + ' wrap ' + (isIPX ? 'scroll_view_X' : '')"
     @tap="onTap"
     upper-threshold="-50"
     :scroll-into-view="toView"
   >
-  <view>
-    <u-modal v-model="show" title="消息举报" ref="uModal" confirm-text="举报" :async-close="true" @confirm="reportMsg" >
-      <view class="slot-content">
-         <u-field
+    <view>
+      <!-- <u-modal
+        v-model="show"
+        title="消息举报"
+        ref="uModal"
+        confirm-text="举报"
+        :async-close="true"
+        @confirm="reportMsg"
+      >
+        <view class="slot-content">
+          <u-field
             v-model="reason"
             label="举报原因"
             placeholder="请填写举报原因"
@@ -17,28 +24,56 @@
             :auto-height="false"
             :clearable="false"
             maxlength="100"
-		      >
-		    </u-field>
-			</view>
-    </u-modal>
-		<u-action-sheet :list="list" @click="onMenuClick" v-model="showRpt"></u-action-sheet>
-		<u-action-sheet :list="typeList" @click="onReportTypeClick" v-model="showRptType"></u-action-sheet>
-	</view>
-	<view class="tips">本应用仅用于环信产品功能开发测试，请勿用于非法用途。任何涉及转账、汇款、裸聊、网恋、网购退款、投资理财等统统都是诈骗，请勿相信！</view>
-    <view @longtap="onMsgTap(item)" class="message" v-for="item in chatMsg" :key="item.mid" :id="item.mid">
+          >
+          </u-field>
+        </view>
+      </u-modal> -->
+      <uni-popup ref="inputDialog" type="dialog">
+        <uni-popup-dialog
+          ref="inputClose"
+          mode="input"
+          title="输入内容"
+          value="对话框预置提示内容!"
+          placeholder="请输入内容"
+          @confirm="dialogInputConfirm"
+        ></uni-popup-dialog>
+      </uni-popup>
+      <!-- <u-action-sheet
+        :list="list"
+        @click="onMenuClick"
+        v-model="showRpt"
+      ></u-action-sheet>
+      <u-action-sheet
+        :list="typeList"
+        @click="onReportTypeClick"
+        v-model="showRptType"
+      ></u-action-sheet> -->
+    </view>
+    <view class="tips"
+      >本应用仅用于环信产品功能开发测试，请勿用于非法用途。任何涉及转账、汇款、裸聊、网恋、网购退款、投资理财等统统都是诈骗，请勿相信！</view
+    >
+    <view
+      @longtap="onMsgTap(item)"
+      class="message"
+      v-for="item in chatMsg"
+      :key="item.mid"
+      :id="item.mid"
+    >
       <!-- <view class="time">
 				<text class="time-text">{{ item.time }}</text>
       </view>-->
       <view class="main" :class="item.style">
         <view class="user">
           <!-- yourname：就是消息的 from -->
-          <text v-if="!item.style" class="user-text">{{ showMessageListNickname(item.yourname) + ' ' + handleTime(item)}}</text>
+          <text v-if="!item.style" class="user-text">{{
+            showMessageListNickname(item.yourname) + ' ' + handleTime(item)
+          }}</text>
         </view>
         <image class="avatar" :src="showMessageListAvatar(item)" />
         <view class="msg">
           <image
             class="err"
-            :class="(item.style == 'self' && item.isFail) ?  'show' : 'hide'"
+            :class="item.style == 'self' && item.isFail ? 'show' : 'hide'"
             src="/static/images/msgerr.png"
           />
 
@@ -52,46 +87,84 @@
             src="/static/images/popleftarrow2x.png"
             class="msg_popleftarrow"
           />
-          <view v-if="item.msg.type == msgtype.IMAGE || item.msg.type == msgtype.VIDEO">
+          <view
+            v-if="
+              item.msg.type == msgtype.IMAGE || item.msg.type == msgtype.VIDEO
+            "
+          >
             <image
               v-if="item.msg.type == msgtype.IMAGE"
               class="avatar"
               :src="item.msg.data"
-              style="width:90px; height:120px; margin:2px auto;"
+              style="width: 90px; height: 120px; margin: 2px auto"
               mode="aspectFit"
               @tap="previewImage"
               :data-url="item.msg.data"
             />
-            <video v-if="item.msg.type == msgtype.VIDEO" :src="item.msg.data" controls style="width:300rpx;"/>
+            <video
+              v-if="item.msg.type == msgtype.VIDEO"
+              :src="item.msg.data"
+              controls
+              style="width: 300rpx"
+            />
           </view>
-          <audio-msg v-if="item.msg.type == msgtype.AUDIO" :msg="item"></audio-msg>
+          <audio-msg
+            v-if="item.msg.type == msgtype.AUDIO"
+            :msg="item"
+          ></audio-msg>
           <file-msg v-if="item.msg.type == msgtype.FILE" :msg="item"></file-msg>
-          <view v-else-if="item.msg.type == msgtype.TEXT || item.msg.type == msgtype.EMOJI">
-            <view class="template" v-for="(d_item, d_index) in item.msg.data" :key="d_index">
+          <view
+            v-else-if="
+              item.msg.type == msgtype.TEXT || item.msg.type == msgtype.EMOJI
+            "
+          >
+            <view
+              class="template"
+              v-for="(d_item, d_index) in item.msg.data"
+              :key="d_index"
+            >
               <text
                 :data-msg="item"
-                @tap="clickMsg"
                 v-if="d_item.type == msgtype.TEXT"
                 class="msg-text"
-                style="float:left;"
+                style="float: left"
                 selectable="true"
-              >{{ d_item.data }}</text>
+                >{{ d_item.data }}</text
+              >
 
               <image
                 v-if="d_item.type == msgtype.EMOJI"
                 class="avatar"
                 :src="'/static/images/faces/' + d_item.data"
-                style="width:25px; height:25px; margin:0 0 2px 0; float:left;"
+                style="
+                  width: 25px;
+                  height: 25px;
+                  margin: 0 0 2px 0;
+                  float: left;
+                "
               />
             </view>
           </view>
           <!-- 个人名片 -->
-          <view v-else-if="item.msg.type == msgtype.CUSTOM && item.customEvent=== 'userCard'" @click="to_profile_page(item.msg.data)">
+          <view
+            v-else-if="
+              item.msg.type == msgtype.CUSTOM && item.customEvent === 'userCard'
+            "
+            @click="to_profile_page(item.msg.data)"
+          >
             <view class="usercard_mian">
-                <image :src="item.msg.data.avatarurl || item.msg.data.avatar || defaultAvatar" />
-                <text class="name">{{ item.msg.data.nickname || item.msg.data.uid }}</text>
+              <image
+                :src="
+                  item.msg.data.avatarurl ||
+                  item.msg.data.avatar ||
+                  defaultAvatar
+                "
+              />
+              <text class="name">{{
+                item.msg.data.nickname || item.msg.data.uid
+              }}</text>
             </view>
-            <u-divider :use-slot="false" />
+            <!-- <u-divider :use-slot="false" /> -->
             <text>[个人名片]</text>
           </view>
         </view>
@@ -101,75 +174,79 @@
   <!-- <view style="height: 1px;"></view> -->
 </template>
 
-
 <script>
-let msgStorage = require("../msgstorage");
-let disp = require("../../../utils/broadcast");
+import msgStorage from '../msgstorage';
+// let msgStorage = require("../msgstorage");
+import disp from '@/utils/broadcast';
+// let disp = require('../../../utils/broadcast');
 let LIST_STATUS = {
-  SHORT: "scroll_view_change",
-  NORMAL: "scroll_view"
+  SHORT: 'scroll_view_change',
+  NORMAL: 'scroll_view',
 };
 let page = 0;
 let Index = 0;
 let curMsgMid = '';
 let isFail = false;
-import msgtype from "@/components/chat/msgtype";
-import audioMsg from "./type/audio/audio";
-import fileMsg from "./type/file";
-let WebIM = require("../../../utils/WebIM")["default"];
+import msgtype from '@/components/chat/msgtype';
+import audioMsg from './type/audio/audio';
+import fileMsg from './type/file';
+const WebIM = uni.WebIM;
 export default {
   data() {
     return {
       msgtype,
       view: LIST_STATUS.NORMAL,
-      toView: "",
+      toView: '',
       chatMsg: [],
       __visibility__: false,
       isIPX: false,
-      title:'消息举报',
-			list: [{
-					text: '举报'
-			}],
+      title: '消息举报',
+      list: [
+        {
+          text: '举报',
+        },
+      ],
       show: false,
-			showRpt: false,
+      showRpt: false,
       showRptType: false,
       rptMsgId: '', // 举报消息id
       rptType: '', // 举报类型
       reason: '',
       typeList: [
         {
-          text: "涉政"
+          text: '涉政',
         },
         {
-          text: "涉黄"
+          text: '涉黄',
         },
         {
-          text: "广告"
+          text: '广告',
         },
         {
-          text: "辱骂"
+          text: '辱骂',
         },
         {
-          text: "暴恐"
+          text: '暴恐',
         },
         {
-          text: "违禁"
-        }
+          text: '违禁',
+        },
       ],
-      defaultAvatar: "/static/images/theme2x.png",
-      defaultGroupAvatar: "/static/images/groupTheme.png"
+      defaultAvatar: '/static/images/theme2x.png',
+      defaultGroupAvatar: '/static/images/groupTheme.png',
     };
   },
 
   components: {
     audioMsg,
-    fileMsg
+    fileMsg,
   },
   props: {
-    username: {
+    chatParams: {
       type: Object,
-      default: () => ({})
-    }
+      default: () => ({}),
+      required: true,
+    },
   },
 
   // lifetimes
@@ -185,22 +262,23 @@ export default {
 
   destroyed() {
     this.__visibility__ = false;
-	msgStorage.off("newChatMsg", this.dispMsg)
+    msgStorage.off('newChatMsg', this.dispMsg);
   },
 
   mounted(event) {
-
     let me = this;
     if (getApp().globalData.isIPX) {
       this.setData({
-        isIPX: true
+        isIPX: true,
       });
     }
-	
-	  this.username = uni.username;
+
+    this.username = uni.username;
     let username = this.username;
-    let myUsername = uni.getStorageSync("myUsername");
-    let sessionKey = username.groupId ? username.groupId + myUsername : username.your + myUsername;
+    let myUsername = uni.getStorageSync('myUsername');
+    let sessionKey = username.groupId
+      ? username.groupId + myUsername
+      : username.your + myUsername;
     let chatMsg = uni.getStorageSync(sessionKey) || [];
     this.renderMsg(null, null, chatMsg, sessionKey);
     uni.setStorageSync(sessionKey, null);
@@ -209,14 +287,17 @@ export default {
       isFail = true;
       // return;
       console.log('发送失败了');
-	  return;
+      return;
       let msgList = me.chatMsg;
-      msgList.map(item => {
-        if (item.mid.substring(item.mid.length - 10) == curMsgMid.substring(curMsgMid.length - 10)) {
+      msgList.map((item) => {
+        if (
+          item.mid.substring(item.mid.length - 10) ==
+          curMsgMid.substring(curMsgMid.length - 10)
+        ) {
           item.msg.data[0].isFail = true;
           item.isFail = true;
           me.setData({
-            chatMsg: msgList
+            chatMsg: msgList,
           });
         }
       });
@@ -226,170 +307,184 @@ export default {
       //   me.curChatMsg[0].isShow = false;
       // }
 
-      uni.setStorageSync("rendered_" + sessionKey, msgList);
+      uni.setStorageSync('rendered_' + sessionKey, msgList);
     });
-    msgStorage.on("newChatMsg", this.dispMsg);
+    msgStorage.on('newChatMsg', this.dispMsg);
   },
-  computed:{
+  computed: {
     //消息列表头像展示
     showMessageListAvatar() {
       const friendUserInfoMap = getApp().globalData.friendUserInfoMap;
       const myUserInfos = getApp().globalData.userInfoFromServer;
-      return (item)=>{
-        if(!item.style){
-            if(friendUserInfoMap.has(item.username) && friendUserInfoMap.get(item.username)?.avatarurl){
-                return friendUserInfoMap.get(item.username).avatarurl
-            }else{
-                return this.defaultAvatar
-            }
-        }else{
-            if(myUserInfos?.avatarurl){
-                return myUserInfos.avatarurl
-            }else{
-                return this.defaultAvatar
-            }
+      return (item) => {
+        if (!item.style) {
+          if (
+            friendUserInfoMap.has(item.username) &&
+            friendUserInfoMap.get(item.username)?.avatarurl
+          ) {
+            return friendUserInfoMap.get(item.username).avatarurl;
+          } else {
+            return this.defaultAvatar;
+          }
+        } else {
+          if (myUserInfos?.avatarurl) {
+            return myUserInfos.avatarurl;
+          } else {
+            return this.defaultAvatar;
+          }
         }
-        
-      }
+      };
     },
     //消息列表昵称显示
-    showMessageListNickname(){
-        const friendUserInfoMap = getApp().globalData.friendUserInfoMap;
-        return (hxId)=>{
-            if(friendUserInfoMap.has(hxId) && friendUserInfoMap.get(hxId)?.nickname){
-                return friendUserInfoMap.get(hxId).nickname
-            }else{
-                return hxId
-            }
-            
+    showMessageListNickname() {
+      const friendUserInfoMap = getApp().globalData.friendUserInfoMap;
+      return (hxId) => {
+        if (
+          friendUserInfoMap.has(hxId) &&
+          friendUserInfoMap.get(hxId)?.nickname
+        ) {
+          return friendUserInfoMap.get(hxId).nickname;
+        } else {
+          return hxId;
         }
+      };
     },
     //处理时间显示
     handleTime() {
-        return (item) => {
-            return this.$u.timeFormat(item.time, 'mm/dd/hh:MM')
-        }
-    }
+      return (item) => {
+        return this.$u.timeFormat(item.time, 'mm/dd/hh:MM');
+      };
+    },
   },
   methods: {
     normalScroll() {
       this.setData({
-        view: LIST_STATUS.NORMAL
+        view: LIST_STATUS.NORMAL,
       });
     },
-	dispMsg(renderableMsg, type, curChatMsg, sesskey) {
-	  let me = this;
-	  let username = this.username;
-	  let myUsername = uni.getStorageSync("myUsername");
-	  let sessionKey = username.groupId ? username.groupId + myUsername : username.your + myUsername;
-	  me.curChatMsg = curChatMsg;
-	  
-	  if (!me.__visibility__) return; // 判断是否属于当前会话
-	
-	  if (username.groupId) {
-	    // 群消息的 to 是 id，from 是 name
-	    if (renderableMsg.info.from == username.groupId || renderableMsg.info.to == username.groupId) {
-	      if (sesskey == sessionKey) {
-	        me.renderMsg(renderableMsg, type, curChatMsg, sessionKey, 'newMsg');
-	      }
-	    }
-	  } else if (renderableMsg.info.from == username.your || renderableMsg.info.to == username.your) {
-	    if (sesskey == sessionKey) {
-	      me.renderMsg(renderableMsg, type, curChatMsg, sessionKey, 'newMsg');
-	    }
-	  }
-	},
-    onInput(e){
+    dispMsg(renderableMsg, type, curChatMsg, sesskey) {
+      let me = this;
+      let username = this.username;
+      let myUsername = uni.getStorageSync('myUsername');
+      let sessionKey = username.groupId
+        ? username.groupId + myUsername
+        : username.your + myUsername;
+      me.curChatMsg = curChatMsg;
+
+      if (!me.__visibility__) return; // 判断是否属于当前会话
+
+      if (username.groupId) {
+        // 群消息的 to 是 id，from 是 name
+        if (
+          renderableMsg.info.from == username.groupId ||
+          renderableMsg.info.to == username.groupId
+        ) {
+          if (sesskey == sessionKey) {
+            me.renderMsg(renderableMsg, type, curChatMsg, sessionKey, 'newMsg');
+          }
+        }
+      } else if (
+        renderableMsg.info.from == username.your ||
+        renderableMsg.info.to == username.your
+      ) {
+        if (sesskey == sessionKey) {
+          me.renderMsg(renderableMsg, type, curChatMsg, sessionKey, 'newMsg');
+        }
+      }
+    },
+    onInput(e) {
       this.setData({
-        reason: e.target.value
-      })
+        reason: e.target.value,
+      });
     },
     shortScroll() {
       this.setData({
-        view: LIST_STATUS.SHORT
+        view: LIST_STATUS.SHORT,
       });
     },
 
     onTap() {
-      this.$emit("msglistTap", null, {
-        bubbles: true
+      this.$emit('msglistTap', null, {
+        bubbles: true,
       });
     },
 
-    onMsgTap(item){
+    onMsgTap(item) {
       // 别人发的消息
-      if(item.style !== 'self'){
+      if (item.style !== 'self') {
         this.setData({
           showRpt: true,
-          rptMsgId: item.id
-        })
+          rptMsgId: item.id,
+        });
       }
     },
 
-    onMenuClick(idx){
-      if(idx === 0){
+    onMenuClick(idx) {
+      if (idx === 0) {
         this.setData({
-          showRptType: true
-        })
+          showRptType: true,
+        });
       }
     },
 
-    reportMsg(){
-      let that = this
-      if(this.reason === ''){
+    reportMsg() {
+      let that = this;
+      if (this.reason === '') {
         this.$refs.uModal.clearLoading();
-        uni.showToast({title: "请填写举报原因",icon:'none'});
-        return false
+        uni.showToast({ title: '请填写举报原因', icon: 'none' });
+        return false;
       }
       WebIM.conn
         .reportMessage({
           reportType: that.rptType, // 举报类型
           reportReason: that.reason, // 举报原因。
-          messageId: that.rptMsgId // 上报消息id
+          messageId: that.rptMsgId, // 上报消息id
         })
         .then(() => {
-          uni.showToast({title: "举报成功",icon:'none'});
+          uni.showToast({ title: '举报成功', icon: 'none' });
         })
         .catch((e) => {
-           uni.showToast({title: "举报失败",icon:'none'});
-        }).finally(() => {
-            that.setData({
-              reason: '',
-              rptType: '',
-              rptMsgId: '',
-              show: false
-            })
+          uni.showToast({ title: '举报失败', icon: 'none' });
+        })
+        .finally(() => {
+          that.setData({
+            reason: '',
+            rptType: '',
+            rptMsgId: '',
+            show: false,
+          });
         });
     },
 
-    onReportTypeClick(idx){
+    onReportTypeClick(idx) {
       // 设置举报类型
       this.setData({
         rptType: this.typeList[idx].text,
-        show: true
-      })
+        show: true,
+      });
     },
-    
 
     previewImage(event) {
       var url = event.target.dataset.url;
       uni.previewImage({
-        urls: [url] // 需要预览的图片 http 链接列表
+        urls: [url], // 需要预览的图片 http 链接列表
       });
     },
 
     getHistoryMsg() {
       let me = this;
       let username = this.username;
-      let myUsername = uni.getStorageSync("myUsername");
-      let sessionKey = username.groupId ? username.groupId + myUsername : username.your + myUsername;
-      let historyChatMsgs = uni.getStorageSync("rendered_" + sessionKey) || [];
+      let myUsername = uni.getStorageSync('myUsername');
+      let sessionKey = username.groupId
+        ? username.groupId + myUsername
+        : username.your + myUsername;
+      let historyChatMsgs = uni.getStorageSync('rendered_' + sessionKey) || [];
 
       if (Index < historyChatMsgs.length) {
         let timesMsgList = historyChatMsgs.slice(-Index - 10, -Index);
         this.setData({
           chatMsg: timesMsgList.concat(me.chatMsg),
-          toView: timesMsgList[timesMsgList.length - 1].mid
+          toView: timesMsgList[timesMsgList.length - 1].mid,
         });
         Index += timesMsgList.length;
 
@@ -404,9 +499,9 @@ export default {
     renderMsg(renderableMsg, type, curChatMsg, sessionKey, isnew) {
       let me = this;
 
-      var historyChatMsgs = uni.getStorageSync("rendered_" + sessionKey) || []; 
+      var historyChatMsgs = uni.getStorageSync('rendered_' + sessionKey) || [];
 
-      historyChatMsgs = historyChatMsgs.concat(curChatMsg); 
+      historyChatMsgs = historyChatMsgs.concat(curChatMsg);
 
       if (!historyChatMsgs.length) return;
 
@@ -414,17 +509,17 @@ export default {
         this.setData({
           chatMsg: this.chatMsg.concat(curChatMsg),
           // 跳到最后一条
-          toView: historyChatMsgs[historyChatMsgs.length - 1].mid
+          toView: historyChatMsgs[historyChatMsgs.length - 1].mid,
         });
       } else {
         this.setData({
           chatMsg: historyChatMsgs.slice(-10),
           // 跳到最后一条
-          toView: historyChatMsgs[historyChatMsgs.length - 1].mid
+          toView: historyChatMsgs[historyChatMsgs.length - 1].mid,
         });
       }
 
-      uni.setStorageSync("rendered_" + sessionKey, historyChatMsgs);
+      uni.setStorageSync('rendered_' + sessionKey, historyChatMsgs);
       let chatMsg = uni.getStorageSync(sessionKey) || [];
       chatMsg.map(function (item, index) {
         curChatMsg.map(function (item2, index2) {
@@ -435,17 +530,17 @@ export default {
       });
       uni.setStorageSync(sessionKey, chatMsg);
       Index = historyChatMsgs.slice(-10).length;
-	  // setTimeout 兼容支付宝小程序
-	  setTimeout(() => {
-		  uni.pageScrollTo({
-		    scrollTop: 5000,
-		    duration: 300,
-		  		fail: (e) => {
-		  			//console.log('滚失败了', e)
-		  		}
-		  });
-	  }, 100)
-      
+      // setTimeout 兼容支付宝小程序
+      setTimeout(() => {
+        uni.pageScrollTo({
+          scrollTop: 5000,
+          duration: 300,
+          fail: (e) => {
+            //console.log('滚失败了', e)
+          },
+        });
+      }, 100);
+
       if (isFail) {
         this.renderFail(sessionKey);
       }
@@ -454,12 +549,15 @@ export default {
     renderFail(sessionKey) {
       let me = this;
       let msgList = me.chatMsg;
-      msgList.map(item => {
-        if (item.mid.substring(item.mid.length - 10) == curMsgMid.substring(curMsgMid.length - 10)) {
+      msgList.map((item) => {
+        if (
+          item.mid.substring(item.mid.length - 10) ==
+          curMsgMid.substring(curMsgMid.length - 10)
+        ) {
           item.msg.data[0].isFail = true;
           item.isFail = true;
           me.setData({
-            chatMsg: msgList
+            chatMsg: msgList,
           });
         }
       });
@@ -469,28 +567,20 @@ export default {
         me.curChatMsg[0].isShow = false;
       }
 
-      uni.setStorageSync("rendered_" + sessionKey, msgList);
+      uni.setStorageSync('rendered_' + sessionKey, msgList);
       isFail = false;
     },
-	
-	clickMsg(event){
-		if(typeof(event.target.dataset.msg) == 'object' && 
-			event.target.dataset.msg.msg.ext && 
-			event.target.dataset.msg.msg.ext.msg_extension){
-			this.$emit("clickMsg", event.target.dataset.msg.msg.ext)
-		}
-	},
+
     to_profile_page(userInfo) {
-        if(userInfo) {
-            uni.navigateTo({
-                url: `../profile/profile?otherProfile=${JSON.stringify(userInfo)}`
-            });
-        }
-       
-    }
-  }
+      if (userInfo) {
+        uni.navigateTo({
+          url: `../profile/profile?otherProfile=${JSON.stringify(userInfo)}`,
+        });
+      }
+    },
+  },
 };
 </script>
 <style>
-@import "./msglist.css";
+@import './msglist.css';
 </style>

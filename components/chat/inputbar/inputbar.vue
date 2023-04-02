@@ -64,10 +64,10 @@
             群信息
           </view>
           <view class="menu_wrap">
-			  <view class="account_box" @tap="openUserCardModal">
-				     <u-icon name="account" color="#2D2D2D" size="44"></u-icon>
-			  </view>
-			用户名片
+            <view class="account_box" @tap="openUserCardModal">
+              <u-icon name="account" color="#2D2D2D" size="44"></u-icon>
+            </view>
+            用户名片
           </view>
           <!-- <view class="menu_wrap" @tap="sendVideo">
             <image
@@ -91,25 +91,32 @@
         </view>
       </swiper-item>
     </swiper>
-	<chatUserCard ref="chatUserCard" :username="username" :chatType="chatType" @closeFunModal="closeFunModal" />
+    <chatUserCard
+      ref="chatUserCard"
+      :username="username"
+      :chatType="chatType"
+      @closeFunModal="closeFunModal"
+    />
   </view>
 </template>
 
 <script>
-let RecordStatus = require("./suit/audio/record_status").RecordStatus;
-let msgType = require("../msgtype");
-import chatSuitEmoji from "./suit/emoji/emoji";
-import chatSuitImage from "./suit/image/image";
-import chatSuitLocation from "./suit/location/location";
-import chatSuitMain from "./suit/main/main";
-import chatSuitPtopcall from "./suit/ptopcall/ptopcall.vue";
-import chatSuitAttach from "./suit/attach";
-import chatUserCard from "./suit/userCard/userCard"
+import { RecordStatus } from './suit/audio/record_status';
+// let RecordStatus = require("./suit/audio/record_status").RecordStatus;
+import msgType from '../msgtype';
+// let msgType = require('../msgtype');
+import chatSuitEmoji from './suit/emoji/emoji';
+import chatSuitImage from './suit/image/image';
+import chatSuitLocation from './suit/location/location';
+import chatSuitMain from './suit/main/main';
+import chatSuitPtopcall from './suit/ptopcall/ptopcall.vue';
+import chatSuitAttach from './suit/attach';
+import chatUserCard from './suit/userCard/userCard';
 // import chatSuitVideo from "./suit/videoComp/videoComp"
 
 let FUNMODAL_STATUS = {
-  OPENED: "showFunModal",
-  CLOSED: "fun_list"
+  OPENED: 'showFunModal',
+  CLOSED: 'fun_list',
 };
 
 export default {
@@ -122,10 +129,10 @@ export default {
         emoji: null,
         image: null,
         location: null,
-        video: null
+        video: null,
       },
-      isIPX: "",
-      showFunModal: FUNMODAL_STATUS.CLOSED
+      isIPX: '',
+      showFunModal: FUNMODAL_STATUS.CLOSED,
     };
   },
 
@@ -136,18 +143,18 @@ export default {
     chatSuitMain,
     chatSuitPtopcall,
     chatSuitAttach,
-	chatUserCard
+    chatUserCard,
     // chatSuitVideo
   },
   props: {
     username: {
       type: Object,
-      default: () => ({})
+      default: () => ({}),
     },
     chatType: {
       type: String,
-      default: msgType.chatType.SINGLE_CHAT
-    }
+      default: msgType.chatType.SINGLE_CHAT,
+    },
   },
 
   // lifetimes
@@ -161,7 +168,7 @@ export default {
 
   onLoad() {
     this.setData({
-      isIPX: false //getApp().globalData.isIPX
+      isIPX: false, //getApp().globalData.isIPX
     });
     // let comps = this.$data.__comps__;
     // comps.main = this.selectComponent("#chatSuitMain");
@@ -172,9 +179,9 @@ export default {
   methods: {
     // 事件有长度限制：仅限 26 字符
     toggleRecordModal() {
-      this.$emit("tapSendAudio", null, {
+      this.$emit('tapSendAudio', null, {
         bubbles: true,
-        composed: true
+        composed: true,
       });
     },
 
@@ -188,7 +195,7 @@ export default {
     openEmoji() {
       setTimeout(() => {
         this.setData({
-          showFunModal: FUNMODAL_STATUS.CLOSED
+          showFunModal: FUNMODAL_STATUS.CLOSED,
         });
       }, 100);
       this.$refs.chatSuitEmoji.openEmoji();
@@ -215,19 +222,19 @@ export default {
     },
 
     onMakeVideoCall() {
-      console.log("onMakeVideoCall -> inputbar");
-      this.$emit("makeVideoCall", null, "single");
+      console.log('onMakeVideoCall -> inputbar');
+      this.$emit('makeVideoCall', null, 'single');
     },
 
     openFunModal() {
       this.setData({
-        showFunModal: FUNMODAL_STATUS.OPENED
+        showFunModal: FUNMODAL_STATUS.OPENED,
       });
       this.cancelEmoji();
     },
     closeFunModal() {
       this.setData({
-        showFunModal: FUNMODAL_STATUS.CLOSED
+        showFunModal: FUNMODAL_STATUS.CLOSED,
       });
       this.cancelEmoji();
     },
@@ -239,20 +246,20 @@ export default {
       var nameList = {
         myName: this.username.myName,
         groupName: this.username.your,
-        roomId: this.username.groupId
+        roomId: this.username.groupId,
       };
       uni.navigateTo({
         url:
-          "../groupSetting/groupSetting?groupInfo=" + JSON.stringify(nameList)
+          '../groupSetting/groupSetting?groupInfo=' + JSON.stringify(nameList),
       });
     },
-	//打开用户卡片选择
-	openUserCardModal(){
-		this.$refs['chatUserCard'].showModal = true
-	}
-  }
+    //打开用户卡片选择
+    openUserCardModal() {
+      this.$refs['chatUserCard'].showModal = true;
+    },
+  },
 };
 </script>
 <style>
-@import "./inputbar.css";
+@import './inputbar.css';
 </style>

@@ -1,5 +1,5 @@
-module.exports = {
-  PLAYING: "playing",
-  PAUSE: "pause",
-  STOP: "stop"
+export default {
+  PLAYING: 'playing',
+  PAUSE: 'pause',
+  STOP: 'stop',
 };

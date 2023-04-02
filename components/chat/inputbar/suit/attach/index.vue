@@ -20,44 +20,48 @@
 </template>
 
 <script>
-let WebIM = require("../../../../../utils/WebIM")["default"];
-let msgType = require("../../../msgtype");
-let disp = require("../../../../../utils/broadcast");
-let msgStorage = require("../../../msgstorage");
-const str = WebIM.config.appkey.split("#");
+// let WebIM = require("../../../../../utils/WebIM")["default"];
+// let msgType = require("../../../msgtype");
+// let disp = require("../../../../../utils/broadcast");
+// let msgStorage = require("../../../msgstorage");
+import msgType from '@/components/chat/msgtype';
+import msgStorage from '@/components/chat/msgstorage';
+import disp from '@/utils/broadcast';
+const WebIM = uni.WebIM;
+const str = WebIM.config.appkey.split('#');
 const token = WebIM.conn.context.accessToken;
 export default {
   data() {
     return {
       option: {
         url: `https://a1.easemob.com/${str[0]}/${str[1]}/chatfiles `,
-        name: "file",
+        name: 'file',
         header: {
-          Authorization: `Bearer${token}`
-        }
+          Authorization: `Bearer${token}`,
+        },
       },
       // 选择文件后是否立即自动上传，true=选择后立即上传
       instantly: true,
       // 必传宽高且宽高应与slot宽高保持一致
-      width: "108rpx",
-      height: "155rpx",
+      width: '108rpx',
+      height: '155rpx',
       // 限制允许选择的格式，空串=不限制，默认为空
-      formats: "",
+      formats: '',
       // 文件上传大小限制
       size: 10,
       // 是否打印日志
-      debug: true
+      debug: true,
     };
   },
   props: {
     username: {
       type: Object,
-      default: () => ({})
+      default: () => ({}),
     },
     chatType: {
       type: String,
-      default: msgType.chatType.SINGLE_CHAT
-    }
+      default: msgType.chatType.SINGLE_CHAT,
+    },
   },
   onReady() {},
   methods: {
@@ -84,31 +88,31 @@ export default {
         accessToken: token,
         body: {
           type: msgType.FILE,
-          url: dataObj.uri + "/" + dataObj.entities[0].uuid,
+          url: dataObj.uri + '/' + dataObj.entities[0].uuid,
           filename: res.name,
           accessToken: token,
-          file_length: res.size
+          file_length: res.size,
         },
         from: me.username.myName,
         to: me.getSendToParam(),
         roomType: false,
         chatType: me.chatType,
         success: function (argument) {
-          disp.fire("em.chat.sendSuccess", id);
-        }
+          disp.fire('em.chat.sendSuccess', id);
+        },
       });
 
       if (this.isGroupChat()) {
-        msg.setGroup("groupchat");
+        msg.setGroup('groupchat');
       }
 
       WebIM.conn.send(msg.body);
       let obj = {
         msg: msg,
-        type: msgType.FILE
+        type: msgType.FILE,
       };
       this.saveSendMsg(obj);
-    }
-  }
+    },
+  },
 };
 </script>

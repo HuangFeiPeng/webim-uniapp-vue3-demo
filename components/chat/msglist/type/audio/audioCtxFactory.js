@@ -31,7 +31,7 @@ function proxier(ctx) {
   }
 }
 
-module.exports = {
+export default {} = {
   getCtx(mid) {
     let returnCtx = allCtx[mid];
 
@@ -45,7 +45,7 @@ module.exports = {
   },
 
   getAllCtx() {
-    uni.setStorageSync("allCtx", JSON.stringify(Object.keys(allCtx)));
+    uni.setStorageSync('allCtx', JSON.stringify(Object.keys(allCtx)));
     return allCtx;
   },
 
@@ -57,6 +57,5 @@ module.exports = {
     }
 
     return allComm;
-  }
-
+  },
 };

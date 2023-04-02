@@ -1,15 +1,23 @@
 <template>
-<view class="audio-player" @tap="audioPlay" :style="'opacity: ' + opcity">
-	<text class="time">语音消息 {{ time }}</text>
-	<view class="controls play-btn">
-		<image :src="style == 'self'? '../../../../../static/images/voicemsgmy.png' : '../../../../../static/images/voicemsg.png'"></image>
-	</view>
-</view>
+  <view class="audio-player" @tap="audioPlay" :style="'opacity: ' + opcity">
+    <text class="time">语音消息 {{ time }}</text>
+    <view class="controls play-btn">
+      <image
+        :src="
+          style == 'self'
+            ? '../../../../../static/images/voicemsgmy.png'
+            : '../../../../../static/images/voicemsg.png'
+        "
+      ></image>
+    </view>
+  </view>
 </template>
 
 <script>
-let audioCtxFc = require("./audioCtxFactory");
-let playStatus = require("./playStatus");
+import audioCtxFc from './audioCtxFactory';
+// let audioCtxFc = require("./audioCtxFactory");
+import playStatus from './playStatus';
+// let playStatus = require('./playStatus');
 
 export default {
   data() {
@@ -19,9 +27,9 @@ export default {
       time: "0'",
       opcity: 1,
       __comps__: {
-        audioCtx: null
+        audioCtx: null,
       },
-      style: ""
+      style: '',
     };
   },
 
@@ -29,8 +37,8 @@ export default {
   props: {
     msg: {
       type: Object,
-      val: {}
-    }
+      val: {},
+    },
   },
   obeyMuteSwitch: false,
   autoplay: true,
@@ -41,14 +49,16 @@ export default {
   beforeMount() {
     this.setData({
       time: this.msg.msg.length + "''",
-      style: this.msg.style
+      style: this.msg.style,
     });
   },
 
   moved() {},
 
   destroyed() {
-    let audioCtx = this.$data.__comps__.audioCtx = audioCtxFc.getCtx(this.msg.mid);
+    let audioCtx = (this.$data.__comps__.audioCtx = audioCtxFc.getCtx(
+      this.msg.mid
+    ));
     this.audioPause(audioCtx);
     this.delEvent(); //audioCtx.destroy();
   },
@@ -56,20 +66,22 @@ export default {
   mounted() {
     let self = this;
     let curl = '';
-    let audioCtx = this.$data.__comps__.audioCtx = audioCtxFc.getCtx(this.msg.mid);
+    let audioCtx = (this.$data.__comps__.audioCtx = audioCtxFc.getCtx(
+      this.msg.mid
+    ));
     audioCtx.autoplay = false;
     audioCtx.loop = false; //
 
     this.onPlaying = () => {
       //console.log("onPlaying", JSON.stringify(this.data));
       this.setData({
-        curStatus: playStatus.PLAYING
+        curStatus: playStatus.PLAYING,
       });
       uni.inter && clearInterval(uni.inter);
       uni.inter = setInterval(() => {
         let opcity = this.opcity;
         this.setData({
-          opcity: opcity == 1 ? 0.4 : 1
+          opcity: opcity == 1 ? 0.4 : 1,
         });
       }, 500);
     };
@@ -83,8 +95,7 @@ export default {
 
       this.setData({
         curStatus: playStatus.PAUSE,
-        opcity: 1 //time: "0'",
-
+        opcity: 1, //time: "0'",
       });
     };
 
@@ -92,23 +103,21 @@ export default {
       // console.log("onDone", JSON.stringify(this.data));
       this.setData({
         curStatus: playStatus.STOP,
-        opcity: 1 //time: "0'",
-
+        opcity: 1, //time: "0'",
       });
       clearInterval(uni.inter);
     }; // 多次播放会丢失这个回调
 
-
     this.onTimeUpdate = () => {
       this.setData({
-        time: (audioCtx.currentTime >> 0) + "'"
+        time: (audioCtx.currentTime >> 0) + "'",
       });
     };
 
     this.onWait = () => {
       uni.showToast({
-        title: "下载中...",
-        duration: 1000
+        title: '下载中...',
+        duration: 1000,
       });
     };
 
@@ -117,23 +126,23 @@ export default {
 
   methods: {
     audioPlay() {
-	if(uni.getSystemInfo().app === 'alipay'){
-		// https://forum.alipay.com/mini-app/post/7301031?ant_source=opendoc_recommend
-		uni.showToast({
-			duration: 2000,
-			title: '支付宝小程序不支持音频消息'
-		})
-		return 
-	}
+      if (uni.getSystemInfo().app === 'alipay') {
+        // https://forum.alipay.com/mini-app/post/7301031?ant_source=opendoc_recommend
+        uni.showToast({
+          duration: 2000,
+          title: '支付宝小程序不支持音频消息',
+        });
+        return;
+      }
       uni.inter && clearInterval(uni.inter);
       let audioCtx = this.$data.__comps__.audioCtx;
       var curl = '';
       uni.downloadFile({
         url: this.msg.msg.data,
         header: {
-          "X-Requested-With": "XMLHttpRequest",
-          Accept: "audio/mp3",
-          Authorization: "Bearer " + this.msg.msg.token
+          'X-Requested-With': 'XMLHttpRequest',
+          Accept: 'audio/mp3',
+          Authorization: 'Bearer ' + this.msg.msg.token,
         },
 
         success(res) {
@@ -145,19 +154,19 @@ export default {
         },
 
         fail(e) {
-          console.log("downloadFile failed", e);
+          console.log('downloadFile failed', e);
           uni.showToast({
-            title: "下载失败",
-            duration: 1000
+            title: '下载失败',
+            duration: 1000,
           });
-        }
-
+        },
       });
     },
 
     audioPause(auCtx) {
       //let audioCtx = this.data.__comps__.audioCtx;
-      let audioCtx = this.$data.__comps__.audioCtx = audioCtxFc.getCtx(this.msg.mid) || auCtx;
+      let audioCtx = (this.$data.__comps__.audioCtx =
+        audioCtxFc.getCtx(this.msg.mid) || auCtx);
       audioCtx && audioCtx.pause();
     },
 
@@ -182,11 +191,10 @@ export default {
       audioCtx.offError(this.onDone);
       audioCtx.offWaiting(this.onWait); // 多次播放会丢失这个回调，所以不用卸载
       // audioCtx.offTimeUpdate(this.onTimeUpdate);
-    }
-
-  }
+    },
+  },
 };
 </script>
 <style>
-@import "./audio.css";
+@import './audio.css';
 </style>

@@ -1,10 +1,13 @@
 <template>
-<view></view>
+  <view></view>
 </template>
 <script>
-let WebIM = require("../../../../../utils/WebIM")["default"];
-let msgType = require("../../../msgtype");
-let msgStorage = require("../../../msgstorage");
+// let WebIM = require('../../../../../utils/WebIM')['default'];
+import msgType from '@/components/chat/msgtype';
+// let msgType = require("../../../msgtype");
+import msgStorage from '@/components/chat/msgstorage';
+// let msgStorage = require('../../../msgstorage');
+const WebIM = uni.WebIM;
 export default {
   data() {
     return {};
@@ -14,12 +17,12 @@ export default {
   props: {
     username: {
       type: Object,
-      default: () => ({})
+      default: () => ({}),
     },
     chatType: {
       type: String,
-      default: msgType.chatType.SINGLE_CHAT
-    }
+      default: msgType.chatType.SINGLE_CHAT,
+    },
   },
   methods: {
     isGroupChat() {
@@ -33,12 +36,12 @@ export default {
     sendLocation() {
       var me = this;
       uni.authorize({
-        scope: "scope.userLocation",
+        scope: 'scope.userLocation',
 
         fail() {
           uni.showToast({
-            title: "已拒绝",
-            icon: "none"
+            title: '已拒绝',
+            icon: 'none',
           });
         },
 
@@ -56,7 +59,7 @@ export default {
               var id = WebIM.conn.getUniqueId();
               var msg = new WebIM.message(msgType.LOCATION, id);
               msg.set({
-                msg: "",
+                msg: '',
                 from: me.username.myName,
                 to: me.getSendToParam(),
                 roomType: false,
@@ -65,31 +68,27 @@ export default {
                 addr: respData.address,
                 chatType: me.chatType,
 
-                success(id, serverMsgId) {}
-
+                success(id, serverMsgId) {},
               });
 
               if (me.chatType == msgType.chatType.CHAT_ROOM) {
-                msg.setGroup("groupchat");
+                msg.setGroup('groupchat');
               }
 
               WebIM.conn.send(msg.body);
-                let obj = {
-                  msg: msg,
-                  type: msgType.IMAGE
-                }
+              let obj = {
+                msg: msg,
+                type: msgType.IMAGE,
+              };
               me.saveSendMsg(obj);
-            }
-
+            },
           });
-        }
-
+        },
       });
     },
     saveSendMsg(evt) {
       msgStorage.saveMsg(evt.msg, evt.type);
-    }
-
-  }
+    },
+  },
 };
 </script>
