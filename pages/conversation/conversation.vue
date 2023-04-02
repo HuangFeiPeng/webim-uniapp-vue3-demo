@@ -106,7 +106,7 @@
                     class="em-msgNum"
                     v-if="
                       item.unReadCount > 0 &&
-                      !pushConfigData.includes(
+                      !conversationState.pushConfigData.includes(
                         item.chatType === 'chat' ? item.username : item.info.to
                       )
                     "
