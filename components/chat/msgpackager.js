@@ -1,12 +1,11 @@
-import msgType from './msgtype.js'
+import msgType from './msgtype.js';
 let WebIM = uni.WebIM;
 
 // let msgType = require("./msgtype.js");
 
-
 function getMsgData(sendableMsg, type) {
   if (type == msgType.TEXT) {
-    return WebIM.parseEmoji(sendableMsg.value.replace(/\n/gm, ""));
+    return WebIM.parseEmoji(sendableMsg.value.replace(/\n/gm, ''));
   } else if (type == msgType.EMOJI) {
     return sendableMsg.value;
   } else if (
@@ -21,15 +20,15 @@ function getMsgData(sendableMsg, type) {
     return sendableMsg.body.customExts;
   }
 
-  return "";
+  return '';
 }
-const msgPackager =  function (sendableMsg, type, myName) {
-  console.log(sendableMsg, 'sendableMsg')
-//   var time = WebIM.time();
+const msgPackager = function (sendableMsg, type, myName) {
+  console.log(sendableMsg, 'sendableMsg');
+  //   var time = WebIM.time();
   var renderableMsg = {
     info: {
       from: sendableMsg.body.from,
-      to: sendableMsg.body.to
+      to: sendableMsg.body.to,
     },
     username:
       sendableMsg.body.from == myName
@@ -38,29 +37,29 @@ const msgPackager =  function (sendableMsg, type, myName) {
     yourname: sendableMsg.body.from,
     msg: {
       type: type,
-      url: sendableMsg.body.url ? sendableMsg.body.url : "",
+      url: sendableMsg.body.url ? sendableMsg.body.url : '',
       data: getMsgData(sendableMsg, type),
-      ext: sendableMsg.body.ext
+      ext: sendableMsg.body.ext,
     },
-    style: sendableMsg.body.from == myName ? "self" : "",
+    style: sendableMsg.body.from == myName ? 'self' : '',
     time: sendableMsg.time || Date.now(),
-    mid: sendableMsg.type + sendableMsg.id,
+    mid: sendableMsg.id,
     id: sendableMsg.id,
-    chatType: sendableMsg.body.chatType
+    chatType: sendableMsg.body.chatType,
   };
-  console.log('>>>>>>renderableMsg',renderableMsg)
+  console.log('>>>>>>renderableMsg', renderableMsg);
   if (type == msgType.IMAGE) {
     renderableMsg.msg.size = {
       width: sendableMsg.body.body.size.width,
-      height: sendableMsg.body.body.size.height
+      height: sendableMsg.body.body.size.height,
     };
   } else if (type == msgType.AUDIO) {
     renderableMsg.msg.length = sendableMsg.body.length;
   } else if (type == msgType.FILE) {
-    renderableMsg.msg.url = sendableMsg?.body?.body.url || "";
-    renderableMsg.msg.filename = sendableMsg?.body?.body.filename || "";
+    renderableMsg.msg.url = sendableMsg?.body?.body.url || '';
+    renderableMsg.msg.filename = sendableMsg?.body?.body.filename || '';
     renderableMsg.msg.size = sendableMsg?.body?.body.file_length || 0;
-  } else if (type == msgType.CUSTOM){
+  } else if (type == msgType.CUSTOM) {
     //由于自定义消息属于特殊消息结构因此单独进一步进行处理。
     renderableMsg.customEvent = sendableMsg.body.customEvent;
     renderableMsg.time = sendableMsg.body.time || Date.now();
@@ -69,7 +68,6 @@ const msgPackager =  function (sendableMsg, type, myName) {
   }
 
   return renderableMsg;
-
 };
 
-export default msgPackager
+export default msgPackager;

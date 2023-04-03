@@ -87,8 +87,8 @@ const toggleRecordModal = () => {
 const chatMsglistComp = ref(null);
 const normalScroll = () => {
   chatMsglistComp.value.normalScroll();
-  chatMsglistComp.value.cancelEmoji();
-  chatMsglistComp.value.closeFunModal();
+  chatInputbarComp.value.cancelEmoji();
+  chatInputbarComp.value.closeFunModal();
 };
 const getMore = () => {
   chatMsglistComp.value.getHistoryMsg();

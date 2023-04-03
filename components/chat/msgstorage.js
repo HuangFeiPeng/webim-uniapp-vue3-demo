@@ -1,14 +1,14 @@
-import Disp from '@/utils/Dispatcher.js'
+import Disp from '@/utils/Dispatcher.js';
 // let Disp = require("../../utils/Dispatcher.js");
-import msgPackager from './msgpackager.js'
+import msgPackager from './msgpackager.js';
 // let msgPackager = require("./msgpackager.js");
-import  msgType  from './msgtype.js'
+import msgType from './msgtype.js';
 // let msgType = require("./msgtype.js");
-import disp from '@/utils/broadcast.js'
+import disp from '@/utils/broadcast.js';
 let msgStorage = new Disp();
 
 msgStorage.saveReceiveMsg = function (receiveMsg, type) {
-  console.log(receiveMsg, 'receiveMsg')
+  console.log(receiveMsg, 'receiveMsg');
   let sendableMsg;
 
   if (type == msgType.IMAGE) {
@@ -22,7 +22,7 @@ msgStorage.saveReceiveMsg = function (receiveMsg, type) {
         type: receiveMsg.type,
         ext: receiveMsg.ext,
         chatType: receiveMsg.type,
-        toJid: "",
+        toJid: '',
         body: {
           type: type,
           url: receiveMsg.url,
@@ -30,11 +30,11 @@ msgStorage.saveReceiveMsg = function (receiveMsg, type) {
           filetype: receiveMsg.filetype,
           size: {
             width: receiveMsg.width,
-            height: receiveMsg.height
-          }
-        }
+            height: receiveMsg.height,
+          },
+        },
       },
-      time:receiveMsg.time
+      time: receiveMsg.time,
     };
   } else if (type == msgType.TEXT || type == msgType.EMOJI) {
     sendableMsg = {
@@ -47,24 +47,24 @@ msgStorage.saveReceiveMsg = function (receiveMsg, type) {
         type: receiveMsg.type,
         ext: receiveMsg.ext,
         chatType: receiveMsg.type,
-        toJid: "",
+        toJid: '',
         body: {
           type: type,
-          msg: receiveMsg.data
-        }
+          msg: receiveMsg.data,
+        },
       },
       value: receiveMsg.data,
-      time:receiveMsg.time
+      time: receiveMsg.time,
     };
-  } 
-  else if (type == 'INFORM') { // 通知消息
+  } else if (type == 'INFORM') {
+    // 通知消息
     sendableMsg = {
       body: {
         from: receiveMsg.from,
         to: receiveMsg.to,
         chatType: 'INFORM',
-        gid:receiveMsg.gid ? receiveMsg.gid:'',
-        type:receiveMsg.type
+        gid: receiveMsg.gid ? receiveMsg.gid : '',
+        type: receiveMsg.type,
       },
     };
   } else if (type == msgType.FILE) {
@@ -79,16 +79,16 @@ msgStorage.saveReceiveMsg = function (receiveMsg, type) {
         type: receiveMsg.type,
         ext: receiveMsg.ext,
         chatType: receiveMsg.type,
-        toJid: "",
+        toJid: '',
         body: {
           type: type,
           url: receiveMsg.url,
           filename: receiveMsg.filename,
-          file_length: receiveMsg.file_length
-        }
+          file_length: receiveMsg.file_length,
+        },
       },
       value: receiveMsg.data,
-      time:receiveMsg.time
+      time: receiveMsg.time,
     };
   } else if (type == msgType.AUDIO) {
     sendableMsg = {
@@ -103,17 +103,17 @@ msgStorage.saveReceiveMsg = function (receiveMsg, type) {
         type: receiveMsg.type,
         ext: receiveMsg.ext,
         chatType: receiveMsg.type,
-        toJid: "",
+        toJid: '',
         body: {
           type: type,
           url: receiveMsg.url,
           filename: receiveMsg.filename,
           filetype: receiveMsg.filetype,
           from: receiveMsg.from,
-          to: receiveMsg.to
-        }
+          to: receiveMsg.to,
+        },
       },
-      time:receiveMsg.time
+      time: receiveMsg.time,
     };
   } else if (type == msgType.VIDEO) {
     sendableMsg = {
@@ -128,36 +128,35 @@ msgStorage.saveReceiveMsg = function (receiveMsg, type) {
         type: receiveMsg.type,
         ext: receiveMsg.ext,
         chatType: receiveMsg.type,
-        toJid: "",
+        toJid: '',
         body: {
           type: type,
           url: receiveMsg.url,
           filename: receiveMsg.filename,
           filetype: receiveMsg.filetype,
           from: receiveMsg.from,
-          to: receiveMsg.to
+          to: receiveMsg.to,
         },
       },
-      time:receiveMsg.time
+      time: receiveMsg.time,
     };
-  } else if(type == msgType.CUSTOM) {
+  } else if (type == msgType.CUSTOM) {
     sendableMsg = {
+      id: receiveMsg.id,
+      type: type,
+      body: {
         id: receiveMsg.id,
-        type: type,
-        body: {
-            id: receiveMsg.id,
-            from: receiveMsg.from,
-            to: receiveMsg.to,
-            type: receiveMsg.type,
-            ext: receiveMsg.ext,
-            chatType: receiveMsg.type,
-            customEvent:receiveMsg.customEvent,
-            customExts:receiveMsg.customExts
-        },
-        time:receiveMsg.time
-    }
-  } 
-  else {
+        from: receiveMsg.from,
+        to: receiveMsg.to,
+        type: receiveMsg.type,
+        ext: receiveMsg.ext,
+        chatType: receiveMsg.type,
+        customEvent: receiveMsg.customEvent,
+        customExts: receiveMsg.customExts,
+      },
+      time: receiveMsg.time,
+    };
+  } else {
     return;
   }
 
@@ -166,18 +165,21 @@ msgStorage.saveReceiveMsg = function (receiveMsg, type) {
 
 msgStorage.saveMsg = function (sendableMsg, type, receiveMsg) {
   let me = this;
-  let myName = uni.getStorageSync("myUsername");
+  let myName = uni.getStorageSync('myUsername');
   let sessionKey; // 仅用作群聊收消息，发消息没有 receiveMsg
 
-  if (receiveMsg && receiveMsg.type == "groupchat") {
+  if (receiveMsg && receiveMsg.type == 'groupchat') {
     sessionKey = receiveMsg.to + myName;
-  } else if (sendableMsg.body.chatType === 'INFORM'){
-    sessionKey = 'INFORM'
+  } else if (sendableMsg.body.chatType === 'INFORM') {
+    sessionKey = 'INFORM';
   }
-  
+
   // 群聊发 & 单发 & 单收
   else {
-    sessionKey = sendableMsg.body.from == myName ? sendableMsg.body.to + myName : sendableMsg.body.from + myName;
+    sessionKey =
+      sendableMsg.body.from == myName
+        ? sendableMsg.body.to + myName
+        : sendableMsg.body.from + myName;
   }
 
   let curChatMsg = uni.getStorageSync(sessionKey) || [];
@@ -194,7 +196,6 @@ msgStorage.saveMsg = function (sendableMsg, type, receiveMsg) {
     renderableMsg.msg.token = sendableMsg.accessToken; //如果是音频则请求服务器转码
   }
 
-
   save();
 
   function save() {
@@ -207,9 +208,8 @@ msgStorage.saveMsg = function (sendableMsg, type, receiveMsg) {
           disp.fire('em.chat.audio.fileLoaded');
         }
 
-        me.fire("newChatMsg", renderableMsg, type, curChatMsg, sessionKey);
-      }
-
+        me.fire('newChatMsg', renderableMsg, type, curChatMsg, sessionKey);
+      },
     });
   }
 };
