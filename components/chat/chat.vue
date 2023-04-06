@@ -52,7 +52,7 @@ const props = defineProps({
   },
 });
 const { chatParams, chatType } = toRefs(props);
-
+console.log('chatType', chatType);
 console.log('props', props.chatParams);
 const chatState = reactive({
   __comps__: {

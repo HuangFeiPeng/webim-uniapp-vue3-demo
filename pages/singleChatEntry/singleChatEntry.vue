@@ -9,18 +9,22 @@
 
 <script setup>
 import { ref } from 'vue';
-import { onLoad, onUnload, onPullDownRefresh } from '@dcloudio/uni-app';
+import {
+  onLoad,
+  onUnload,
+  onPullDownRefresh,
+  onNavigationBarButtonTap,
+} from '@dcloudio/uni-app';
 import disp from '@/utils/broadcast';
-// let disp = require('../../utils/broadcast');
 import chat from '@/components/chat/chat.vue';
 
 const chatComp = ref(null);
 let chatParams = {};
-const onNavigationBarButtonTap = () => {
+onNavigationBarButtonTap(() => {
   uni.navigateTo({
-    url: `/pages/moreMenu/moreMenu?username=${username.your}&type=singleChat`,
+    url: `/pages/moreMenu/moreMenu?username=${chatParams.your}&type=singleChat`,
   });
-};
+});
 onLoad((options) => {
   let params = JSON.parse(options.username);
   chatParams = params;

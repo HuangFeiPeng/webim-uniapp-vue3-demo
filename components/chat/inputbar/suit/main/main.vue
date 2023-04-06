@@ -96,7 +96,7 @@ const blur = () => {
   });
 };
 const isGroupChat = () => {
-  return chatType == msgType.chatType.CHAT_ROOM;
+  return chatType.value == msgType.chatType.CHAT_ROOM;
 };
 
 const getSendToParam = () => {

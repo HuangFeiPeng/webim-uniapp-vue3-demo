@@ -18,7 +18,7 @@ const $emits = defineEmits(['deleteChatItem']);
 const translateX = ref(0);
 const deleteItem = (e) => {
   translateX.value = 0;
-  $emit(
+  $emits(
     'deleteChatItem',
     {},
     {

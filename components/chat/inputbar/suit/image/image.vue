@@ -19,7 +19,7 @@ const props = defineProps({
 });
 const { chatParmas, chatType } = toRefs(props);
 const isGroupChat = () => {
-  return chatType == msgType.chatType.CHAT_ROOM;
+  return chatType.value == msgType.chatType.CHAT_ROOM;
 };
 const getSendToParam = () => {
   return isGroupChat() ? chatParmas.groupId : chatParmas.your;

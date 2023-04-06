@@ -286,7 +286,6 @@ const conversationState = reactive({
   defaultGroupAvatar: '/static/images/groupTheme.png',
 });
 onLoad(() => {
-  console.log('>>>>>onLoad');
   disp.on('em.subscribe', onChatPageSubscribe);
   //监听解散群
   disp.on('em.invite.deleteGroup', onChatPageDeleteGroup);
@@ -307,7 +306,6 @@ onLoad(() => {
   readJoinedGroupName();
 });
 onShow(() => {
-  console.log('>>>>onShow');
   uni.hideHomeButton && uni.hideHomeButton();
   setTimeout(() => {
     getLocalConversationlist();
@@ -338,7 +336,10 @@ const showConversationAvatar = computed(() => {
       } else {
         return conversationState.defaultAvatar;
       }
-    } else if (item.chatType === 'groupchat' || item.chatType === 'chatRoom') {
+    } else if (
+      item.chatType.toLowerCase() === 'groupchat' ||
+      item.chatType === 'chatRoom'
+    ) {
       return conversationState.defaultGroupAvatar;
     }
   };
@@ -375,7 +376,10 @@ const showConversationName = computed(() => {
       } else {
         return item.username;
       }
-    } else if (item.chatType === 'groupchat' || item.chatType === 'chatRoom') {
+    } else if (
+      item.chatType === msgtype.chatType.GROUP_CHAT ||
+      item.chatType === msgtype.chatType.CHAT_ROOM
+    ) {
       return item.groupName;
     }
   };
@@ -535,11 +539,10 @@ const packageConversation = (newChatMsgKeys, historyChatMsgKeys) => {
       }
     }
     if (
-      lastChatMsg &&
-      (lastChatMsg.chatType == 'groupchat' ||
-        lastChatMsg.chatType == 'chatRoom')
+      lastChatMsg.chatType == msgtype.chatType.GROUP_CHAT ||
+      lastChatMsg.chatType == msgtype.chatType.CHAT_ROOM
     ) {
-      lastChatMsg.groupName = me.groupName[lastChatMsg.info.to];
+      lastChatMsg.groupName = conversationState.groupName[lastChatMsg.info.to];
     }
     lastChatMsg &&
       lastChatMsg.username != myName &&
@@ -551,10 +554,11 @@ const packageConversation = (newChatMsgKeys, historyChatMsgKeys) => {
       lastChatMsg = newChatMsgs[newChatMsgs.length - 1];
       lastChatMsg.unReadCount = newChatMsgs.length;
       if (
-        lastChatMsg.chatType == 'groupchat' ||
-        lastChatMsg.chatType == 'chatRoom'
+        lastChatMsg.chatType == msgtype.chatType.GROUP_CHAT ||
+        lastChatMsg.chatType == msgtype.chatType.CHAT_ROOM
       ) {
-        lastChatMsg.groupName = me.groupName[lastChatMsg.info.to];
+        lastChatMsg.groupName =
+          conversationState.groupName[lastChatMsg.info.to];
       }
       lastChatMsg.username != myName && conversationList.push(lastChatMsg);
     }
@@ -646,8 +650,8 @@ const tab_notification = () => {
 const into_chatRoom = (event) => {
   let detail = JSON.parse(event.currentTarget.dataset.item);
   if (
-    detail.chatType == 'groupchat' ||
-    detail.chatType == 'chatRoom' ||
+    detail.chatType == msgtype.chatType.GROUP_CHAT ||
+    detail.chatType == msgtype.chatType.CHAT_ROOM ||
     detail.groupName
   ) {
     into_groupChatRoom(detail);
@@ -683,7 +687,8 @@ const into_groupChatRoom = (detail) => {
     groupId: detail.info.to,
   };
   uni.navigateTo({
-    url: '../groupChatRoom/groupChatRoom?username=' + JSON.stringify(nameList),
+    url:
+      '../groupChatEntry/groupChatEntry?username=' + JSON.stringify(nameList),
   });
 };
 const into_inform = () => {
@@ -709,6 +714,7 @@ const removeAndRefresh = (event) => {
 
 const del_chat = (event) => {
   let detail = event.currentTarget.dataset.item;
+  let nameList = {};
   // 删除当前选中群组聊天列表
   if (detail.chatType == 'groupchat' || detail.chatType == 'chatRoom') {
     nameList = {
