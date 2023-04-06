@@ -1,12 +1,12 @@
 <template>
   <view class="main">
     <view class="main">
-      <!-- <chatSuitAudio
+      <chatSuitAudio
         ref="chatSuitAudioComp"
-        :username="chatParams"
+        :chatParams="chatParams"
         :chatType="chatType"
         @newAudioMsg="saveSendMsg"
-      ></chatSuitAudio> -->
+      ></chatSuitAudio>
 
       <chatMsglist
         ref="chatMsglistComp"
@@ -15,9 +15,9 @@
         id="chat-msglist"
       ></chatMsglist>
     </view>
-    <!-- <chatInputbar
+    <chatInputbar
       ref="chatInputbarComp"
-      :username="username"
+      :chatParams="chatParams"
       :chatType="chatType"
       @newTextMsg="saveSendMsg"
       @newImageMsg="saveSendMsg"
@@ -26,7 +26,7 @@
       @tapSendAudio="toggleRecordModal"
       @inputFocused="shortScroll"
       @inputBlured="normalScroll"
-    ></chatInputbar> -->
+    ></chatInputbar>
   </view>
 </template>
 
@@ -127,7 +127,7 @@ defineExpose({
 
 //   mounted() {
 //
-//     uni.$on('createConfrSuccess', this.onCreateConfrSuccess);
+//
 //   },
 
 //   moved() {},

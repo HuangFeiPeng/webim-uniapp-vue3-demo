@@ -30,7 +30,7 @@
 .message {
 	width: 100%;
 	height: auto;
-	padding: 0 30rpx;
+	/* padding: 0 30rpx; */
 	position: relative;
 
 }

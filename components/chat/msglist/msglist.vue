@@ -565,6 +565,7 @@ const reportMsg = () => {
 defineExpose({
   normalScroll,
   getHistoryMsg,
+  shortScroll,
 });
 </script>
 <style>

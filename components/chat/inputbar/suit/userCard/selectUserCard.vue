@@ -1,92 +1,111 @@
 <template>
-  <view>
-    <u-modal
-      class="selcet_modal"
+  <uni-popup ref="selectUserCard" type="dialog">
+    <uni-popup-dialog
       title="选择好友名片"
-      v-model="showSelectUserModal"
-      :show-cancel-button="true"
+      placeholder="请输入内容"
       @confirm="confirmPicked"
-      @cancel="cannelPick"
+      @close="cannelPick"
     >
       <scroll-view scroll-y="true" class="scroll-Y" @touchmove.stop>
-        <!-- <u-radio-group v-model="value" :wrap="true">
-          <u-radio
-            v-for="(item, index) in friendList"
-            :key="index"
-            :name="item.hxId"
-          >
-            {{ item.nickname || item.hxId }}
-          </u-radio>
-        </u-radio-group> -->
         <uni-data-checkbox
-          v-model="value"
-          :localdata="range"
-          @change="change"
-          wrap
+          v-model="selectUserCardState.value"
+          :localdata="selectUserCardState.friendList"
+          :wrap="true"
         ></uni-data-checkbox>
       </scroll-view>
-    </u-modal>
-  </view>
+    </uni-popup-dialog>
+  </uni-popup>
 </template>
 
-<script>
-export default {
-  props: {
-    showModal: {
-      type: Boolean,
-      default: false,
-    },
+<script setup>
+import { ref, reactive, watch, onMounted, toRefs } from 'vue';
+import uniPopup from '@/components/uni-popup/uni-popup.vue';
+const props = defineProps({
+  showModal: {
+    type: Boolean,
+    default: false,
   },
-  data() {
-    return {
-      showSelectUserModal: this.showModal,
-      friendList: [],
-      value: '',
-    };
-  },
-  watch: {
-    showModal(newVal, oldVal) {
-      console.log('>>>>监听到showModal', newVal);
-      if (newVal) {
-        this.initFriendList();
-      }
-      this.showSelectUserModal = newVal;
-    },
-  },
-  methods: {
-    initFriendList() {
-      const friendUserInfos = getApp().globalData.friendUserInfoMap;
-      const membersList = uni.getStorageSync('member');
-      let friendList = [];
-      membersList.length &&
-        membersList.map((item) => {
-          const member = {
-            hxId: '',
-            nickname: '',
-          };
-          item.name && (member.hxId = item.name);
-          if (friendUserInfos.has(item.name)) {
-            friendUserInfos.get(item.name)?.nickname
-              ? (member.nickname = friendUserInfos.get(item.name).nickname)
-              : item.name;
-          }
-          return friendList.push(member);
-        });
-      console.log('friendList', friendList);
-      this.friendList = friendList;
-    },
-    confirmPicked() {
-      const callback = () => {
-        this.value = '';
-      };
-      this.$emit('sendUserCardMessage', this.value, callback);
-    },
-    cannelPick() {
-      this.value = '';
-      this.$parent.showModal = false;
-    },
-  },
+});
+const $emits = defineEmits(['sendUserCardMessage', 'changeShowModal']);
+const { showModal } = toRefs(props);
+const selectUserCardState = reactive({
+  showSelectUserModal: false,
+  friendList: [],
+  value: '',
+});
+onMounted(() => {
+  selectUserCardState.showSelectUserModal = showModal.value;
+});
+watch(showModal, (newVal) => {
+  console.log('>>>>监听到showModal', newVal);
+  if (newVal) {
+    initFriendList();
+  }
+  selectUserCardState.showSelectUserModal = newVal;
+  handleModal();
+});
+const selectUserCard = ref(null);
+const handleModal = () => {
+  if (selectUserCardState.showSelectUserModal) {
+    selectUserCard.value.open();
+  } else {
+    selectUserCard.value.close();
+  }
 };
+const initFriendList = () => {
+  const friendUserInfos = getApp().globalData.friendUserInfoMap;
+  const membersList = uni.getStorageSync('member');
+  let friendList = [];
+  membersList.length &&
+    membersList.map((item) => {
+      const member = {
+        text: '',
+        value: '',
+      };
+      item.name && (member.value = item.name);
+      if (
+        friendUserInfos.has(item.name) &&
+        friendUserInfos.get(item.name).nickname
+      ) {
+        member.text = friendUserInfos.get(item.name).nickname;
+      } else {
+        member.text = item.name;
+      }
+      console.log('member', member);
+      return friendList.push(member);
+    });
+  selectUserCardState.friendList = friendList;
+  console.log('friendList', friendList);
+};
+
+const confirmPicked = () => {
+  const callback = () => {
+    selectUserCardState.value = '';
+  };
+  $emits('sendUserCardMessage', selectUserCardState.value, callback);
+};
+const cannelPick = () => {
+  selectUserCardState.showSelectUserModal = false;
+  $emits('changeShowModal');
+};
+// export default {
+//   props: {
+
+//   },
+//   data() {
+//     return {
+
+//     };
+//   },
+//   watch: {
+//     showModal(newVal, oldVal) {
+//
+//     },
+//   },
+//   methods: {
+
+//   },
+// };
 </script>
 <style lang="scss" scoped>
 // .slot-content {
@@ -97,6 +116,9 @@ export default {
 // /deep/ .u-mode-center-box {
 //   padding: 0 50rpx;
 // }
+:deep(.checklist-box) {
+  width: 100%;
+}
 .scroll-Y {
   height: 300rpx;
 }

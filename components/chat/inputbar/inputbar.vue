@@ -1,41 +1,38 @@
 <template>
   <view class="room_bar">
     <chatSuitEmoji
-      ref="chatSuitEmoji"
+      ref="chatSuitEmojiComp"
       @newEmojiStr="emojiAction"
     ></chatSuitEmoji>
     <chatSuitMain
-      ref="chatSuitMain"
-      :username="username"
+      ref="chatSuitMainComp"
+      :chatParams="chatParams"
       :chatType="chatType"
       @inputFocused="closeAllModal"
       @openEmoji="openEmoji"
       @openRecordModal="toggleRecordModal"
       @openFunModal="openFunModal"
+      @cancelEmoji="cancelEmoji"
+      @closeFunModal="closeFunModal"
     ></chatSuitMain>
     <chatSuitImage
-      ref="chatSuitImage"
-      :username="username"
+      ref="chatSuitImageComp"
+      :chatParams="chatParams"
       :chatType="chatType"
     ></chatSuitImage>
-    <!-- <chat-suit-location id="chat-suit-location" username="{{ username }}"></chat-suit-location> -->
-    <!-- <chat-suit-video ref="chatSuitVideo" :username="username"></chat-suit-video> -->
-    <chatSuitPtopcall
-      ref="chatSuitPtopcall"
-      :chatType="chatType"
-      @makeVideoCall="onMakeVideoCall"
-    >
-    </chatSuitPtopcall>
-
+    <!-- <chat-suit-location id="chat-suit-location" chatParams="{{ chatParams }}"></chat-suit-location> -->
+    <!-- <chat-suit-video ref="chatSuitVideo" :chatParams="chatParams"></chat-suit-video> -->
     <swiper
-      :class="showFunModal"
+      :class="inputbarState.showFunModal"
       :indicator-dots="true"
       :autoplay="false"
       :interval="5000"
       :duration="1000"
     >
       <swiper-item>
-        <view :class="'other_func ' + (isIPX ? 'other_func_X' : '')">
+        <view
+          :class="'other_func ' + (inputbarState.isIPX ? 'other_func_X' : '')"
+        >
           <view class="open_camera" @tap="openCamera">
             <image src="/static/images/camora.png"></image>
             相机
@@ -46,7 +43,7 @@
           </view>
           <!-- #ifdef APP-PLUS -->
           <view class="menu_wrap">
-            <chatSuitAttach :username="username" :chatType="chatType">
+            <chatSuitAttach :chatParams="chatParams" :chatType="chatType">
               <image
                 style="background-color: #fff"
                 src="/static/images/file.png"
@@ -65,7 +62,7 @@
           </view>
           <view class="menu_wrap">
             <view class="account_box" @tap="openUserCardModal">
-              <u-icon name="account" color="#2D2D2D" size="44"></u-icon>
+              <!-- <u-icon name="account" color="#2D2D2D" size="44"></u-icon> -->
             </view>
             用户名片
           </view>
@@ -82,7 +79,7 @@
             />
           </view>
 
-          <view class="v-record" @tap="callVideo" v-if="username.groupId">
+          <view class="v-record" @tap="callVideo" v-if="chatParams.groupId">
             <image
               src="/static/images/call2x.png"
               style="height: 24px; width: 15px"
@@ -92,24 +89,23 @@
       </swiper-item>
     </swiper>
     <chatUserCard
-      ref="chatUserCard"
-      :username="username"
+      ref="chatUserCardComp"
+      :chatParams="chatParams"
       :chatType="chatType"
       @closeFunModal="closeFunModal"
     />
   </view>
 </template>
 
-<script>
+<script setup>
+import { reactive, ref, toRefs } from 'vue';
+import { onLoad, onShow, onUnload } from '@dcloudio/uni-app';
 import { RecordStatus } from './suit/audio/record_status';
-// let RecordStatus = require("./suit/audio/record_status").RecordStatus;
 import msgType from '../msgtype';
-// let msgType = require('../msgtype');
 import chatSuitEmoji from './suit/emoji/emoji';
 import chatSuitImage from './suit/image/image';
-import chatSuitLocation from './suit/location/location';
+// import chatSuitLocation from './suit/location/location';
 import chatSuitMain from './suit/main/main';
-import chatSuitPtopcall from './suit/ptopcall/ptopcall.vue';
 import chatSuitAttach from './suit/attach';
 import chatUserCard from './suit/userCard/userCard';
 // import chatSuitVideo from "./suit/videoComp/videoComp"
@@ -118,147 +114,101 @@ let FUNMODAL_STATUS = {
   OPENED: 'showFunModal',
   CLOSED: 'fun_list',
 };
-
-export default {
-  data() {
-    return {
-      recordStatus: RecordStatus.HIDE,
-      RecordStatus,
-      __comps__: {
-        main: null,
-        emoji: null,
-        image: null,
-        location: null,
-        video: null,
-      },
-      isIPX: '',
-      showFunModal: FUNMODAL_STATUS.CLOSED,
-    };
+/* props */
+const props = defineProps({
+  chatParams: {
+    type: Object,
+    default: () => ({}),
+    required: true,
   },
-
-  components: {
-    chatSuitEmoji,
-    chatSuitImage,
-    chatSuitLocation,
-    chatSuitMain,
-    chatSuitPtopcall,
-    chatSuitAttach,
-    chatUserCard,
-    // chatSuitVideo
+  chatType: {
+    type: String,
+    default: msgType.chatType.SINGLE_CHAT,
+    required: true,
   },
-  props: {
-    username: {
-      type: Object,
-      default: () => ({}),
-    },
-    chatType: {
-      type: String,
-      default: msgType.chatType.SINGLE_CHAT,
-    },
+});
+const { chatParams, chatType } = toRefs(props);
+/* emits */
+const $emits = defineEmits(['tapSendAudio']);
+const inputbarState = reactive({
+  recordStatus: RecordStatus.HIDE,
+  RecordStatus,
+  __comps__: {
+    main: null,
+    emoji: null,
+    image: null,
+    location: null,
+    video: null,
   },
-
-  // lifetimes
-  created() {},
-
-  beforeMount() {},
-
-  moved() {},
-
-  destroyed() {},
-
-  onLoad() {
-    this.setData({
-      isIPX: false, //getApp().globalData.isIPX
-    });
-    // let comps = this.$data.__comps__;
-    // comps.main = this.selectComponent("#chatSuitMain");
-    // comps.emoji = this.selectComponent("#chatSuitEmoji");
-    // comps.image = this.selectComponent("#chatSuitImage");
-  },
-
-  methods: {
-    // 事件有长度限制：仅限 26 字符
-    toggleRecordModal() {
-      this.$emit('tapSendAudio', null, {
-        bubbles: true,
-        composed: true,
-      });
-    },
-
-    // sendVideo(){
-    // 	this.$refs.chatSuitVideo.sendVideo();
-    // },
-    openCamera() {
-      this.$refs.chatSuitImage.openCamera();
-    },
-
-    openEmoji() {
-      setTimeout(() => {
-        this.setData({
-          showFunModal: FUNMODAL_STATUS.CLOSED,
-        });
-      }, 100);
-      this.$refs.chatSuitEmoji.openEmoji();
-    },
-
-    cancelEmoji() {
-      this.$refs.chatSuitEmoji.cancelEmoji();
-    },
-
-    sendImage() {
-      this.$refs.chatSuitImage.sendImage();
-    },
-
-    sendLocation() {
-      // this.data.__comps__.location.sendLocation();
-    },
-
-    emojiAction(evt) {
-      this.$refs.chatSuitMain.emojiAction(evt.msg);
-    },
-
-    callVideo() {
-      this.$refs.chatSuitPtopcall.show();
-    },
-
-    onMakeVideoCall() {
-      console.log('onMakeVideoCall -> inputbar');
-      this.$emit('makeVideoCall', null, 'single');
-    },
-
-    openFunModal() {
-      this.setData({
-        showFunModal: FUNMODAL_STATUS.OPENED,
-      });
-      this.cancelEmoji();
-    },
-    closeFunModal() {
-      this.setData({
-        showFunModal: FUNMODAL_STATUS.CLOSED,
-      });
-      this.cancelEmoji();
-    },
-    closeAllModal() {
-      this.cancelEmoji();
-      this.closeFunModal();
-    },
-    edit_group() {
-      var nameList = {
-        myName: this.username.myName,
-        groupName: this.username.your,
-        roomId: this.username.groupId,
-      };
-      uni.navigateTo({
-        url:
-          '../groupSetting/groupSetting?groupInfo=' + JSON.stringify(nameList),
-      });
-    },
-    //打开用户卡片选择
-    openUserCardModal() {
-      this.$refs['chatUserCard'].showModal = true;
-    },
-  },
+  isIPX: '',
+  showFunModal: FUNMODAL_STATUS.CLOSED,
+});
+onLoad(() => {
+  inputbarState.isIPX = false;
+});
+// 事件有长度限制：仅限 26 字符
+const toggleRecordModal = () => {
+  $emits('tapSendAudio', null, {
+    bubbles: true,
+    composed: true,
+  });
 };
+const chatSuitEmojiComp = ref(null);
+const openEmoji = () => {
+  setTimeout(() => {
+    inputbarState.showFunModal = FUNMODAL_STATUS.CLOSED;
+  }, 100);
+  chatSuitEmojiComp.value.openEmoji();
+};
+const cancelEmoji = () => {
+  chatSuitEmojiComp.value.cancelEmoji();
+};
+const chatSuitImageComp = ref(null);
+const openCamera = () => {
+  chatSuitImageComp.value.openCamera();
+};
+
+const sendImage = () => {
+  chatSuitImageComp.value.sendImage();
+};
+const chatSuitMainComp = ref(null);
+const emojiAction = (evt) => {
+  chatSuitMainComp.value.emojiAction(evt.msg);
+};
+const openFunModal = () => {
+  inputbarState.showFunModal = FUNMODAL_STATUS.OPENED;
+  cancelEmoji();
+};
+const closeFunModal = () => {
+  inputbarState.showFunModal = FUNMODAL_STATUS.CLOSED;
+  cancelEmoji();
+};
+const closeAllModal = () => {
+  cancelEmoji();
+  closeFunModal();
+};
+const edit_group = () => {
+  const nameList = {
+    myName: chatParams.myName,
+    groupName: chatParams.your,
+    roomId: chatParams.groupId,
+  };
+  uni.navigateTo({
+    url: '../groupSetting/groupSetting?groupInfo=' + JSON.stringify(nameList),
+  });
+};
+//打开用户卡片选择
+const chatUserCardComp = ref(null);
+const openUserCardModal = () => {
+  console.log('>>>>>>>openUserCardModal');
+  chatUserCardComp.value.showModal = true;
+};
+
+defineExpose({
+  cancelEmoji,
+  closeFunModal,
+  toggleRecordModal,
+});
 </script>
 <style>
 @import './inputbar.css';
