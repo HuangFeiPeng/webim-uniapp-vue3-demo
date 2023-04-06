@@ -12,54 +12,54 @@
   </view>
 </template>
 
-<script>
-export default {
-  name: "long-press-modal",
-  props: {
-    /* 窗口尺寸 */
-    winSize: {
-      type: Object,
-      default() {
-        return {
-          witdh: 375,
-          height: 603,
-        };
-      },
-    },
-    /* 显示操作弹窗 */
-    showPop: {
-      type: Boolean,
-      default: false,
-    },
-    /* 弹窗按钮列表 */
-    popButton: {
-      type: Array,
-      default() {
-        // 如下
-        // return ["标为关注", "置顶聊天", "删除该聊天"]
-        return [];
-      },
-    },
-    /* 弹窗定位样式 */
-    popStyle: {
-      type: String,
-      default: "",
-    },
-    change:{
-      type:Function,
-    }
-  },
-  methods: {
-    /* 隐藏弹窗 */
-    hidePop() {
-      this.$emit('hidePop')
-    },
-    /* 选择菜单 */
-    pickerMenu() {
-      this.$emit('change')
-      this.hidePop();
+<script setup>
+import { toRefs } from 'vue';
+/* props */
+const props = defineProps({
+  /* 窗口尺寸 */
+  winSize: {
+    type: Object,
+    default() {
+      return {
+        witdh: 375,
+        height: 603,
+      };
     },
   },
+  /* 显示操作弹窗 */
+  showPop: {
+    type: Boolean,
+    default: false,
+  },
+  /* 弹窗按钮列表 */
+  popButton: {
+    type: Array,
+    default() {
+      // 如下
+      // return ["标为关注", "置顶聊天", "删除该聊天"]
+      return [];
+    },
+  },
+  /* 弹窗定位样式 */
+  popStyle: {
+    type: String,
+    default: '',
+  },
+  change: {
+    type: Function,
+  },
+});
+const { winSize, showPop, popButton, popStyle, change } = toRefs(props);
+/* emits */
+const $emits = defineEmits(['hidePop', 'change']);
+/* 隐藏弹窗 */
+const hidePop = () => {
+  $emits('hidePop');
+};
+/* 选择菜单 */
+const pickerMenu = () => {
+  $emits('change');
+  hidePop();
 };
 </script>
 <style scoped lang="scss">
