@@ -34,6 +34,40 @@
         "navigationBarTitleText": "设置"
       }
     },
+	{
+		"path": "pages/inform/inform",
+		"style": {
+			"navigationBarBackgroundColor": "#f2f2f2",
+			"navigationBarTextStyle": "black",
+			"navigationBarTitleText": "申请与通知"
+		}
+	},
+	{
+		"path": "pages/notification/notification",
+		"style": {
+			"navigationBarBackgroundColor": "#ffffff",
+			"navigationBarTextStyle": "black",
+			"backgroundTextStyle": "light",
+			"navigationBarTitleText": "环信"
+		}
+	},
+	{
+		"path": "pages/notification_groupDetail/groupDetail",
+		"style": {
+			"navigationBarBackgroundColor": "#ffffff",
+			"backgroundTextStyle": "light",
+			"navigationBarTitleText": "加群组申请"
+		}
+	},
+	{
+		"path": "pages/notification_friendDetail/friendDetail",
+		"style": {
+			"navigationBarBackgroundColor": "#ffffff",
+			"backgroundTextStyle": "light",
+			"navigationBarTextStyle": "black",
+			"navigationBarTitleText": "加好友申请"
+		}
+	},
     {
       "path": "pages/singleChatEntry/singleChatEntry",
       "style": {
