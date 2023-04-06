@@ -189,10 +189,11 @@ const closeAllModal = () => {
 };
 const edit_group = () => {
   const nameList = {
-    myName: chatParams.myName,
-    groupName: chatParams.your,
-    roomId: chatParams.groupId,
+    myName: chatParams.value.myName,
+    groupName: chatParams.value.your,
+    roomId: chatParams.value.groupId,
   };
+  console.log('>>>>>群信息', nameList);
   uni.navigateTo({
     url: '../groupSetting/groupSetting?groupInfo=' + JSON.stringify(nameList),
   });
