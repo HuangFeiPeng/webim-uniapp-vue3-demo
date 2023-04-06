@@ -76,6 +76,14 @@
 		}
 	},
 	{
+		"path": "pages/add_new/add_new",
+		"style": {
+			"navigationBarBackgroundColor": "#f2f2f2",
+			"navigationBarTextStyle": "black",
+			"navigationBarTitleText": "添加好友"
+		}
+	},
+	{
 		"path": "pages/groups/groups",
 		"style": {
 			"navigationBarBackgroundColor": "#f2f2f2",
