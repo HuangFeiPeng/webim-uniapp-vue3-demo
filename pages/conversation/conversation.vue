@@ -762,6 +762,7 @@ const removeLocalStorage = (yourname) => {
 };
 const longpress = (e) => {
   //将当前选中的值存在data中方便后续操作
+  //!此处已经给uni-app官方提了bug，H5存在事件event不返回touches字段的问题，待后续修复。
   conversationState.currentVal = e;
   let [touches, style, index] = [
     e.touches[0],
