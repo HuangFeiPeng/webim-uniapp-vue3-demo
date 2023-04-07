@@ -132,18 +132,28 @@ export default {
           title: '正在初始化客户端..',
           mask: true,
         });
-        this.curOpenOpt = opt;
-        WebIM.conn
-          .open(opt)
-          .then(() => {
-            //token获取成功，即可开始请求用户属性。
-            disp.fire('em.mian.profile.update');
-            disp.fire('em.mian.friendProfile.update');
-          })
-          .catch((err) => {
-            console.log('>>>>>token获取失败', err);
-          });
-        this.closed = false;
+        const actionOpen = () => {
+          this.curOpenOpt = opt;
+          WebIM.conn
+            .open(opt)
+            .then(() => {
+              //token获取成功，即可开始请求用户属性。
+              disp.fire('em.mian.profile.update');
+              disp.fire('em.mian.friendProfile.update');
+            })
+            .catch((err) => {
+              console.log('>>>>>token获取失败', err);
+            });
+          this.closed = false;
+        };
+        if (WebIM.conn.isOpened()) {
+          WebIM.conn.close();
+          setTimeout(() => {
+            actionOpen();
+          }, 300);
+        } else {
+          actionOpen();
+        }
       },
 
       reopen() {
