@@ -65,13 +65,17 @@ const audioState = reactive({
   changedTouches: null,
   recordStatus: RecordStatus.HIDE,
   radomHeight: InitHeight,
-  recorderManager: uni.getRecorderManager && uni.getRecorderManager(),
+  recorderManager: null,
   recordClicked: false,
   isLongPress: false,
   recordTime: 0,
   rec: null, // h5 audio record
 });
 
+const sysInfo = uni.getSystemInfoSync();
+if (sysInfo.uniPlatform !== 'web') {
+  audioState.recorderManager = uni.getRecorderManager();
+}
 const toggleRecordModal = () => {
   if (audioState.recordStatus === RecordStatus.HIDE) {
     audioState.recordStatus = RecordStatus.SHOW;
@@ -142,7 +146,6 @@ const executeRecord = (e) => {
           uni.openSetting({
             success: function (res) {
               let recordAuth = res.authSetting['scope.record'];
-
               if (recordAuth == true) {
                 uni.showToast({
                   title: '授权成功',
@@ -188,7 +191,7 @@ const executeRecord = (e) => {
     return;
   }
 };
-const handleRecording = (e) => {
+const handleRecording = async (e) => {
   const sysInfo = uni.getSystemInfoSync();
   console.log('getSystemInfoSync', sysInfo);
   if (sysInfo.app === 'alipay') {
@@ -201,36 +204,35 @@ const handleRecording = (e) => {
   audioState.recordClicked = true;
   // h5不支持uni.getRecorderManager, 需要单独处理
   if (sysInfo.uniPlatform === 'web') {
-    import('../../../../../recorderCore/src/recorder-core').then((Recorder) => {
-      require('../../../../../recorderCore/src/engine/mp3');
-      require('../../../../../recorderCore/src/engine/mp3-engine');
-      if (audioState.recordClicked == true) {
-        clearInterval(recordTimeInterval);
-        initStartRecord(e);
-        audioState.rec = new Recorder.default({
-          type: 'mp3',
-        });
-        audioState.rec.open(
-          () => {
-            saveRecordTime();
-            audioState.rec.start();
-          },
-          (msg, isUserNotAllow) => {
-            if (isUserNotAllow) {
-              uni.showToast({
-                title: '鉴权失败，请重试',
-                icon: 'none',
-              });
-            } else {
-              uni.showToast({
-                title: `开启失败，请重试`,
-                icon: 'none',
-              });
-            }
+    const Recorder = await import('@/recorderCore/src/recorder-core');
+    await import('@/recorderCore/src/engine/mp3');
+    await import('@/recorderCore/src/engine/mp3-engine');
+    if (audioState.recordClicked == true) {
+      clearInterval(recordTimeInterval);
+      initStartRecord(e);
+      audioState.rec = new window.Recorder({
+        type: 'mp3',
+      });
+      audioState.rec.open(
+        () => {
+          saveRecordTime();
+          audioState.rec.start();
+        },
+        (msg, isUserNotAllow) => {
+          if (isUserNotAllow) {
+            uni.showToast({
+              title: '鉴权失败，请重试',
+              icon: 'none',
+            });
+          } else {
+            uni.showToast({
+              title: `开启失败，请重试`,
+              icon: 'none',
+            });
           }
-        );
-      }
-    });
+        }
+      );
+    }
   } else {
     setTimeout(() => {
       if (audioState.recordClicked == true) {
