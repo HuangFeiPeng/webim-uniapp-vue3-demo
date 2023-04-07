@@ -52,7 +52,6 @@
         class="chat_list"
         :data-item="item"
         @tap.stop="del_chat"
-        @longpress="longpress"
       >
         <swipe-delete>
           <!-- 通知模块 -->
@@ -162,15 +161,6 @@
           </view>
         </swipe-delete>
       </view>
-
-      <long-press-modal
-        :winSize="conversationState.winSize"
-        :popButton="conversationState.popButton"
-        @change="pickerMenuChange"
-        :showPop="conversationState.showPop"
-        @hidePop="hidePop"
-        :popStyle="conversationState.popStyle"
-      />
       <view
         v-if="
           conversationState.conversationList &&
@@ -252,7 +242,6 @@
 import { reactive, computed, nextTick } from 'vue';
 import { onLoad, onShow, onUnload } from '@dcloudio/uni-app';
 import swipeDelete from '@/components/swipedelete/swipedelete';
-import longPressModal from '@/components/longPressModal/index';
 import msgtype from '@/components/chat/msgtype';
 import dateFormater from '@/utils/dateFormater';
 // let disp = require('../../utils/broadcast');
@@ -280,7 +269,6 @@ const conversationState = reactive({
   winSize: {},
   popButton: ['删除该聊天'],
   showPop: false,
-  popStyle: '',
   currentVal: '',
   pushConfigData: [],
   defaultAvatar: '/static/images/theme2x.png',
@@ -345,26 +333,6 @@ const showConversationAvatar = computed(() => {
     }
   };
 });
-//     showConversationName() {
-//       const friendUserInfoMap = getApp().globalData.friendUserInfoMap;
-//       return (item) => {
-//         if (item.chatType === 'singleChat' || item.chatType === 'chat') {
-//           if (
-//             friendUserInfoMap.has(item.username) &&
-//             friendUserInfoMap.get(item.username)?.nickname
-//           ) {
-//             return friendUserInfoMap.get(item.username).nickname;
-//           } else {
-//             return item.username;
-//           }
-//         } else if (
-//           item.chatType === 'groupchat' ||
-//           item.chatType === 'chatRoom'
-//         ) {
-//           return item.groupName;
-//         }
-//       };
-//     },
 const showConversationName = computed(() => {
   const friendUserInfoMap = getApp().globalData.friendUserInfoMap;
   return (item) => {
@@ -385,12 +353,6 @@ const showConversationName = computed(() => {
     }
   };
 });
-
-//  handleTime() {
-//       return (item) => {
-//         return conversationState.$u.timeFormat(item.time, 'mm/dd/hh:MM');
-//       };
-//     },
 const handleTime = computed(() => {
   return (item) => {
     return dateFormater('MM/DD/HH:mm', item.time);
@@ -760,37 +722,6 @@ const removeLocalStorage = (yourname) => {
   var myName = uni.getStorageSync('myUsername');
   uni.removeStorageSync(yourname + myName);
   uni.removeStorageSync('rendered_' + yourname + myName);
-};
-const longpress = (e) => {
-  //将当前选中的值存在data中方便后续操作
-  //!此处已经给uni-app官方提了bug，H5存在事件event不返回touches字段的问题，待后续修复。
-  conversationState.currentVal = e;
-  let [touches, style, index] = [
-    e.touches[0],
-    '',
-    e.currentTarget.dataset.index,
-  ];
-
-  /* 因 非H5端不兼容 style 属性绑定 Object ，所以拼接字符 */
-  if (touches.clientY > conversationState.winSize.height / 2) {
-    style = `bottom:${conversationState.winSize.height - touches.clientY}px;`;
-  } else {
-    style = `top:${touches.clientY}px;`;
-  }
-  if (touches.clientX > conversationState.winSize.witdh / 2) {
-    style += `right:${conversationState.winSize.witdh - touches.clientX}px`;
-  } else {
-    style += `left:${touches.clientX}px`;
-  }
-
-  conversationState.popStyle = style;
-  // conversationState.pickerUserIndex = Number(index);
-  conversationState.showShade = true;
-  nextTick(() => {
-    setTimeout(() => {
-      conversationState.showPop = true;
-    }, 10);
-  });
 };
 
 /* 获取窗口尺寸 */
