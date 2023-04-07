@@ -254,6 +254,7 @@ import { onLoad, onShow, onUnload } from '@dcloudio/uni-app';
 import swipeDelete from '@/components/swipedelete/swipedelete';
 import longPressModal from '@/components/longPressModal/index';
 import msgtype from '@/components/chat/msgtype';
+import dateFormater from '@/utils/dateFormater';
 // let disp = require('../../utils/broadcast');
 import disp from '@/utils/broadcast';
 // var WebIM = require('../../utils/WebIM')['default'];
@@ -392,7 +393,7 @@ const showConversationName = computed(() => {
 //     },
 const handleTime = computed(() => {
   return (item) => {
-    return '时间展示';
+    return dateFormater('MM/DD/HH:mm', item.time);
   };
 });
 

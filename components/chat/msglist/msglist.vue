@@ -194,6 +194,7 @@ import { reactive, ref, computed, onMounted, onUnmounted } from 'vue';
 import msgStorage from '../msgstorage';
 // let msgStorage = require("../msgstorage");
 import disp from '@/utils/broadcast';
+import dateFormater from '@/utils/dateFormater';
 // let disp = require('../../../utils/broadcast');
 import msgtype from '@/components/chat/msgtype';
 import audioMsg from './type/audio/audio';
@@ -359,8 +360,7 @@ const showMessageListNickname = computed(() => {
 //处理时间显示
 const handleTime = computed(() => {
   return (item) => {
-    // return this.$u.timeFormat(item.time, 'mm/dd/hh:MM');
-    return '待处理消息时间展示';
+    return dateFormater('MM/DD/HH:mm', item.time);
   };
 });
 
