@@ -86,7 +86,6 @@ import { reactive, onMounted } from 'vue';
 import { onLoad, onShow, onUnload } from '@dcloudio/uni-app';
 import msgType from '@/components/chat/msgtype';
 import swipeDelete from '@/components/swipedelete/swipedelete';
-import longPressModal from '@/components/longPressModal/index';
 const WebIM = uni.WebIM;
 const searchMsgState = reactive({
   currentUser: '',
