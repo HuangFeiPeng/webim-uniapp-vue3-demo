@@ -143,7 +143,7 @@ const sendMessage = () => {
       console.log('成功了');
       // 关闭表情弹窗
       $emits.cancelEmoji && $emits.cancelEmoji();
-      $emits.cancelEmoji && $emits.closeFunModal();
+      $emits.closeFunModal && $emits.closeFunModal();
       disp.fire('em.chat.sendSuccess', id, mainState.userMessage);
     },
     fail(id, serverMsgId) {

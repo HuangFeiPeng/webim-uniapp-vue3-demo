@@ -1,5 +1,6 @@
 import msgType from './msgtype.js';
-let WebIM = uni.WebIM;
+import WebIM from '@/utils/WebIM.js';
+// let WebIM = uni.WebIM;
 
 // let msgType = require("./msgtype.js");
 

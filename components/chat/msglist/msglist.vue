@@ -274,9 +274,7 @@ onUnmounted(() => {
 
 onMounted(() => {
   if (getApp().globalData.isIPX) {
-    this.setData({
-      isIPX: true,
-    });
+    msglistState.isIPX = true;
   }
   //根据原有uni demo 处理似乎支付宝小程序有参数传递问题，因此针对该平台单独取传递的参数
   if (uni.getSystemInfoSync().uniPlatform === 'mp-alipay') {

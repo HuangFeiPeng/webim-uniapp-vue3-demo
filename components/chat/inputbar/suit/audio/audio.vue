@@ -204,7 +204,9 @@ const handleRecording = async (e) => {
   audioState.recordClicked = true;
   // h5不支持uni.getRecorderManager, 需要单独处理
   if (sysInfo.uniPlatform === 'web') {
-    const Recorder = await import('@/recorderCore/src/recorder-core');
+    // console.log('>>>>>>进入了web层面注册页面');
+    // #ifdef H5
+    await import('@/recorderCore/src/recorder-core');
     await import('@/recorderCore/src/engine/mp3');
     await import('@/recorderCore/src/engine/mp3-engine');
     if (audioState.recordClicked == true) {
@@ -233,6 +235,7 @@ const handleRecording = async (e) => {
         }
       );
     }
+    // #endif
   } else {
     setTimeout(() => {
       if (audioState.recordClicked == true) {
@@ -339,7 +342,7 @@ const uploadRecord = (tempFilePath, dur) => {
           accessToken: token,
           length: Math.ceil(dur / 1000),
         },
-        from: me.username.myName,
+        from: WebIM.conn.user,
         to: getSendToParam(),
         roomType: false,
         chatType: isGroupChat() ? chatType.GROUP_CHAT : chatType.SINGLE_CHAT,
