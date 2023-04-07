@@ -89,6 +89,22 @@
       }
     },
 	{
+		"path": "pages/profile/profile",
+		"style": {
+			"navigationBarBackgroundColor": "#f2f2f2",
+			"navigationBarTextStyle": "black",
+			"navigationBarTitleText": "个人资料"
+		}
+	},
+	{
+	    "path": "pages/profile/selectAvatar",
+	    "style": {
+			"navigationBarBackgroundColor": "#f2f2f2",
+			"navigationBarTextStyle": "black",
+			"navigationBarTitleText": "选择头像"
+		}
+	},
+	{
 		"path": "pages/groupChatEntry/groupChatEntry",
 		"style": {
 			"navigationBarBackgroundColor": "#f2f2f2",

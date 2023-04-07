@@ -178,11 +178,11 @@ onLoad(() => {
   disp.on('em.unreadspot', onSettingPageUnreadspot);
   //监听加入群组事件
   disp.on('em.invite.joingroup', onSettingPageJoingroup);
-  settingState.phoneNumber = uni.getStorageSync('phoneNumber');
-  settingState.userInfoFromServer = getApp().globalData.userInfoFromServer;
 });
 onShow(() => {
   uni.hideHomeButton && uni.hideHomeButton();
+  settingState.phoneNumber = uni.getStorageSync('phoneNumber');
+  settingState.userInfoFromServer = getApp().globalData.userInfoFromServer;
   settingState.messageNum = getApp().globalData.saveFriendList.length;
   settingState.unReadSpotNum =
     getApp().globalData.unReadMessageNum > 99
