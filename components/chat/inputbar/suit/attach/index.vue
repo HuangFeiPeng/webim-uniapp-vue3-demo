@@ -5,7 +5,7 @@
       childId="upload1"
       :width="attachState.width"
       :height="attachState.height"
-      :option="option"
+      :option="options"
       :size="attachState.size"
       :formats="attachState.formats"
       :debug="attachState.debug"
@@ -66,7 +66,7 @@ const isGroupChat = () => {
   return chatType.value == msgType.chatType.CHAT_ROOM;
 };
 
-co = (evt) => {
+const saveSendMsg = (evt) => {
   msgStorage.saveMsg(evt.msg, evt.type);
 };
 const onUploadEnd = (res) => {
