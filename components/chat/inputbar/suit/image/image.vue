@@ -7,8 +7,10 @@ import msgType from '@/components/chat/msgtype';
 import msgStorage from '@/components/chat/msgstorage';
 import disp from '@/utils/broadcast';
 const WebIM = uni.WebIM;
+
+/* props */
 const props = defineProps({
-  chatParmas: {
+  chatParams: {
     type: Object,
     default: () => ({}),
   },
@@ -17,12 +19,13 @@ const props = defineProps({
     default: msgType.chatType.SINGLE_CHAT,
   },
 });
-const { chatParmas, chatType } = toRefs(props);
+const { chatParams, chatType } = toRefs(props);
+
 const isGroupChat = () => {
   return chatType.value == msgType.chatType.CHAT_ROOM;
 };
 const getSendToParam = () => {
-  return isGroupChat() ? chatParmas.groupId : chatParmas.your;
+  return isGroupChat() ? chatParams.value.groupId : chatParams.value.your;
 };
 const openCamera = () => {
   uni.chooseImage({
@@ -119,17 +122,13 @@ const upLoadImage = (res) => {
               body: file,
               from: WebIM.conn.user,
               to: getSendToParam(),
-              roomType: false,
-              chatType: chatType,
+              chatType: isGroupChat()
+                ? msgType.chatType.GROUP_CHAT
+                : msgType.chatType.SINGLE_CHAT,
               success: function (argument) {
                 disp.fire('em.chat.sendSuccess', id);
               },
             });
-
-            if (chatType == msgType.chatType.CHAT_ROOM) {
-              msg.setGroup('groupchat');
-            }
-
             WebIM.conn.send(msg.body);
             let obj = {
               msg: msg,
@@ -149,6 +148,7 @@ const upLoadImage = (res) => {
   });
 };
 const saveSendMsg = (evt) => {
+  console.log('saveSendMsg', evt);
   msgStorage.saveMsg(evt.msg, evt.type);
 };
 defineExpose({
