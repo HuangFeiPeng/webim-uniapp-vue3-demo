@@ -173,7 +173,7 @@
 </template>
 
 <script setup>
-import { reactive, computed, nextTick } from 'vue';
+import { reactive, computed } from 'vue';
 import disp from '@/utils/broadcast';
 import swipeDelete from '@/components/swipedelete/swipedelete';
 import { onLoad, onShow, onUnload } from '@dcloudio/uni-app';
@@ -182,7 +182,6 @@ const WebIM = uni.WebIM;
 // let disp = require('../../utils/broadcast');
 let systemReady = false;
 let canPullDownreffesh = true;
-let oHeight = [];
 
 const contactsState = reactive({
   search_btn: true,
@@ -237,15 +236,9 @@ const showFriendNickname = computed(() => {
 
 const getRoster = (fetchType) => {
   if (fetchType === 'local') {
-    const localRoster = uni.getStorageSync('member');
-    let member = [];
-    for (let i = 0; i < localRoster.length; i++) {
-      if (localRoster[i].subscription == 'both') {
-        member.push(localRoster[i]);
-      }
-    }
-    contactsState.member = member;
-    getBrands(member);
+    const localRosterList = uni.getStorageSync('member');
+    contactsState.member = localRosterList;
+    getBrands(localRosterList);
   } else if (fetchType === 'server') {
     let rosters = {
       success: (roster) => {
@@ -435,7 +428,6 @@ const into_info = (event) => {
     url: '../friend_info/friend_info?yourname=' + event.target.dataset.username,
   });
 };
-//TODO 右侧索引 该部分代码未生效，后续可能替换为uni ui 组件
 //点击右侧字母导航定位触发
 const scrollToViewFn = (e) => {
   let _id = e.target.dataset.id;
@@ -443,33 +435,53 @@ const scrollToViewFn = (e) => {
     if (contactsState.listMain[i].id === _id) {
       contactsState.isActive = _id;
       contactsState.toView = 'inToView' + _id;
+      uni.pageScrollTo({
+        selector: `#inToView${_id}`,
+        duration: 300,
+        success: () => {
+          console.log('>>>>滚动成功');
+        },
+        fail: () => {
+          console.log('>>>>失败成功');
+        },
+      });
       break;
     }
   }
 };
-// 处理数据格式，及获取分组高度
+// 处理数据格式 生成list 索引。
 const getBrands = (member) => {
-  const that = this;
   const reg = /[a-z]/i;
-
-  member.forEach((item) => {
-    if (reg.test(item.name.substring(0, 1))) {
-      item.initial = item.name.substring(0, 1).toUpperCase();
-    } else {
-      item.initial = '#';
-    }
-  });
-  member.sort((a, b) => a.initial.charCodeAt(0) - b.initial.charCodeAt(0));
+  let contactsList = [];
+  member.length &&
+    member.forEach((userId) => {
+      let contactsObj = {};
+      contactsObj.name = userId;
+      if (reg.test(userId.substring(0, 1))) {
+        contactsObj.initial = userId.substring(0, 1).toUpperCase();
+        contactsList.push({ ...contactsObj });
+      } else {
+        contactsObj.initial = '#';
+        contactsList.push({ ...contactsObj });
+      }
+    });
+  generateIndexedList(contactsList);
+};
+//成功index列表
+const generateIndexedList = (contactsList) => {
+  contactsList.sort(
+    (a, b) => a.initial.charCodeAt(0) - b.initial.charCodeAt(0)
+  );
   var someTtitle = null;
   var someArr = [];
 
-  for (var i = 0; i < member.length; i++) {
+  for (var i = 0; i < contactsList.length; i++) {
     var newBrands = {
-      brandId: member[i].jid,
-      name: member[i].name,
+      brandId: contactsList[i].name + contactsList[i].initial,
+      name: contactsList[i].name,
     };
 
-    if (member[i].initial == '#') {
+    if (contactsList[i].initial == '#') {
       if (!lastObj) {
         var lastObj = {
           id: i,
@@ -480,8 +492,8 @@ const getBrands = (member) => {
 
       lastObj.brands.push(newBrands);
     } else {
-      if (member[i].initial != someTtitle) {
-        someTtitle = member[i].initial;
+      if (contactsList[i].initial != someTtitle) {
+        someTtitle = contactsList[i].initial;
         var newObj = {
           id: i,
           region: someTtitle,
@@ -501,35 +513,8 @@ const getBrands = (member) => {
   }
   //赋值给列表值
   contactsState.listMain = someArr;
-
   //赋值给当前高亮的isActive
   contactsState.isActive = someArr.length > 0 ? someArr[0].id : '';
-
-  //计算分组高度,uni.createSelectotQuery()获取节点信息
-  let number = 0;
-  for (let j = 0; j < someArr.length; ++j) {
-    const query = uni.createSelectorQuery().in(this);
-    query
-      .select(`#inToView${someArr[j].id}`)
-      .boundingClientRect((rect) => {
-        if (rect) {
-          number = rect.height + number;
-          var newArry = [
-            {
-              height: number,
-              key: rect.dataset.id,
-              name: someArr[j].region,
-            },
-          ];
-          oHeight = oHeight.concat(newArry);
-        } else {
-          nextTick(() => {
-            //this.getBrands(member)
-          });
-        }
-      })
-      .exec();
-  }
 };
 /*  disp event callback function */
 const onMainPageSubscribe = () => {

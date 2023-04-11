@@ -292,6 +292,7 @@ onLoad(() => {
   if (!uni.getStorageSync('member')) {
     getRoster();
   }
+
   readJoinedGroupName();
 });
 onShow(() => {
@@ -376,35 +377,25 @@ const listGroups = () => {
   });
 };
 
-const getRoster = () => {
-  let rosters = {
-    success(roster) {
-      let member = [];
-      for (let i = 0; i < roster.length; i++) {
-        if (roster[i].subscription == 'both') {
-          member.push(roster[i]);
-        }
-      }
-      uni.setStorage({
-        key: 'member',
-        data: member,
-      });
-      conversationState.member = member;
-      //if(!systemReady){
-      disp.fire('em.main.ready');
-      //systemReady = true;
-      //}
-      getLocalConversationlist();
-      conversationState.unReadSpotNum =
-        getApp().globalData.unReadMessageNum > 99
-          ? '99+'
-          : getApp().globalData.unReadMessageNum;
-    },
-    error(err) {
-      console.log(err);
-    },
-  };
-  uni.WebIM.conn.getContacts(rosters);
+const getRoster = async () => {
+  const { data } = await WebIM.conn.getContacts();
+  if (data.length) {
+    uni.setStorage({
+      key: 'member',
+      data: [...data],
+    });
+    conversationState.member = [...data];
+    //if(!systemReady){
+    disp.fire('em.main.ready');
+    //systemReady = true;
+    //}
+    getLocalConversationlist();
+    conversationState.unReadSpotNum =
+      getApp().globalData.unReadMessageNum > 99
+        ? '99+'
+        : getApp().globalData.unReadMessageNum;
+  }
+  console.log('>>>>好友列表获取成功', data);
 };
 
 const readJoinedGroupName = () => {
