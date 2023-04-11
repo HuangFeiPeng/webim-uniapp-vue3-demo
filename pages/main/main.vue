@@ -235,33 +235,45 @@ const showFriendNickname = computed(() => {
   };
 });
 
-const getRoster = () => {
-  let rosters = {
-    success: (roster) => {
-      let member = [];
-      for (let i = 0; i < roster.length; i++) {
-        if (roster[i].subscription == 'both') {
-          member.push(roster[i]);
+const getRoster = (fetchType) => {
+  if (fetchType === 'local') {
+    const localRoster = uni.getStorageSync('member');
+    let member = [];
+    for (let i = 0; i < localRoster.length; i++) {
+      if (localRoster[i].subscription == 'both') {
+        member.push(localRoster[i]);
+      }
+    }
+    contactsState.member = member;
+    getBrands(member);
+  } else if (fetchType === 'server') {
+    let rosters = {
+      success: (roster) => {
+        let member = [];
+        for (let i = 0; i < roster.length; i++) {
+          if (roster[i].subscription == 'both') {
+            member.push(roster[i]);
+          }
         }
-      }
-      uni.setStorage({
-        key: 'member',
-        data: member,
-      });
-      contactsState.member = member;
-      if (!systemReady) {
-        disp.fire('em.main.ready');
-        systemReady = true;
-      }
+        uni.setStorage({
+          key: 'member',
+          data: member,
+        });
+        contactsState.member = member;
+        if (!systemReady) {
+          disp.fire('em.main.ready');
+          systemReady = true;
+        }
 
-      getBrands(member);
-    },
-    error: (err) => {
-      console.log('[main:getRoster]', err);
-    },
-  };
+        getBrands(member);
+      },
+      error: (err) => {
+        console.log('[main:getRoster]', err);
+      },
+    };
 
-  WebIM.conn.getContacts(rosters);
+    WebIM.conn.getContacts(rosters);
+  }
 };
 const moveFriend = (message) => {
   let rosters = {
@@ -527,10 +539,7 @@ const onMainPageSubscribe = () => {
     getApp().globalData.saveGroupInvitedList.length;
 };
 const onMainPageRemoveContacts = (message) => {
-  const pageStack = getCurrentPages();
-  if (pageStack[pageStack.length - 1].route === this.__route__) {
-    getRoster();
-  }
+  getRoster('server');
 };
 const onMainPageUnreadspot = () => {
   contactsState.unReadSpotNum =
@@ -547,19 +556,14 @@ const onMainPageJoingroup = () => {
 };
 const onMainPagesubscribed = () => {
   const pageStack = getCurrentPages();
-  if (pageStack[pageStack.length - 1].route === this.__route__) {
-    getRoster();
-  }
+  getRoster('server');
 };
 const onMainPageUnsubscribed = (message) => {
-  const pageStack = getCurrentPages();
-  if (pageStack[pageStack.length - 1].route === this.__route__) {
-    getRoster();
-    uni.showToast({
-      title: `与${message.from}好友关系解除`,
-      icon: 'none',
-    });
-  }
+  getRoster('server');
+  uni.showToast({
+    title: `与${message.from}好友关系解除`,
+    icon: 'none',
+  });
 };
 onLoad((option) => {
   const app = getApp().globalData;
@@ -576,7 +580,7 @@ onLoad((option) => {
   // 监听被解除好友
   disp.on('em.unsubscribed', onMainPageUnsubscribed);
   contactsState.myName = option.myName;
-  getRoster();
+  getRoster('local');
 });
 onShow(() => {
   uni.hideHomeButton && uni.hideHomeButton();
@@ -602,33 +606,6 @@ onUnload(() => {
   disp.off('em.subscribed', onMainPagesubscribed);
   disp.off('em.unsubscribed', onMainPageUnsubscribed);
 });
-// export default {
-//   data() {
-//     return {
-//     };
-//   },
-//   components: {
-//     swipeDelete,
-//   },
-//   onLoad(option) {
-
-//   },
-//   mounted() {
-//
-//   },
-//   onShow() {
-
-//   },
-//   onUnload() {
-
-//   },
-//   computed: {
-
-//   },
-//   methods: {
-
-//   },
-// };
 </script>
 <style>
 @import './main.css';
