@@ -59,7 +59,7 @@
         </view>
         <view class="menu_wrap">
           <view class="account_box" @tap="openUserCardModal">
-            <!-- <u-icon name="account" color="#2D2D2D" size="44"></u-icon> -->
+            <image src="/static/images/pic.png"></image>
           </view>
           用户名片
         </view>
