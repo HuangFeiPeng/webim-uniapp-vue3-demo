@@ -23,7 +23,8 @@
     <!-- <chat-suit-location id="chat-suit-location" chatParams="{{ chatParams }}"></chat-suit-location> -->
     <!-- <chat-suit-video ref="chatSuitVideo" :chatParams="chatParams"></chat-suit-video> -->
     <swiper
-      :class="inputbarState.showFunModal"
+      v-if="inputbarState.showFunModal"
+      :class="'showFunModal'"
       :indicator-dots="true"
       :autoplay="false"
       :interval="5000"
@@ -141,7 +142,7 @@ const inputbarState = reactive({
     video: null,
   },
   isIPX: '',
-  showFunModal: FUNMODAL_STATUS.CLOSED,
+  showFunModal: false,
 });
 onLoad(() => {
   inputbarState.isIPX = false;
@@ -156,7 +157,7 @@ const toggleRecordModal = () => {
 const chatSuitEmojiComp = ref(null);
 const openEmoji = () => {
   setTimeout(() => {
-    inputbarState.showFunModal = FUNMODAL_STATUS.CLOSED;
+    inputbarState.showFunModal = false;
   }, 100);
   chatSuitEmojiComp.value.openEmoji();
 };
@@ -176,11 +177,11 @@ const emojiAction = (evt) => {
   chatSuitMainComp.value.emojiAction(evt.msg);
 };
 const openFunModal = () => {
-  inputbarState.showFunModal = FUNMODAL_STATUS.OPENED;
+  inputbarState.showFunModal = true;
   cancelEmoji();
 };
 const closeFunModal = () => {
-  inputbarState.showFunModal = FUNMODAL_STATUS.CLOSED;
+  inputbarState.showFunModal = false;
   cancelEmoji();
 };
 const closeAllModal = () => {
