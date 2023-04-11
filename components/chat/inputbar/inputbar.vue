@@ -22,52 +22,48 @@
     ></chatSuitImage>
     <!-- <chat-suit-location id="chat-suit-location" chatParams="{{ chatParams }}"></chat-suit-location> -->
     <!-- <chat-suit-video ref="chatSuitVideo" :chatParams="chatParams"></chat-suit-video> -->
-    <swiper
-      v-if="inputbarState.showFunModal"
-      :class="'showFunModal'"
-      :indicator-dots="true"
-      :autoplay="false"
-      :interval="5000"
-      :duration="1000"
-    >
-      <swiper-item>
-        <view
-          :class="'other_func ' + (inputbarState.isIPX ? 'other_func_X' : '')"
-        >
-          <view class="open_camera" @tap="openCamera">
-            <image src="/static/images/camora.png"></image>
-            相机
-          </view>
-          <view class="menu_wrap" @tap="sendImage">
-            <image src="/static/images/pic.png"></image>
-            相册
-          </view>
-          <!-- #ifdef APP-PLUS -->
-          <view class="menu_wrap">
-            <chatSuitAttach :chatParams="chatParams" :chatType="chatType">
-              <image
-                style="background-color: #fff"
-                src="/static/images/file.png"
-              ></image>
-              附件
-            </chatSuitAttach>
-          </view>
-          <!-- #endif -->
-          <view
-            class="menu_wrap"
-            @tap="edit_group"
-            v-show="chatType === 'chatRoom'"
+    <view v-if="inputbarState.showFunModal" :class="'showFunModal'">
+      <view
+        :class="'other_func ' + (inputbarState.isIPX ? 'other_func_X' : '')"
+      >
+        <view class="open_camera" @tap="openCamera">
+          <image src="/static/images/camora.png"></image>
+          相机
+        </view>
+        <view class="menu_wrap" @tap="sendImage">
+          <image src="/static/images/pic.png"></image>
+          相册
+        </view>
+        <!-- #ifdef APP-PLUS -->
+        <view class="menu_wrap">
+          <chatSuitAttach
+            :chatParams="chatParams"
+            :chatType="chatType"
+            @closeAllModal="closeAllModal"
           >
-            <image src="/static/images/pic.png"></image>
-            群信息
+            <image
+              style="background-color: #fff"
+              src="/static/images/file.png"
+            ></image>
+            附件
+          </chatSuitAttach>
+        </view>
+        <!-- #endif -->
+        <view
+          class="menu_wrap"
+          @tap="edit_group"
+          v-show="chatType === 'chatRoom'"
+        >
+          <image src="/static/images/pic.png"></image>
+          群信息
+        </view>
+        <view class="menu_wrap">
+          <view class="account_box" @tap="openUserCardModal">
+            <!-- <u-icon name="account" color="#2D2D2D" size="44"></u-icon> -->
           </view>
-          <view class="menu_wrap">
-            <view class="account_box" @tap="openUserCardModal">
-              <!-- <u-icon name="account" color="#2D2D2D" size="44"></u-icon> -->
-            </view>
-            用户名片
-          </view>
-          <!-- <view class="menu_wrap" @tap="sendVideo">
+          用户名片
+        </view>
+        <!-- <view class="menu_wrap" @tap="sendVideo">
             <image
               src="/static/images/video.png"
               style="height: 20px; width: 20px"
@@ -86,9 +82,9 @@
               style="height: 24px; width: 15px"
             />
           </view> -->
-        </view>
-      </swiper-item>
-    </swiper>
+      </view>
+    </view>
+
     <chatUserCard
       ref="chatUserCardComp"
       :chatParams="chatParams"

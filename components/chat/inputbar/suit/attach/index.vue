@@ -10,6 +10,7 @@
       :formats="attachState.formats"
       :debug="attachState.debug"
       :instantly="attachState.instantly"
+      @change="checkedFile"
       @uploadEnd="onUploadEnd"
     >
       <view :style="{ width: attachState.width, height: attachState.height }">
@@ -39,6 +40,8 @@ const props = defineProps({
   },
 });
 const { chatParams, chatType } = toRefs(props);
+/* emits */
+const $emits = defineEmits(['closeAllModal']);
 const options = reactive({
   url: `https://a1.easemob.com/${str[0]}/${str[1]}/chatfiles `,
   name: 'file',
@@ -69,6 +72,11 @@ const isGroupChat = () => {
 const saveSendMsg = (evt) => {
   msgStorage.saveMsg(evt.msg, evt.type);
 };
+//onProgress
+const checkedFile = (evt) => {
+  uni.showLoading({ title: '文件上传中，请稍后' });
+};
+//onUploadEnd
 const onUploadEnd = (res) => {
   console.log(res);
   let id = WebIM.conn.getUniqueId();
@@ -100,5 +108,7 @@ const onUploadEnd = (res) => {
     type: msgType.FILE,
   };
   saveSendMsg(obj);
+  uni.hideLoading();
+  $emits('closeAllModal');
 };
 </script>
