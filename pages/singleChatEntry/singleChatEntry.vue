@@ -8,7 +8,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, reactive } from 'vue';
 import {
   onLoad,
   onUnload,
@@ -19,7 +19,7 @@ import disp from '@/utils/broadcast';
 import chat from '@/components/chat/chat.vue';
 
 const chatComp = ref(null);
-let chatParams = {};
+let chatParams = reactive({});
 onNavigationBarButtonTap(() => {
   uni.navigateTo({
     url: `/pages/moreMenu/moreMenu?username=${chatParams.your}&type=singleChat`,
@@ -27,7 +27,7 @@ onNavigationBarButtonTap(() => {
 });
 onLoad((options) => {
   let params = JSON.parse(options.username);
-  chatParams = params;
+  chatParams = Object.assign(chatParams, params);
   // 生成的支付宝小程序在onLoad里获取不到，这里放到全局变量下
   uni.username = params;
   uni.setNavigationBarTitle({

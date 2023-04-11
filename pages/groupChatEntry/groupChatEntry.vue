@@ -12,7 +12,7 @@
 <script setup>
 import chat from '@/components/chat/chat.vue';
 import disp from '@/utils/broadcast';
-import { ref, toRefs } from 'vue';
+import { ref, reactive, toRefs } from 'vue';
 import {
   onLoad,
   onUnload,
@@ -20,7 +20,7 @@ import {
   onNavigationBarButtonTap,
 } from '@dcloudio/uni-app';
 const chatComp = ref(null);
-let chatParams = {};
+let chatParams = reactive({});
 /* props */
 const props = defineProps({
   groupId: {
@@ -33,7 +33,7 @@ const { groupId } = toRefs;
 // options = 系统传入的 url 参数
 onLoad((options) => {
   let params = JSON.parse(options.username);
-  chatParams = params;
+  chatParams = Object.assign(chatParams, params);
   uni.username = params;
   uni.setNavigationBarTitle({
     title: chatParams.your,
