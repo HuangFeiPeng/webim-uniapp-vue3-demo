@@ -19,7 +19,6 @@
 
 <script setup>
 import { ref, reactive, watch, onMounted, toRefs } from 'vue';
-import uniPopup from '@/components/uni-popup/uni-popup.vue';
 const props = defineProps({
   showModal: {
     type: Boolean,
@@ -57,19 +56,16 @@ const initFriendList = () => {
   const membersList = uni.getStorageSync('member');
   let friendList = [];
   membersList.length &&
-    membersList.map((item) => {
+    membersList.map((userId) => {
       const member = {
         text: '',
         value: '',
       };
-      item.name && (member.value = item.name);
-      if (
-        friendUserInfos.has(item.name) &&
-        friendUserInfos.get(item.name).nickname
-      ) {
-        member.text = friendUserInfos.get(item.name).nickname;
+      member.value = userId;
+      if (friendUserInfos.has(userId) && friendUserInfos.get(userId).nickname) {
+        member.text = friendUserInfos.get(userId).nickname;
       } else {
-        member.text = item.name;
+        member.text = userId;
       }
       console.log('member', member);
       return friendList.push(member);

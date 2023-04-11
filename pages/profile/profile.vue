@@ -49,7 +49,6 @@
 import { reactive, ref, computed } from 'vue';
 import { onLoad, onShow } from '@dcloudio/uni-app';
 import disp from '@/utils/broadcast';
-import uniPopup from '@/components/uni-popup/uni-popup.vue';
 const WebIM = uni.WebIM;
 const profileState = reactive({
   isShowEditModal: false,

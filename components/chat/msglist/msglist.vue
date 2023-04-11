@@ -199,8 +199,6 @@ import dateFormater from '@/utils/dateFormater';
 import msgtype from '@/components/chat/msgtype';
 import audioMsg from './type/audio/audio';
 import fileMsg from './type/file';
-/* ui-popup */
-import uniPopup from '@/components/uni-popup/uni-popup';
 let LIST_STATUS = {
   SHORT: 'scroll_view_change',
   NORMAL: 'scroll_view',
