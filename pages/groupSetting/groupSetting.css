@@ -31,14 +31,19 @@ text{
 	font-size: 14px;
 }
 .group-name{
+    box-sizing: border-box;
 	width: 100%;
 	line-height: 40px;
-	padding: 10px;
+	padding: 10rpx;
     border-bottom: 1px solid #f2f2f2;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  
 }
+
 .group-name .item-name{
-	float: right;
-	margin-right:10px;
 	color: #ccc;
 	font-size: 14px;
 }
@@ -49,26 +54,33 @@ text{
 	border-bottom: 10px solid #f2f2f2;
 }
 .group-member{
-	max-height: 300px;
-	overflow-y: auto;
+    /* max-height: 300px; */
+	/* overflow-y: auto; */
 	border-bottom: 1px solid #f2f2f2;
 }
-
-.group-member .member-list{
-	padding-left: 10px;
-	font-size: 14px;
-	line-height: 30px;
-	color: #ccc;
+.group-member-list{
+    box-sizing: border-box;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    padding: 5rpx 10rpx;
+    border-bottom: 1px solid #f2f2f2;
 }
+
 .member-list{
-	width: 50px;
+    margin: 0 10rpx;
+	display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 	text-align: center;
 	line-height: normal !important;
-	margin: 0 0 10px 12px;
 }
 .member-list image{
-	width: 40px;
-	height: 40px;
+	width: 66rpx;
+	height: 66rpx;
 }
 .invite-member .invite-wrap input{
     display:inline-block;

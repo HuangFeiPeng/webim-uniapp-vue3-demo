@@ -13,16 +13,18 @@
           <text class="textd-10" style="margin: 5px 0 20px 5px">群组成员</text>
           <text style="float: right">{{ groupSettingState.groupCount }}人</text>
         </view>
-
+      </view>
+      <view class="group-member-list">
         <view
+          class="member-list"
           v-for="(item, index) in groupSettingState.groupMember"
           :key="index"
-          style="display: inline-block"
         >
-          <view class="member-list">
-            <image src="/static/images/theme2x.png"></image>
-            <text>{{ item.member || item.owner }}</text>
-          </view>
+          <image
+            style="display: inline-block"
+            src="/static/images/theme2x.png"
+          ></image>
+          <text>{{ item.member || item.owner }}</text>
         </view>
       </view>
       <view class="invite-member">
