@@ -176,35 +176,6 @@ const openFunModal = () => {
 defineExpose({
   emojiAction,
 });
-// export default {
-//   data() {
-//     return {
-//
-//     };
-//   },
-
-//   components: {},
-//   props: {
-
-//   },
-
-//   // lifetimes
-//   created() {
-
-//   },
-
-//   beforeMount() {},
-
-//   moved() {},
-
-//   destroyed() {},
-
-//   mounted() {},
-
-//   methods: {
-
-//   },
-// };
 </script>
 <style>
 @import './main.css';

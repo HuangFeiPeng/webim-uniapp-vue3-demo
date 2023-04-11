@@ -426,7 +426,7 @@ const renderMsg = (renderableMsg, type, curChatMsg, sessionKey, isnew) => {
   setTimeout(() => {
     uni.pageScrollTo({
       scrollTop: 5000,
-      duration: 300,
+      duration: 100,
       fail: (e) => {
         //console.log('滚失败了', e)
       },

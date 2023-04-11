@@ -7,133 +7,124 @@
   </view>
 </template>
 
-<script>
-const ATTACH_KEY = "filePathCache";
-export default {
-  data() {
-    return {};
+<script setup>
+import { computed, toRefs } from 'vue';
+const ATTACH_KEY = 'filePathCache';
+/* props */
+const props = defineProps({
+  msg: {
+    type: Object,
+    default: () => ({}),
   },
+});
+const { msg } = toRefs(props);
 
-  components: {},
-  props: {
-    msg: {
-      type: Object,
-      default: () => ({})
-    }
-  },
-
-  created() {},
-
-  moved() {},
-
-  methods: {
-    formatMoney(value) {
-      return `（${(value / 1024 / 1024).toFixed(2)}M）`;
-    },
-    storageFilePath({ id, path }) {
-      uni.getStorage({
+const formatMoney = computed(() => {
+  return (size) => {
+    return (size / 1024 / 1024).toFixed(2) + 'MB';
+  };
+});
+const storageFilePath = ({ id, path }) => {
+  uni.getStorage({
+    key: ATTACH_KEY,
+    success: (res) => {
+      let dt = res.data || {};
+      uni.setStorage({
         key: ATTACH_KEY,
-        success: (res) => {
-          let dt = res.data || {};
-          uni.setStorage({
-            key: ATTACH_KEY,
-            data: {
-              ...dt,
-              [id]: path
-            }
-          });
+        data: {
+          ...dt,
+          [id]: path,
         },
-        fail: (e) => {
-          uni.setStorage({
-            key: ATTACH_KEY,
-            data: {
-              [id]: path
-            }
-          });
-        }
       });
     },
-    downloadFile() {
-      let _this = this;
-      // 下载完存储filePath，下次预览直接访问
-      uni.downloadFile({
-        url: `${this.msg.msg?.url}`,
-        success: function (res) {
-          let filePath = res.tempFilePath;
-          uni.saveFile({
-            tempFilePath: filePath,
-            success: function (res) {
-              let savedFilePath = res.savedFilePath;
-              _this.storageFilePath({
-                id: _this.msg.id,
-                path: savedFilePath
-              });
-              _this.openFile(savedFilePath);
-            },
-            fail: function (e) {
-              uni.hideLoading();
-              uni.showToast({
-                icon: "none",
-                title: "保存失败"
-              });
-            }
-          });
+    fail: (e) => {
+      uni.setStorage({
+        key: ATTACH_KEY,
+        data: {
+          [id]: path,
         },
-        fail: () => {
+      });
+    },
+  });
+};
+const downloadFile = () => {
+  // 下载完存储filePath，下次预览直接访问
+  uni.downloadFile({
+    url: `${msg.value.msg?.url}`,
+    success: function (res) {
+      let filePath = res.tempFilePath;
+      uni.saveFile({
+        tempFilePath: filePath,
+        success: function (res) {
+          let savedFilePath = res.savedFilePath;
+          storageFilePath({
+            id: msg.value.id,
+            path: savedFilePath,
+          });
+          openFile(savedFilePath);
+        },
+        fail: function (e) {
           uni.hideLoading();
           uni.showToast({
-            icon: "none",
-            title: "失败请重新下载"
+            icon: 'none',
+            title: '保存失败',
           });
-        }
+        },
       });
     },
-    openFile(filePath) {
-      uni.openDocument({
-        filePath,
-        success: function (res) {
-          uni.hideLoading();
-        },
-        fail(e) {
-          uni.showToast({
-            title: "暂不支持此类型",
-            duration: 2000
-          });
-          uni.hideLoading();
-        }
+    fail: () => {
+      uni.hideLoading();
+      uni.showToast({
+        icon: 'none',
+        title: '失败请重新下载',
       });
     },
-    previewFile() {
-      let sysInfo = uni.getSystemInfoSync();
-      if (sysInfo.uniPlatform === "web") {
-        uni.showToast({
-          title: "H5暂不支持预览文件消息",
-          duration: 2000,
-          icon: "none"
-        });
-        return;
-      }
-      uni.showLoading();
-      uni.getStorage({
-        key: ATTACH_KEY,
-        success: (res) => {
-          let dt = res.data || {};
-          let path = dt[this.msg.id];
-          if (path) {
-            this.openFile(path);
-          } else {
-            this.downloadFile();
-          }
-        },
-        fail: (e) => {
-          this.downloadFile();
-        }
+  });
+};
+const openFile = (filePath) => {
+  uni.openDocument({
+    filePath,
+    success: function (res) {
+      uni.hideLoading();
+    },
+    fail(e) {
+      uni.showToast({
+        title: '暂不支持此类型',
+        duration: 2000,
       });
-    }
+      uni.hideLoading();
+    },
+  });
+};
+const previewFile = () => {
+  let sysInfo = uni.getSystemInfoSync();
+  if (sysInfo.uniPlatform === 'web') {
+    uni.showToast({
+      title: 'H5暂不支持预览文件消息',
+      duration: 2000,
+      icon: 'none',
+    });
+    return;
   }
+  uni.showLoading();
+  uni.getStorage({
+    key: ATTACH_KEY,
+    success: (res) => {
+      let dt = res.data || {};
+      let path = dt[msg.value.id];
+      if (path) {
+        openFile(path);
+      } else {
+        downloadFile();
+      }
+    },
+    fail: (e) => {
+      downloadFile();
+    },
+  });
 };
 </script>
 
 <style>
-@import "./index.css";
+@import './index.css';
 </style>
