@@ -9,27 +9,6 @@
     :scroll-into-view="msglistState.toView"
   >
     <view>
-      <!-- <u-modal
-        v-model="show"
-        title="消息举报"
-        ref="uModal"
-        confirm-text="举报"
-        :async-close="true"
-        @confirm="reportMsg"
-      >
-        <view class="slot-content">
-          <u-field
-            v-model="reason"
-            label="举报原因"
-            placeholder="请填写举报原因"
-            type="textarea"
-            :auto-height="false"
-            :clearable="false"
-            maxlength="100"
-          >
-          </u-field>
-        </view>
-      </u-modal> -->
       <!-- 弹出举报入口 -->
       <uni-popup ref="alertReport">
         <button @click="showSelectReportType">举报</button>
@@ -436,7 +415,7 @@ const renderMsg = (renderableMsg, type, curChatMsg, sessionKey, isnew) => {
   }
 };
 const renderFail = (sessionKey) => {
-  let msgList = me.chatMsg;
+  let msgList = msglistState.chatMsg;
   msgList.map((item) => {
     if (
       item.mid.substring(item.mid.length - 10) ==
@@ -481,7 +460,7 @@ const getHistoryMsg = () => {
   let historyChatMsgs = uni.getStorageSync('rendered_' + sessionKey) || [];
   if (Index < historyChatMsgs.length) {
     let timesMsgList = historyChatMsgs.slice(-Index - 10, -Index);
-    msglistState.chatMsg = timesMsgList.concat(me.chatMsg);
+    msglistState.chatMsg = timesMsgList.concat(msglistState.chatMsg);
     msglistState.toView = timesMsgList[timesMsgList.length - 1].mid;
     Index += timesMsgList.length;
     if (timesMsgList.length == 10) {

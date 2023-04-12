@@ -696,7 +696,7 @@ const del_chat = (event) => {
       if (res.confirm) {
         uni.removeStorageSync(nameList.your + myName);
         uni.removeStorageSync('rendered_' + nameList.your + myName);
-        nameList.your === 'INFORM' && me.removeAndRefresh(event);
+        nameList.your === 'INFORM' && removeAndRefresh(event);
         // if (Object.keys(currentPage[0]).length>0) {
         //   currentPage[0].onShow();
         // }
