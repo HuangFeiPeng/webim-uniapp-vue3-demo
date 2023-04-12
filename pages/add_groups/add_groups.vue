@@ -89,17 +89,17 @@ onShow(async () => {
   //           member.push(roster[i]);
   //         }
   //       }
-  //       addGroupsState.friendList = member;
+
   //     },
   //   });
   try {
     const { data } = await WebIM.conn.getContacts();
-    console.log('>>>>>>App.vue 拉取好友列表');
     if (data.length) {
       uni.setStorage({
         key: 'member',
         data: [...data],
       });
+      addGroupsState.friendList = [...data];
     }
   } catch (error) {
     console.log('>>>>>好友列表获取失败', error);
