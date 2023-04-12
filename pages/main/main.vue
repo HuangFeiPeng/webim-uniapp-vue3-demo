@@ -234,38 +234,31 @@ const showFriendNickname = computed(() => {
   };
 });
 
-const getRoster = (fetchType) => {
+const getRoster = async (fetchType) => {
   if (fetchType === 'local') {
     const localRosterList = uni.getStorageSync('member');
     contactsState.member = localRosterList;
+    console.log('>>>>>>>localRosterList', localRosterList);
     getBrands(localRosterList);
   } else if (fetchType === 'server') {
-    let rosters = {
-      success: (roster) => {
-        let member = [];
-        for (let i = 0; i < roster.length; i++) {
-          if (roster[i].subscription == 'both') {
-            member.push(roster[i]);
-          }
-        }
+    try {
+      const { data } = await WebIM.conn.getContacts();
+      console.log('>>>>>>main');
+      if (data.length) {
         uni.setStorage({
           key: 'member',
-          data: member,
+          data: [...data],
         });
-        contactsState.member = member;
+        contactsState.member = [...data];
         if (!systemReady) {
           disp.fire('em.main.ready');
           systemReady = true;
         }
-
-        getBrands(member);
-      },
-      error: (err) => {
-        console.log('[main:getRoster]', err);
-      },
-    };
-
-    WebIM.conn.getContacts(rosters);
+        getBrands([...data]);
+      }
+    } catch (error) {
+      console.log('>>>>>好友列表获取失败', error);
+    }
   }
 };
 const moveFriend = (message) => {

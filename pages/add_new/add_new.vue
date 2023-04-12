@@ -116,66 +116,28 @@ const onSearch = () => {
 };
 const add_friend = () => {
   let myName = uni.getStorageSync('myUsername');
-  if (
-    addNewState.friend_name == '' ||
-    addNewState.friend_name.toLowerCase() == myName.toLowerCase()
-  ) {
-    uni.showToast({ title: '添加失败' });
-    return;
+  if (addNewState.friend_name == '') {
+    return uni.showToast({ title: '请输入要添加的用户！' });
+  } else if (addNewState.friend_name.toLowerCase() == myName.toLowerCase()) {
+    return uni.showToast({ title: '不可添加自己为好友！' });
   }
-
-  WebIM.conn.addContact(addNewState.friend_name, myName + '请求添加好友');
-
-  let rosters = {
-    success: function (roster) {
-      console.log('success');
-      var member = [];
-
-      for (let i = 0; i < roster.length; i++) {
-        if (roster[i].subscription == 'both') {
-          member.push(roster[i]);
-        }
-      }
-
-      if (isExistFriend(addNewState.friend_name, member)) {
-        uni.showToast({
-          title: '已经是你的好友',
-        });
-      } else {
-        uni.showToast({
-          title: '已发出好友申请',
-        });
-      }
-
-      addNewState.isdisable = true;
-    },
-  };
-  WebIM.conn.getContacts(rosters);
-};
-const isExistFriend = (name, list) => {
-  for (let index = 0; index < list.length; index++) {
-    if (name == list[index].name) {
-      return true;
+  {
+    WebIM.conn.addContact(addNewState.friend_name, myName + '请求添加好友');
+    const friendList = uni.getStorageSync('member');
+    if (friendList.includes(addNewState.friend_name)) {
+      uni.showToast({
+        title: '已经是你的好友',
+      });
+      return;
+    } else {
+      uni.showToast({
+        title: '已发出好友申请',
+      });
     }
+
+    addNewState.isdisable = true;
   }
-  return false;
 };
-// export default {
-//   data() {
-//     return {
-//
-//     };
-//   },
-
-//   components: {},
-//   props: {},
-//   onLoad: function () {
-
-//   },
-//   methods: {
-
-//   },
-// };
 </script>
 <style>
 @import './add_new.css';

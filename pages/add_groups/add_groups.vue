@@ -31,15 +31,15 @@
         <checkbox-group class="checkbox-group" @change="inviteFriendFun">
           <label
             class="checkbox labelStyle"
-            v-for="(item, index) in addGroupsState.friendList"
+            v-for="(userId, index) in addGroupsState.friendList"
             :key="index"
           >
-            <checkbox :value="item.name"></checkbox>
+            <checkbox :value="userId"></checkbox>
             <image
               src="/static/images/theme2x.png"
               style="height: 40px; width: 40px; margin: 0 5px"
             />
-            <text>{{ item.name }}</text>
+            <text>{{ userId }}</text>
           </label>
         </checkbox-group>
       </view>
@@ -79,19 +79,31 @@ const addGroupsState = reactive({
 onLoad((options) => {
   addGroupsState.owner = JSON.parse(options.owner).myName;
 });
-onShow(() => {
+onShow(async () => {
   // 获取当前用户的好友信息
-  WebIM.conn.getContacts({
-    success: function (roster) {
-      let member = [];
-      for (let i = 0; i < roster.length; i++) {
-        if (roster[i].subscription == 'both') {
-          member.push(roster[i]);
-        }
-      }
-      addGroupsState.friendList = member;
-    },
-  });
+  //   WebIM.conn.getContacts({
+  //     success: function (roster) {
+  //       let member = [];
+  //       for (let i = 0; i < roster.length; i++) {
+  //         if (roster[i].subscription == 'both') {
+  //           member.push(roster[i]);
+  //         }
+  //       }
+  //       addGroupsState.friendList = member;
+  //     },
+  //   });
+  try {
+    const { data } = await WebIM.conn.getContacts();
+    console.log('>>>>>>App.vue 拉取好友列表');
+    if (data.length) {
+      uni.setStorage({
+        key: 'member',
+        data: [...data],
+      });
+    }
+  } catch (error) {
+    console.log('>>>>>好友列表获取失败', error);
+  }
 });
 const getGroupName = (e) => {
   addGroupsState.groupName = e.detail.value;
