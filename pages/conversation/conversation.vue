@@ -161,18 +161,18 @@
           </view>
         </swipe-delete>
       </view>
-      <view
-        v-if="
-          conversationState.conversationList &&
-          conversationState.conversationList.length == 0
-        "
-        class="chat_noChat"
-      >
-        <image class="ctbg" src="/static/images/ctbg.png"></image>
-        暂无聊天消息
-      </view>
       <!-- </view> -->
     </scroll-view>
+    <view
+      v-if="
+        conversationState.conversationList &&
+        conversationState.conversationList.length == 0
+      "
+      class="chat_noChat"
+    >
+      <image class="ctbg" src="/static/images/ctbg.png"></image>
+      暂无聊天消息
+    </view>
     <!-- bug: margin-bottom 不生效 需要加一个空标签-->
     <view style="height: 1px"></view>
 
