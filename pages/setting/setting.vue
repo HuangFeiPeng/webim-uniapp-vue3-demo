@@ -97,19 +97,27 @@ const settingState = reactive({
   unReadTotalNotNum: 0,
   isIPX: false,
   phoneNumber: '',
-  defaultAvatar: '/static/images/avatar.png',
+  defaultAvatar: '/static/images/theme2x.png',
   userInfoFromServer: null,
 });
 const loginUserAvactar = computed(() => {
-  if (settingState.userInfoFromServer) {
-    return settingState.userInfoFromServer.avatarurl;
+  if (Array.from(settingState.userInfoFromServer).length) {
+    if (settingState.userInfoFromServer?.avatarurl) {
+      return settingState.userInfoFromServer.avatarurl;
+    } else {
+      return settingState.defaultAvatar;
+    }
   } else {
     return settingState.defaultAvatar;
   }
 });
 const loginUserNickname = computed(() => {
-  if (settingState.userInfoFromServer) {
-    return `${settingState.userInfoFromServer?.nickname}(${settingState.yourname})`;
+  if (Array.from(settingState.userInfoFromServer).length) {
+    if (settingState.userInfoFromServer?.nickname) {
+      return `${settingState.userInfoFromServer?.nickname}(${settingState.yourname})`;
+    } else {
+      return settingState.yourname;
+    }
   } else {
     return settingState.yourname;
   }
