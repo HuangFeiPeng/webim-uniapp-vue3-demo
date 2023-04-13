@@ -17,7 +17,7 @@
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: flex-start;
-    padding: 24rpx;
+    padding: 12rpx;
 }
 .other_func_X{
 	/* height: 128rpx; */
@@ -42,7 +42,7 @@
 .menu_wrap,
 .open_camera,
 .v-record {
-    padding: 24rpx;
+    padding: 20rpx;
 	text-align: center;
 	color: #b7b7b7;
     font-size: 13px;
