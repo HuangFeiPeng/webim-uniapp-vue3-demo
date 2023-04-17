@@ -8,8 +8,9 @@ import msgType from '@/components/chat/msgtype';
 // let disp = require("./utils/broadcast");
 import disp from '@/utils/broadcast';
 import { onGetSilentConfig } from './components/chat/pushStorage';
+import '@/EaseIM';
+import { emConnectListenner } from '@/EaseIM/listenner';
 let logout = false;
-
 function ack(receiveMsg) {
   // 处理未读消息回执
   var bodyId = receiveMsg.id; // 需要发送已读回执的消息id
@@ -566,7 +567,9 @@ export default {
     });
     this.globalData.checkIsIPhoneX();
   },
-
+  setup() {
+    emConnectListenner();
+  },
   methods: {
     async fetchUserInfoWithLoginId() {
       const userId = await uni.WebIM.conn.user;
