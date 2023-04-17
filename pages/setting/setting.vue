@@ -98,26 +98,18 @@ const settingState = reactive({
   isIPX: false,
   phoneNumber: '',
   defaultAvatar: '/static/images/theme2x.png',
-  userInfoFromServer: null,
+  userInfoFromServer: {},
 });
 const loginUserAvactar = computed(() => {
-  if (Array.from(settingState.userInfoFromServer).length) {
-    if (settingState.userInfoFromServer?.avatarurl) {
-      return settingState.userInfoFromServer.avatarurl;
-    } else {
-      return settingState.defaultAvatar;
-    }
+  if (settingState.userInfoFromServer?.avatarurl) {
+    return settingState.userInfoFromServer.avatarurl;
   } else {
     return settingState.defaultAvatar;
   }
 });
 const loginUserNickname = computed(() => {
-  if (Array.from(settingState.userInfoFromServer).length) {
-    if (settingState.userInfoFromServer?.nickname) {
-      return `${settingState.userInfoFromServer?.nickname}(${settingState.yourname})`;
-    } else {
-      return settingState.yourname;
-    }
+  if (settingState.userInfoFromServer?.nickname) {
+    return `${settingState.userInfoFromServer?.nickname}(${settingState.yourname})`;
   } else {
     return settingState.yourname;
   }
@@ -190,7 +182,10 @@ onLoad(() => {
 onShow(() => {
   uni.hideHomeButton && uni.hideHomeButton();
   settingState.phoneNumber = uni.getStorageSync('phoneNumber');
-  settingState.userInfoFromServer = getApp().globalData.userInfoFromServer;
+  settingState.userInfoFromServer = Object.assign(
+    settingState.userInfoFromServer,
+    getApp().globalData.userInfoFromServer
+  );
   settingState.messageNum = getApp().globalData.saveFriendList.length;
   settingState.unReadSpotNum =
     getApp().globalData.unReadMessageNum > 99
