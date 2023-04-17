@@ -3,12 +3,18 @@ import { defineStore } from 'pinia';
 export const useLoginStore = defineStore('login', {
   state: () => {
     return {
-      count: 0,
+      loginUserBaseInfos: {
+        loginUserId: '',
+        phoneNumber: '',
+      },
     };
   },
   actions: {
-    increament() {
-      this.count++;
+    setLoginUserBaseInfos(baseInfos) {
+      this.loginUserBaseInfos = Object.assign(
+        this.loginUserBaseInfos,
+        baseInfos
+      );
     },
   },
 });

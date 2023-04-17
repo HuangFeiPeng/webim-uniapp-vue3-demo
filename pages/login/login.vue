@@ -8,10 +8,11 @@
           style="width: 100px; height: 100px"
         ></image>
       </view>
+      <!-- 用户名或手机号输入框 -->
       <view :class="'login_user ' + loginState.nameFocus">
         <input
           type="text"
-          v-model="loginState.name"
+          v-model.trim="loginState.name"
           :placeholder="
             loginState.usePwdLogin ? '请输入用户名' : '请输入手机号'
           "
@@ -20,17 +21,17 @@
           @blur="onBlurName"
         />
       </view>
-
+      <!-- 用户密码输入框 -->
       <view
         :class="'login_pwd ' + loginState.psdFocus"
         v-if="loginState.usePwdLogin"
       >
         <input
           type="text"
+          v-model.trim="loginState.psd"
           :password="!loginState.showPassword"
           placeholder="请输入密码"
           placeholder-style="color:rgb(173,185,193)"
-          @input="bindPassword"
           @focus="onFocusPsd"
           @blur="onBlurPsd"
         />
@@ -44,44 +45,36 @@
           @tap="loginState.showPassword = !loginState.showPassword"
         ></image>
       </view>
-
+      <!-- 验证码输入框 -->
       <view class="login_pwd" v-else>
         <input
           type="text"
+          v-model.trim="loginState.psd"
           placeholder="请输入验证码"
           hover-class="input-hover"
           placeholder-style="color:rgb(173,185,193)"
-          @input="bindPassword"
+          @focus="onFocusPsd"
+          @blur="onBlurPsd"
         />
         <view class="login_sms" @tap="getSmsCode">{{
           loginState.btnText
         }}</view>
       </view>
-
       <view class="login_btn">
-        <button hover-class="btn_hover" @click="loginIM">登录</button>
+        <button hover-class="btn_hover" @click="loginEaseIM">登录</button>
       </view>
-      <!-- <view class="login_text">
-		<navigator url="../register/register" open-type="redirect">账号注册</navigator>
-		<navigator url="../resetpassword/resetpassword" open-type="redirect">找回密码</navigator>
-		<navigator url="../login_token/login_token" open-type="redirect" hover-class="navigator-hover">使用Token登录</navigator>
-	</view> -->
     </view>
   </view>
 </template>
 
 <script setup>
 import { reactive } from 'vue';
-import disp from '@/utils/broadcast.js';
-// let WebIM = require("../../utils/WebIM")["default"];
-let __test_account__, __test_psword__;
-// let disp = require("../../utils/broadcast");
-let runAnimation = true;
+import { EMClient } from '@/EaseIM';
+import { useLoginStore } from '@/stores/login';
 let times = 60;
 let timer;
-const WebIM = uni.WebIM;
 const loginState = reactive({
-  usePwdLogin: true, //是否用户名+手机号方式登录
+  usePwdLogin: false, //是否用户名+手机号方式登录
   name: '',
   psd: '',
   grant_type: 'password',
@@ -91,21 +84,7 @@ const loginState = reactive({
   type: 'text',
   btnText: '获取验证码',
 });
-const app = getApp().globalData;
 
-disp.on('em.error.passwordErr', function () {
-  uni.showToast({
-    title: '用户名或密码错误',
-    icon: 'none',
-  });
-});
-
-const bindUsername = (e) => {
-  loginState.name = e.detail.value;
-};
-const bindPassword = (e) => {
-  loginState.psd = e.detail.value;
-};
 const onFocusPsd = () => {
   loginState.psdFocus = 'psdFocus';
 };
@@ -194,132 +173,133 @@ const getSmsCode = () => {
   });
 };
 //登录IM
-const loginIM = () => {
-  runAnimation = !runAnimation;
-  if (!loginState.usePwdLogin) {
-    if (!__test_account__ && loginState.name == '') {
+const loginStore = useLoginStore();
+const loginEaseIM = async () => {
+  if (loginState.usePwdLogin) {
+    if (!loginState.name) {
       uni.showToast({
-        title: '请输入手机号！',
+        title: '请输入用户ID！',
         icon: 'none',
       });
       return;
-    } else if (!__test_account__ && loginState.psd == '') {
+    } else if (!loginState.psd) {
       uni.showToast({
         title: '请输入验证码！',
         icon: 'none',
       });
       return;
     }
-    const that = loginState;
-    uni.request({
+    loginWithUserId();
+  } else {
+    if (!loginState.name) {
+      uni.showToast({
+        title: '请输入手机号！',
+        icon: 'none',
+      });
+      return;
+    } else if (!loginState.psd) {
+      uni.showToast({
+        title: '请输入验证码！',
+        icon: 'none',
+      });
+      return;
+    }
+    loginWithPhoneNumber();
+  }
+};
+const loginWithPhoneNumber = async () => {
+  try {
+    let res = await uni.request({
       url: 'https://a1.easemob.com/inside/app/user/login/V2',
       header: {
         'content-type': 'application/json',
       },
       method: 'POST',
       data: {
-        phoneNumber: that.name,
-        smsCode: that.psd,
-      },
-      success(res) {
-        if (res.statusCode == 200) {
-          const { phoneNumber, token, chatUserName } = res.data;
-          getApp().globalData.conn.open({
-            user: chatUserName,
-            accessToken: token,
-          });
-          getApp().globalData.phoneNumber = phoneNumber;
-          uni.setStorage({
-            key: 'myUsername',
-            data: chatUserName,
-          });
-        } else if (res.statusCode == 400) {
-          if (res.data.errorInfo) {
-            switch (res.data.errorInfo) {
-              case 'UserId password error.':
-                uni.showToast({
-                  title: '用户名或密码错误！',
-                  icon: 'none',
-                });
-                break;
-              case 'phone number illegal':
-                uni.showToast({
-                  title: '请输入正确的手机号',
-                  icon: 'none',
-                });
-                break;
-              case 'SMS verification code error.':
-                uni.showToast({
-                  title: '验证码错误',
-                  icon: 'none',
-                });
-                break;
-              case 'Sms code cannot be empty':
-                uni.showToast({
-                  title: '验证码不能为空',
-                  icon: 'none',
-                });
-                break;
-              case 'Please send SMS to get mobile phone verification code.':
-                uni.showToast({
-                  title: '请使用短信验证码登录',
-                  icon: 'none',
-                });
-                break;
-              default:
-                uni.showToast({
-                  title: res.data.errorInfo,
-                  icon: 'none',
-                });
-                break;
-            }
-          }
-        } else {
-          uni.showToast({
-            title: '登录失败！',
-            icon: 'none',
-          });
-        }
-      },
-      fail(error) {
-        uni.showToast({
-          title: '登录失败！',
-          icon: 'none',
-        });
+        phoneNumber: loginState.name,
+        smsCode: loginState.psd,
       },
     });
-  } else {
-    if (!__test_account__ && loginState.name == '') {
-      uni.showToast({
-        title: '请输入用户名！',
-        icon: 'none',
+    if (res.statusCode == 200) {
+      const { phoneNumber, token, chatUserName } = res.data;
+      await EMClient.open({
+        user: chatUserName,
+        accessToken: token,
       });
-      return;
-    } else if (!__test_account__ && loginState.psd == '') {
-      uni.showToast({
-        title: '请输入密码！',
-        icon: 'none',
+      loginStore.setLoginUserBaseInfos({
+        loginUserId: chatUserName,
+        phoneNumber: phoneNumber,
       });
-      return;
+      uni.setStorage({
+        key: 'myUsername',
+        data: chatUserName,
+      });
+    } else if (res.statusCode == 400) {
+      if (res.data.errorInfo) {
+        switch (res.data.errorInfo) {
+          case 'UserId password error.':
+            uni.showToast({
+              title: '用户名或密码错误！',
+              icon: 'none',
+            });
+            break;
+          case 'phone number illegal':
+            uni.showToast({
+              title: '请输入正确的手机号',
+              icon: 'none',
+            });
+            break;
+          case 'SMS verification code error.':
+            uni.showToast({
+              title: '验证码错误',
+              icon: 'none',
+            });
+            break;
+          case 'Sms code cannot be empty':
+            uni.showToast({
+              title: '验证码不能为空',
+              icon: 'none',
+            });
+            break;
+          case 'Please send SMS to get mobile phone verification code.':
+            uni.showToast({
+              title: '请使用短信验证码登录',
+              icon: 'none',
+            });
+            break;
+          default:
+            uni.showToast({
+              title: res.data.errorInfo,
+              icon: 'none',
+            });
+            break;
+        }
+      }
     }
+  } catch (error) {
+    uni.showToast({
+      title: '登录失败！',
+      icon: 'none',
+    });
+  }
+};
+const loginWithUserId = async () => {
+  try {
+    await EMClient.open({ user: loginState.name, pwd: loginState.psd });
     uni.setStorage({
       key: 'myUsername',
-      data: __test_account__ || loginState.name.toLowerCase(),
+      data: loginState.name.toLowerCase(),
     });
-    console.log(111, {
-      apiUrl: WebIM.config.apiURL,
-      user: __test_account__ || loginState.name.toLowerCase(),
-      pwd: __test_psword__ || loginState.psd,
-      grant_type: loginState.grant_type,
-      appKey: WebIM.config.appkey,
+    loginStore.setLoginUserBaseInfos({ loginUserId: loginState.name });
+  } catch (error) {
+    console.log('>>>>>>', error);
+    uni.showToast({
+      title: '登录失败',
+      icon: 'none',
     });
-    getApp().globalData.conn.open({
-      apiUrl: WebIM.config.apiURL,
-      user: __test_account__ || loginState.name.toLowerCase(),
-      pwd: __test_psword__ || loginState.psd,
-      grant_type: loginState.grant_type,
-      appKey: WebIM.config.appkey,
-    });
+  } finally {
+    loginState.name = '';
+    loginState.psd = '';
   }
 };
 </script>
