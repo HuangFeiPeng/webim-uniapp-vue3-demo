@@ -121,54 +121,7 @@
         </view>
       </view>
     </view>
-
-    <view :class="contactsState.isIPX ? 'chatRoom_tab_X' : 'chatRoom_tab'">
-      <view class="tableBar" @tap="tab_chat">
-        <view
-          v-if="
-            contactsState.unReadSpotNum > 0 ||
-            contactsState.unReadSpotNum == '99+'
-          "
-          :class="
-            'em-unread-spot ' +
-            (contactsState.unReadSpotNum == '99+'
-              ? 'em-unread-spot-litleFont'
-              : '')
-          "
-          >{{
-            contactsState.unReadSpotNum == '99+'
-              ? contactsState.unReadSpotNum
-              : contactsState.unReadSpotNum + contactsState.unReadTotalNotNum
-          }}</view
-        >
-        <image
-          :class="
-            contactsState.unReadSpotNum > 0 ||
-            contactsState.unReadSpotNum == '99+'
-              ? 'haveSpot'
-              : ''
-          "
-          src="/static/images/session2x.png"
-        ></image>
-        <text>消息</text>
-      </view>
-
-      <view class="tableBar">
-        <image src="/static/images/comtactshighlight2x.png"></image>
-        <text class="activeText">联系人</text>
-      </view>
-
-      <!-- <view class="tableBar" @tap="tab_notification">
-		<view v-if="unReadTotalNotNum > 0" class="em-unread-spot">{{ unReadTotalNotNum }}</view>
-		<image :class="unReadTotalNotNum > 0 ? 'haveSpot': ''" src="/static/images/notice.png"></image>
-		<text>通知</text>
-	</view> -->
-
-      <view class="tableBar" @tap="tab_setting">
-        <image src="/static/images/setting2x.png"></image>
-        <text>我的</text>
-      </view>
-    </view>
+    <Tabbar />
   </view>
 </template>
 
@@ -177,6 +130,7 @@ import { reactive, computed } from 'vue';
 import disp from '@/utils/broadcast';
 import swipeDelete from '@/components/swipedelete/swipedelete';
 import { onLoad, onShow, onUnload } from '@dcloudio/uni-app';
+import Tabbar from '@/layout/tabbar';
 // let WebIM = require("../../utils/WebIM")["default"];
 const WebIM = uni.WebIM;
 // let disp = require('../../utils/broadcast');

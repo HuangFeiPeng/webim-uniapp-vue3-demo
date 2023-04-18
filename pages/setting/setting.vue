@@ -36,57 +36,14 @@
       </view>
     </view>
 
-    <view :class="settingState.isIPX ? 'chatRoom_tab_X' : 'chatRoom_tab'">
-      <view class="tableBar" @tap="tab_chat">
-        <view
-          v-if="
-            settingState.unReadSpotNum > 0 ||
-            settingState.unReadSpotNum == '99+'
-          "
-          :class="
-            'em-unread-spot ' +
-            (settingState.unReadSpotNum == '99+'
-              ? 'em-unread-spot-litleFont'
-              : '')
-          "
-          >{{
-            settingState.unReadSpotNum + settingState.unReadTotalNotNum
-          }}</view
-        >
-        <image
-          :class="
-            settingState.unReadSpotNum > 0 ||
-            settingState.unReadSpotNum == '99+'
-              ? 'haveSpot'
-              : ''
-          "
-          src="/static/images/session2x.png"
-        ></image>
-        <text>消息</text>
-      </view>
-
-      <view class="tableBar" @tap="tab_contact">
-        <image src="/static/images/comtacts2x.png"></image>
-        <text>联系人</text>
-      </view>
-
-      <!-- <view class="tableBar" @tap="tab_notification">
-		<view v-if="unReadTotalNotNum > 0" class="em-unread-spot">{{ unReadTotalNotNum }}</view>
-		<image :class="unReadTotalNotNum > 0 ? 'haveSpot': ''" src="/static/images/notice.png"></image>
-		<text>通知</text>
-	</view> -->
-
-      <view class="tableBar">
-        <image src="/static/images/settinghighlight2x.png"></image>
-        <text class="activeText">我的</text>
-      </view>
-    </view>
+    <Tabbar />
   </view>
 </template>
 
 <script setup>
 import { reactive, computed } from 'vue';
 import { onLoad, onShow, onUnload } from '@dcloudio/uni-app';
+import Tabbar from '@/layout/tabbar';
 import disp from '@/utils/broadcast';
 const WebIM = uni.WebIM;
 const settingState = reactive({

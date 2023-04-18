@@ -181,66 +181,14 @@
       @tap="close_mask"
       v-if="conversationState.show_mask"
     ></view>
-
-    <view :class="conversationState.isIPX ? 'chatRoom_tab_X' : 'chatRoom_tab'">
-      <view class="tableBar">
-        <view
-          v-if="
-            conversationState.unReadSpotNum > 0 ||
-            conversationState.unReadSpotNum == '99+'
-          "
-          :class="
-            'em-unread-spot ' +
-            (conversationState.unReadSpotNum == '99+'
-              ? 'em-unread-spot-litleFont'
-              : '')
-          "
-          >{{
-            conversationState.unReadSpotNum == '99+'
-              ? conversationState.unReadSpotNum
-              : conversationState.unReadSpotNum +
-                conversationState.unReadTotalNotNum
-          }}</view
-        >
-        <image
-          :class="
-            conversationState.unReadSpotNum > 0 ||
-            conversationState.unReadSpotNum == '99+'
-              ? 'haveSpot'
-              : ''
-          "
-          src="/static/images/sessionhighlight2x.png"
-        ></image>
-        <text class="activeText">消息</text>
-      </view>
-
-      <view class="tableBar" @tap="tab_contacts">
-        <image src="/static/images/comtacts2x.png"></image>
-        <text>联系人</text>
-      </view>
-
-      <!-- <view class="tableBar" @tap="tab_notification">
-        <view v-if="unReadTotalNotNum > 0" class="em-unread-spot">{{
-          unReadTotalNotNum
-        }}</view>
-        <image
-          :class="unReadTotalNotNum > 0 ? 'haveSpot' : ''"
-          src="/static/images/notice.png"
-        ></image>
-        <text>通知</text>
-      </view> -->
-
-      <view class="tableBar" @tap="tab_setting">
-        <image src="/static/images/setting2x.png"></image>
-        <text>我的</text>
-      </view>
-    </view>
+    <Tabbar :tab-type="'conversation'" />
   </view>
 </template>
 
 <script setup>
 import { reactive, computed, nextTick } from 'vue';
 import { onLoad, onShow, onUnload } from '@dcloudio/uni-app';
+import Tabbar from '@/layout/tabbar';
 import swipeDelete from '@/components/swipedelete/swipedelete';
 import msgtype from '@/components/chat/msgtype';
 import dateFormater from '@/utils/dateFormater';
