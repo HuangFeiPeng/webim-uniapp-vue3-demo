@@ -10,6 +10,7 @@ import disp from '@/utils/broadcast';
 import { onGetSilentConfig } from './components/chat/pushStorage';
 import '@/EaseIM';
 import { emConnectListenner } from '@/EaseIM/listenner';
+import { EMClient } from './EaseIM';
 let logout = false;
 function ack(receiveMsg) {
   // 处理未读消息回执
@@ -33,39 +34,6 @@ function onMessageError(err) {
 
   return true;
 }
-
-function getCurrentRoute() {
-  let pages = getCurrentPages();
-  if (pages.length > 0) {
-    let currentPage = pages[pages.length - 1];
-    return currentPage.route;
-  }
-  return '/';
-}
-
-// // 不包含陌生人版本(不接收陌生人消息)
-// function calcUnReadSpot(message) {
-//   let myName = uni.getStorageSync("myUsername");
-//   let members = uni.getStorageSync("member") || []; //好友
-
-//   var listGroups = uni.getStorageSync("listGroup") || []; //群组
-//   let allMembers = members.concat(listGroups);
-//   let count = allMembers.reduce(function(result, curMember, idx) {
-//     let chatMsgs;
-//     if (curMember.groupid) {
-//       chatMsgs =
-//         uni.getStorageSync(curMember.groupid + myName.toLowerCase()) || [];
-//     } else {
-//       chatMsgs =
-//         uni.getStorageSync(
-//           curMember.name && curMember.name.toLowerCase() + myName.toLowerCase()
-//         ) || [];
-//     }
-//     return result + chatMsgs.length;
-//   }, 0);
-//   getApp().globalData.unReadMessageNum = count;
-//   disp.fire("em.unreadspot", message);
-// }
 
 // 包含陌生人版本
 //该方法用以计算本地存储消息的未读总数。
@@ -157,7 +125,6 @@ export default {
           actionOpen();
         }
       },
-
       reopen() {
         if (this.closed) {
           //this.open(this.curOpenOpt);
@@ -166,16 +133,15 @@ export default {
         }
       },
     },
-    onLoginSuccess: function (myName) {
-      uni.hideLoading();
-      uni.redirectTo({
-        url: '../conversation/conversation?myName=' + myName,
-      });
-    },
+    // onLoginSuccess: function (myName) {
+    //   uni.hideLoading();
+    //   uni.redirectTo({
+    //     url: '../conversation/conversation?myName=' + myName,
+    //   });
+    // },
 
     getUserInfo(cb) {
       var me = this;
-
       if (this.userInfo) {
         typeof cb == 'function' && cb(this.userInfo);
       } else {
@@ -568,7 +534,26 @@ export default {
     this.globalData.checkIsIPhoneX();
   },
   setup() {
-    emConnectListenner();
+    const listennerCallback = (type) => {
+      console.log('>>>>>连接成功回调', type);
+      if (type === 'connected') {
+        onLoginSuccess();
+      }
+      if (type === 'disconnected') {
+        onDisconnect();
+      }
+    };
+    const onLoginSuccess = () => {
+      const myName = EMClient.user;
+      uni.hideLoading();
+      uni.redirectTo({
+        url: '../conversation/conversation?myName=' + myName,
+      });
+    };
+    const onDisconnect = () => {
+      console.log('>>>>处理断开连接监听');
+    };
+    emConnectListenner(listennerCallback);
   },
   methods: {
     async fetchUserInfoWithLoginId() {
