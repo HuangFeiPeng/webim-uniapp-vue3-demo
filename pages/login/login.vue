@@ -189,6 +189,10 @@ const loginEaseIM = async () => {
       });
       return;
     }
+    uni.showLoading({
+      title: '正在初始化客户端..',
+      mask: true,
+    });
     loginWithUserId();
   } else {
     if (!loginState.name) {
