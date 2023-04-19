@@ -51,7 +51,7 @@
         :key="index"
         class="chat_list"
         :data-item="item"
-        @tap.stop="del_chat"
+        @tap.stop="deleteConversation"
       >
         <swipe-delete>
           <!-- 通知模块 -->
@@ -180,8 +180,6 @@ import { useConversationStore } from '@/stores/conversation';
 import { useContactsStore } from '@/stores/contacts';
 import { useGroupStore } from '@/stores/group';
 import dateFormater from '@/utils/dateFormater';
-
-let isfirstTime = true;
 const conversationState = reactive({
   //       msgtype,
   search_btn: true,
@@ -209,7 +207,11 @@ const conversationState = reactive({
 });
 /* 会话列表 */
 const conversationStore = useConversationStore();
-const { fetchConversationFromServer } = emConversation();
+const {
+  fetchConversationFromServer,
+  removeConversationFromServer,
+  sendChannelAck,
+} = emConversation();
 const fetchConversationList = async () => {
   const res = await fetchConversationFromServer();
   if (res?.data?.channel_infos) {
@@ -218,7 +220,7 @@ const fetchConversationList = async () => {
     );
   }
 };
-
+//会话列表数据
 const conversationList = computed(() => {
   return conversationStore.conversationList;
 });
@@ -275,6 +277,27 @@ const handleTime = computed(() => {
     return dateFormater('MM/DD/HH:mm', item.time);
   };
 });
+//删除会话
+const deleteConversation = async (event) => {
+  const { channel_id, chatType } = event.currentTarget.dataset.item;
+  try {
+    const res = await uni.showModal({
+      title: '确认删除？',
+      confirmText: '删除',
+    });
+    if (res.confirm) {
+      await removeConversationFromServer(channel_id, chatType);
+      conversationStore.deleteConversation(channel_id);
+    }
+  } catch (error) {
+    uni.showToast({
+      title: '删除失败',
+      icon: 'none',
+      duration: 2000,
+    });
+    console.log('删除失败', error);
+  }
+};
 const openSearch = () => {
   conversationState.search_btn = false;
   conversationState.search_chats = true;
@@ -486,7 +509,9 @@ const pickerMenuChange = () => {
   del_chat(conversationState.currentVal);
 };
 onLoad(() => {
-  fetchConversationList();
+  if (!conversationList.value.length) {
+    fetchConversationList();
+  }
 });
 onShow(() => {
   uni.hideHomeButton && uni.hideHomeButton();

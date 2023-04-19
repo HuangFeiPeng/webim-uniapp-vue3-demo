@@ -39,5 +39,13 @@ export const useConversationStore = defineStore('conversation', {
           return this.conversationList.push(conversationBody);
         });
     },
+    async deleteConversation(channel_id) {
+      this.conversationList.length &&
+        this.conversationList.forEach((channel, index) => {
+          if (channel.channel_id === channel_id) {
+            this.conversationList.splice(index, 1);
+          }
+        });
+    },
   },
 });
