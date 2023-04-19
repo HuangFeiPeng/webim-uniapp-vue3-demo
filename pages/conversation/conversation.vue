@@ -47,7 +47,7 @@
         <text @tap="cancel">取消</text>
       </view>
       <view
-        v-for="(item, index) in conversationState.conversationList"
+        v-for="(item, index) in conversationList"
         :key="index"
         class="chat_list"
         :data-item="item"
@@ -90,7 +90,6 @@
               </view>
             </view>
           </view>
-
           <view
             class="tap_mask"
             @tap.stop="into_chatRoom"
@@ -99,27 +98,13 @@
           >
             <!-- 消息列表 -->
             <view class="list_box">
-              <view class="list_left" :data-username="item.username">
+              <view class="list_left" :data-username="item.channel_id">
                 <view class="list_pic">
-                  <view
-                    class="em-msgNum"
-                    v-if="
-                      item.unReadCount > 0 &&
-                      !conversationState.pushConfigData.includes(
-                        item.chatType === 'chat' ? item.username : item.info.to
-                      )
-                    "
-                  >
-                    {{ item.unReadCount > 99 ? '99+' : item.unReadCount }}</view
+                  <view class="em-msgNum">
+                    {{ item.unread_num > 99 ? '99+' : item.unread_num }}</view
                   >
 
                   <image :src="showConversationAvatar(item)"></image>
-                  <!-- <image :src="
-                    item.chatType == 'groupchat' ||
-                      item.chatType == 'chatRoom'
-                      ? '../../static/images/groupTheme.png'
-                      : '../../static/images/theme2x.png'
-                  "></image> -->
                 </view>
                 <view class="list_text">
                   <text class="list_user">{{
@@ -127,24 +112,32 @@
                   }}</text>
                   <text
                     class="list_word"
-                    v-if="item.msg.type == msgtype.TEXT"
-                    >{{ item.msg.data[0].data }}</text
+                    v-if="item.lastMessage.type == MESSAGE_TYPE.TEXT"
+                    >{{ item.lastMessage.msg }}</text
                   >
-                  <text class="list_word" v-if="item.msg.type == msgtype.IMAGE"
+                  <text
+                    class="list_word"
+                    v-if="item.lastMessage.type == MESSAGE_TYPE.IMAGE"
                     >[图片]</text
                   >
-                  <text class="list_word" v-if="item.msg.type == msgtype.AUDIO"
+                  <text
+                    class="list_word"
+                    v-if="item.lastMessage.type == MESSAGE_TYPE.AUDIO"
                     >[语音]</text
                   >
-                  <text class="list_word" v-if="item.msg.type == msgtype.FILE"
+                  <text
+                    class="list_word"
+                    v-if="item.lastMessage.type == MESSAGE_TYPE.FILE"
                     >[附件]</text
                   >
-                  <text class="list_word" v-if="item.msg.type == msgtype.VIDEO"
+                  <text
+                    class="list_word"
+                    v-if="item.lastMessage.type == MESSAGE_TYPE.VIDEO"
                     >[视频]</text
                   >
                   <text
                     class="list_word"
-                    v-if="item.msg.type == msgtype.CUSTOM"
+                    v-if="item.lastMessage.type == MESSAGE_TYPE.CUSTOM"
                   >
                     <text v-if="item.customEvent === 'userCard'"
                       >[个人名片]</text
@@ -161,15 +154,8 @@
           </view>
         </swipe-delete>
       </view>
-      <!-- </view> -->
     </scroll-view>
-    <view
-      v-if="
-        conversationState.conversationList &&
-        conversationState.conversationList.length == 0
-      "
-      class="chat_noChat"
-    >
+    <view v-if="!conversationList.length" class="chat_noChat">
       <image class="ctbg" src="/static/images/ctbg.png"></image>
       暂无聊天消息
     </view>
@@ -181,21 +167,20 @@
       @tap="close_mask"
       v-if="conversationState.show_mask"
     ></view>
-    <Tabbar :tab-type="'conversation'" />
   </view>
 </template>
 
 <script setup>
-import { reactive, computed, nextTick } from 'vue';
+import { reactive, computed } from 'vue';
 import { onLoad, onShow, onUnload } from '@dcloudio/uni-app';
-import Tabbar from '@/layout/tabbar';
 import swipeDelete from '@/components/swipedelete/swipedelete';
-import msgtype from '@/components/chat/msgtype';
+import { emConversation } from '@/EaseIM/imApis';
+import { CHAT_TYPE, MESSAGE_TYPE } from '@/EaseIM/constant';
+import { useConversationStore } from '@/stores/conversation';
+import { useContactsStore } from '@/stores/contacts';
+import { useGroupStore } from '@/stores/group';
 import dateFormater from '@/utils/dateFormater';
-// let disp = require('../../utils/broadcast');
-import disp from '@/utils/broadcast';
-// var WebIM = require('../../utils/WebIM')['default'];
-const WebIM = uni.WebIM;
+
 let isfirstTime = true;
 const conversationState = reactive({
   //       msgtype,
@@ -222,254 +207,74 @@ const conversationState = reactive({
   defaultAvatar: '/static/images/theme2x.png',
   defaultGroupAvatar: '/static/images/groupTheme.png',
 });
-onLoad(() => {
-  disp.on('em.subscribe', onChatPageSubscribe);
-  //监听解散群
-  disp.on('em.invite.deleteGroup', onChatPageDeleteGroup);
-  //监听未读消息数
-  disp.on('em.unreadspot', onChatPageUnreadspot);
-  //监听未读加群“通知”
-  disp.on('em.invite.joingroup', onChatPageJoingroup);
-  //监听好友删除
-  disp.on('em.contacts.remove', onChatPageRemoveContacts);
-  //监听好友关系解除
-  disp.on('em.unsubscribed', onChatPageUnsubscribed);
-  if (!uni.getStorageSync('listGroup')) {
-    listGroups();
+/* 会话列表 */
+const conversationStore = useConversationStore();
+const { fetchConversationFromServer } = emConversation();
+const fetchConversationList = async () => {
+  const res = await fetchConversationFromServer();
+  if (res?.data?.channel_infos) {
+    conversationStore.setConversationList(
+      Object.assign([], res.data.channel_infos)
+    );
   }
-  if (!uni.getStorageSync('member')) {
-    getRoster();
-  }
+};
 
-  readJoinedGroupName();
+const conversationList = computed(() => {
+  return conversationStore.conversationList;
 });
-onShow(() => {
-  uni.hideHomeButton && uni.hideHomeButton();
-  setTimeout(() => {
-    getLocalConversationlist();
-  }, 100);
-  conversationState.unReadMessageNum =
-    getApp().globalData.unReadMessageNum > 99
-      ? '99+'
-      : getApp().globalData.unReadMessageNum;
-  conversationState.messageNum = getApp().globalData.saveFriendList.length;
-  conversationState.unReadNoticeNum =
-    getApp().globalData.saveGroupInvitedList.length;
-  conversationState.unReadTotalNotNum =
-    getApp().globalData.saveFriendList.length +
-    getApp().globalData.saveGroupInvitedList.length;
-  if (getApp().globalData.isIPX) {
-    conversationState.isIPX = true;
-  }
+//会话列表name&头像展示处理
+const groupStore = useGroupStore();
+const contactsStore = useContactsStore();
+//好友属性
+const friendUserInfoMap = computed(() => {
+  return contactsStore.friendUserInfoMap;
 });
+//会话列表头像
 const showConversationAvatar = computed(() => {
-  const friendUserInfoMap = getApp().globalData.friendUserInfoMap;
   return (item) => {
-    if (item.chatType === 'singleChat' || item.chatType === 'chat') {
+    if (item.chatType === CHAT_TYPE.SINGLE_CHAT || item.chatType === 'chat') {
       if (
-        friendUserInfoMap.has(item.username) &&
-        friendUserInfoMap.get(item.username)?.avatarurl
+        friendUserInfoMap.value.has(item.channel_id) &&
+        friendUserInfoMap.value.get(item.channel_id)?.avatarurl
       ) {
-        return friendUserInfoMap.get(item.username).avatarurl;
+        return friendUserInfoMap.value.get(item.channel_id).avatarurl;
       } else {
         return conversationState.defaultAvatar;
       }
     } else if (
       item.chatType.toLowerCase() === 'groupchat' ||
-      item.chatType === 'chatRoom'
+      item.chatType === CHAT_TYPE.GROUP_CHAT
     ) {
       return conversationState.defaultGroupAvatar;
     }
   };
 });
+//会话列表名称
 const showConversationName = computed(() => {
-  const friendUserInfoMap = getApp().globalData.friendUserInfoMap;
   return (item) => {
-    if (item.chatType === 'singleChat' || item.chatType === 'chat') {
+    if (item.chatType === CHAT_TYPE.SINGLE_CHAT || item.chatType === 'chat') {
       if (
-        friendUserInfoMap.has(item.username) &&
-        friendUserInfoMap.get(item.username)?.nickname
+        friendUserInfoMap.value.has(item.channel_id) &&
+        friendUserInfoMap.value.get(item.channel_id)?.nickname
       ) {
-        return friendUserInfoMap.get(item.username).nickname;
+        return friendUserInfoMap.value.get(item.channel_id).nickname;
       } else {
-        return item.username;
+        return item.channel_id;
       }
     } else if (
-      item.chatType === msgtype.chatType.GROUP_CHAT ||
-      item.chatType === msgtype.chatType.CHAT_ROOM
+      item.chatType === CHAT_TYPE.GROUP_CHAT ||
+      item.chatType === 'groupchat'
     ) {
-      return item.groupName;
+      return item.channel_id;
     }
   };
 });
+//时间展示
 const handleTime = computed(() => {
   return (item) => {
     return dateFormater('MM/DD/HH:mm', item.time);
   };
 });
-
-const listGroups = () => {
-  return uni.WebIM.conn.getGroup({
-    limit: 50,
-    success: function (res) {
-      uni.setStorage({
-        key: 'listGroup',
-        data: res.data,
-      });
-      readJoinedGroupName();
-      getLocalConversationlist();
-    },
-    error: function (err) {
-      console.log(err);
-    },
-  });
-};
-
-const getRoster = async () => {
-  const { data } = await WebIM.conn.getContacts();
-  if (data.length) {
-    uni.setStorage({
-      key: 'member',
-      data: [...data],
-    });
-    conversationState.member = [...data];
-    //if(!systemReady){
-    disp.fire('em.main.ready');
-    //systemReady = true;
-    //}
-    getLocalConversationlist();
-    conversationState.unReadSpotNum =
-      getApp().globalData.unReadMessageNum > 99
-        ? '99+'
-        : getApp().globalData.unReadMessageNum;
-  }
-  console.log('>>>>好友列表获取成功', data);
-};
-
-const readJoinedGroupName = () => {
-  const joinedGroupList = uni.getStorageSync('listGroup');
-  const groupList = joinedGroupList?.data || joinedGroupList || [];
-  let groupName = {};
-  groupList.forEach((item) => {
-    groupName[item.groupid] = item.groupname;
-  });
-  conversationState.groupName = groupName;
-};
-// 不包含陌生人版本
-// getLocalConversationlist() {
-//   var conversationList = [];
-//   var member = uni.getStorageSync("member");
-//   var myName = uni.getStorageSync("myUsername");
-//   var listGroups = uni.getStorageSync('listGroup') || [];
-//   for (let i = 0; i < member.length; i++) {
-//     let newChatMsgs = uni.getStorageSync(member[i].name + myName) || [];
-//     let historyChatMsgs = uni.getStorageSync("rendered_" + member[i].name + myName) || [];
-//     let curChatMsgs = historyChatMsgs.concat(newChatMsgs);
-//     if (curChatMsgs.length) {
-//       let lastChatMsg = curChatMsgs[curChatMsgs.length - 1];
-//       lastChatMsg.unReadCount = newChatMsgs.length;
-//       conversationList.push(lastChatMsg);
-//     }
-//   }
-//   for(let i = 0; i < listGroups.length; i++){
-//     let newChatMsgs = uni.getStorageSync(listGroups[i].groupid + myName) || [];
-//     let historyChatMsgs = uni.getStorageSync("rendered_" + listGroups[i].groupid + myName) || [];
-//     let curChatMsgs = historyChatMsgs.concat(newChatMsgs);
-//     if(curChatMsgs.length){
-//     let lastChatMsg = curChatMsgs[curChatMsgs.length - 1];
-//     lastChatMsg.unReadCount = newChatMsgs.length;
-//     lastChatMsg.groupName = listGroups[i].groupname
-//     conversationList.push(lastChatMsg);
-//     }
-//   }
-//   conversationList.sort((a, b) => {
-//     return b.time - a.time;
-//   });
-//   conversationState.setData({
-//         conversationList: conversationList,
-//   });
-// },
-
-// 包含陌生人版本
-const getLocalConversationlist = () => {
-  const myName = uni.getStorageSync('myUsername');
-  uni.getStorageInfo({
-    success: (res) => {
-      let storageKeys = res.keys;
-      let newChatMsgKeys = [];
-      let historyChatMsgKeys = [];
-      let len = myName.length;
-      storageKeys.forEach((item) => {
-        if (item.slice(-len) == myName && item.indexOf('rendered_') == -1) {
-          newChatMsgKeys.push(item);
-        } else if (
-          item.slice(-len) == myName &&
-          item.indexOf('rendered_') > -1
-        ) {
-          historyChatMsgKeys.push(item);
-        } else if (item === 'INFORM') {
-          newChatMsgKeys.push(item);
-        }
-      });
-      packageConversation(newChatMsgKeys, historyChatMsgKeys);
-    },
-  });
-};
-//组件会话列表方法
-const packageConversation = (newChatMsgKeys, historyChatMsgKeys) => {
-  const myName = uni.getStorageSync('myUsername');
-  let conversationList = [];
-  let lastChatMsg; //最后一条消息
-  for (let i = historyChatMsgKeys.length; i > 0, i--; ) {
-    let index = newChatMsgKeys.indexOf(historyChatMsgKeys[i].slice(9));
-    if (index > -1) {
-      let newChatMsgs = uni.getStorageSync(newChatMsgKeys[index]) || [];
-      if (newChatMsgs.length) {
-        lastChatMsg = newChatMsgs[newChatMsgs.length - 1];
-        lastChatMsg.unReadCount = newChatMsgs.length;
-        newChatMsgKeys.splice(index, 1);
-      } else {
-        let historyChatMsgs = uni.getStorageSync(historyChatMsgKeys[i]);
-        if (historyChatMsgs.length) {
-          lastChatMsg = historyChatMsgs[historyChatMsgs.length - 1];
-        }
-      }
-    } else {
-      let historyChatMsgs = uni.getStorageSync(historyChatMsgKeys[i]);
-      if (historyChatMsgs.length) {
-        lastChatMsg = historyChatMsgs[historyChatMsgs.length - 1];
-      }
-    }
-    if (
-      lastChatMsg.chatType == msgtype.chatType.GROUP_CHAT ||
-      lastChatMsg.chatType == msgtype.chatType.CHAT_ROOM
-    ) {
-      lastChatMsg.groupName = conversationState.groupName[lastChatMsg.info.to];
-    }
-    lastChatMsg &&
-      lastChatMsg.username != myName &&
-      conversationList.push(lastChatMsg);
-  }
-  for (let i = newChatMsgKeys.length; i > 0, i--; ) {
-    let newChatMsgs = uni.getStorageSync(newChatMsgKeys[i]) || [];
-    if (newChatMsgs.length) {
-      lastChatMsg = newChatMsgs[newChatMsgs.length - 1];
-      lastChatMsg.unReadCount = newChatMsgs.length;
-      if (
-        lastChatMsg.chatType == msgtype.chatType.GROUP_CHAT ||
-        lastChatMsg.chatType == msgtype.chatType.CHAT_ROOM
-      ) {
-        lastChatMsg.groupName =
-          conversationState.groupName[lastChatMsg.info.to];
-      }
-      lastChatMsg.username != myName && conversationList.push(lastChatMsg);
-    }
-  }
-  conversationList.sort((a, b) => {
-    return b.time - a.time;
-  });
-  conversationState.conversationList = conversationList;
-};
 const openSearch = () => {
   conversationState.search_btn = false;
   conversationState.search_chats = true;
@@ -680,65 +485,13 @@ const hidePop = () => {
 const pickerMenuChange = () => {
   del_chat(conversationState.currentVal);
 };
-
-/*  disp event callback function */
-const onChatPageSubscribe = () => {
-  getLocalConversationlist();
-  conversationState.messageNum = getApp().globalData.saveFriendList.length;
-  conversationState.unReadTotalNotNum =
-    getApp().globalData.saveFriendList.length +
-    getApp().globalData.saveGroupInvitedList.length;
-};
-const onChatPageDeleteGroup = (infos) => {
-  listGroups();
-  getRoster();
-  getLocalConversationlist();
-  conversationState.messageNum = getApp().globalData.saveFriendList.length;
-  //如果会话存在则执行删除会话
-  removeLocalStorage(infos.gid);
-};
-const onChatPageUnreadspot = (message) => {
-  getLocalConversationlist();
-  let currentLoginUser = WebIM.conn.context.userId;
-  let id =
-    message && message.chatType === 'groupchat' ? message?.to : message?.from;
-  let pushObj = uni.getStorageSync('pushStorageData');
-  let pushAry = pushObj[currentLoginUser] || [];
-  conversationState.pushConfigData = pushAry;
-
-  // if (message && pushValue.includes(id)) return
-  conversationState.unReadSpotNum =
-    getApp().globalData.unReadMessageNum > 99
-      ? '99+'
-      : getApp().globalData.unReadMessageNum;
-};
-const onChatPageJoingroup = () => {
-  conversationState.unReadMessageNum =
-    getApp().globalData.saveGroupInvitedList.length;
-  conversationState.unReadTotalNotNum =
-    getApp().globalData.saveFriendList.length +
-    getApp().globalData.saveGroupInvitedList.length;
-  getLocalConversationlist();
-};
-const onChatPageRemoveContacts = () => {
-  getLocalConversationlist();
-  getRoster();
-};
-const onChatPageUnsubscribed = (message) => {
-  uni.showToast({
-    title: `与${message.from}好友关系解除`,
-    icon: 'none',
-  });
-};
-onUnload(() => {
-  //页面卸载同步取消onload中的订阅，防止重复订阅事件。
-  disp.off('em.subscribe', conversationState.onChatPageSubscribe);
-  disp.off('em.invite.deleteGroup', conversationState.onChatPageDeleteGroup);
-  disp.off('em.unreadspot', conversationState.onChatPageUnreadspot);
-  disp.off('em.invite.joingroup', conversationState.onChatPageJoingroup);
-  disp.off('em.contacts.remove', conversationState.onChatPageRemoveContacts);
-  disp.off('em.unsubscribed', conversationState.onChatPageUnsubscribed);
+onLoad(() => {
+  fetchConversationList();
 });
+onShow(() => {
+  uni.hideHomeButton && uni.hideHomeButton();
+});
+onUnload(() => {});
 </script>
 <style>
 @import './conversation.css';

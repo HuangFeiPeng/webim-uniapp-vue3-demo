@@ -11,6 +11,13 @@
       }
     },
     {
+      "path": "pages/home/index",
+      "style": {
+        "navigationBarBackgroundColor": "#f2f2f2",
+        "navigationBarTextStyle": "black"
+      }
+    },
+    {
       "path": "pages/conversation/conversation",
       "style": {
         "navigationBarBackgroundColor": "#f2f2f2",
@@ -34,40 +41,40 @@
         "navigationBarTitleText": "设置"
       }
     },
-	{
-		"path": "pages/inform/inform",
-		"style": {
-			"navigationBarBackgroundColor": "#f2f2f2",
-			"navigationBarTextStyle": "black",
-			"navigationBarTitleText": "申请与通知"
-		}
-	},
-	{
-		"path": "pages/notification/notification",
-		"style": {
-			"navigationBarBackgroundColor": "#ffffff",
-			"navigationBarTextStyle": "black",
-			"backgroundTextStyle": "light",
-			"navigationBarTitleText": "环信"
-		}
-	},
-	{
-		"path": "pages/notification_groupDetail/groupDetail",
-		"style": {
-			"navigationBarBackgroundColor": "#ffffff",
-			"backgroundTextStyle": "light",
-			"navigationBarTitleText": "加群组申请"
-		}
-	},
-	{
-		"path": "pages/notification_friendDetail/friendDetail",
-		"style": {
-			"navigationBarBackgroundColor": "#ffffff",
-			"backgroundTextStyle": "light",
-			"navigationBarTextStyle": "black",
-			"navigationBarTitleText": "加好友申请"
-		}
-	},
+    {
+      "path": "pages/inform/inform",
+      "style": {
+        "navigationBarBackgroundColor": "#f2f2f2",
+        "navigationBarTextStyle": "black",
+        "navigationBarTitleText": "申请与通知"
+      }
+    },
+    {
+      "path": "pages/notification/notification",
+      "style": {
+        "navigationBarBackgroundColor": "#ffffff",
+        "navigationBarTextStyle": "black",
+        "backgroundTextStyle": "light",
+        "navigationBarTitleText": "环信"
+      }
+    },
+    {
+      "path": "pages/notification_groupDetail/groupDetail",
+      "style": {
+        "navigationBarBackgroundColor": "#ffffff",
+        "backgroundTextStyle": "light",
+        "navigationBarTitleText": "加群组申请"
+      }
+    },
+    {
+      "path": "pages/notification_friendDetail/friendDetail",
+      "style": {
+        "navigationBarBackgroundColor": "#ffffff",
+        "backgroundTextStyle": "light",
+        "navigationBarTextStyle": "black",
+        "navigationBarTitleText": "加好友申请"
+      }
+    },
     {
       "path": "pages/singleChatEntry/singleChatEntry",
       "style": {
@@ -88,99 +95,99 @@
         }
       }
     },
-	{
-		"path": "pages/profile/profile",
-		"style": {
-			"navigationBarBackgroundColor": "#f2f2f2",
-			"navigationBarTextStyle": "black",
-			"navigationBarTitleText": "个人资料"
-		}
-	},
-	{
-	    "path": "pages/profile/selectAvatar",
-	    "style": {
-			"navigationBarBackgroundColor": "#f2f2f2",
-			"navigationBarTextStyle": "black",
-			"navigationBarTitleText": "选择头像"
-		}
-	},
-	{
-		"path": "pages/groupChatEntry/groupChatEntry",
-		"style": {
-			"navigationBarBackgroundColor": "#f2f2f2",
-			"navigationBarTextStyle": "black",
-			"navigationBarTitleText": "群聊",
-			"enablePullDownRefresh": true,
-			"app-plus": {
-				"titleNView": {
-					"buttons": [
-						{
-							"text": "...",
-							"fontSrc": "./static/iconfont/iconfont.ttf",
-							"fontSize": "24",
-							"float": "right"
-						}
-					]
-				}
-			}
-		}
-	},
-	{
-		"path": "pages/add_new/add_new",
-		"style": {
-			"navigationBarBackgroundColor": "#f2f2f2",
-			"navigationBarTextStyle": "black",
-			"navigationBarTitleText": "添加好友"
-		}
-	},
-	{
-		"path": "pages/add_groups/add_groups",
-		"style": {
-			"navigationBarBackgroundColor": "#f2f2f2",
-			"navigationBarTextStyle": "black",
-			"navigationBarTitleText": "创建群组"
-		}
-	},
-	{
-		"path": "pages/groupSetting/groupSetting",
-		"style": {
-			"navigationBarBackgroundColor": "#f2f2f2",
-			"navigationBarTextStyle": "black",
-			"navigationBarTitleText": "群信息"
-		}
-	},
-	{
-		"path": "pages/groups/groups",
-		"style": {
-			"navigationBarBackgroundColor": "#f2f2f2",
-			"navigationBarTextStyle": "black",
-			"navigationBarTitleText": "群组"
-		}
-	},
-	{
-		"path": "pages/moreMenu/moreMenu",
-		"style": {
-			"navigationBarBackgroundColor": "#f2f2f2",
-			"navigationBarTextStyle": "black",
-			"navigationBarTitleText": "好友配置"
-		}
-	},
-	{
-		"path": "pages/setting_general/setting_general",
-		"style": {
-			"navigationBarBackgroundColor": "#f2f2f2",
-			"navigationBarTextStyle": "black",
-			"navigationBarTitleText": "通用设置"
-		}
-	},
-	{
-		"path": "pages/searchMsg/searchMsg",
-		"style": {
-			"navigationBarBackgroundColor": "#f2f2f2",
-			"navigationBarTextStyle": "black",
-			"navigationBarTitleText": "历史记录"
-		}
-	}
+    {
+      "path": "pages/profile/profile",
+      "style": {
+        "navigationBarBackgroundColor": "#f2f2f2",
+        "navigationBarTextStyle": "black",
+        "navigationBarTitleText": "个人资料"
+      }
+    },
+    {
+      "path": "pages/profile/selectAvatar",
+      "style": {
+        "navigationBarBackgroundColor": "#f2f2f2",
+        "navigationBarTextStyle": "black",
+        "navigationBarTitleText": "选择头像"
+      }
+    },
+    {
+      "path": "pages/groupChatEntry/groupChatEntry",
+      "style": {
+        "navigationBarBackgroundColor": "#f2f2f2",
+        "navigationBarTextStyle": "black",
+        "navigationBarTitleText": "群聊",
+        "enablePullDownRefresh": true,
+        "app-plus": {
+          "titleNView": {
+            "buttons": [
+              {
+                "text": "...",
+                "fontSrc": "./static/iconfont/iconfont.ttf",
+                "fontSize": "24",
+                "float": "right"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "path": "pages/add_new/add_new",
+      "style": {
+        "navigationBarBackgroundColor": "#f2f2f2",
+        "navigationBarTextStyle": "black",
+        "navigationBarTitleText": "添加好友"
+      }
+    },
+    {
+      "path": "pages/add_groups/add_groups",
+      "style": {
+        "navigationBarBackgroundColor": "#f2f2f2",
+        "navigationBarTextStyle": "black",
+        "navigationBarTitleText": "创建群组"
+      }
+    },
+    {
+      "path": "pages/groupSetting/groupSetting",
+      "style": {
+        "navigationBarBackgroundColor": "#f2f2f2",
+        "navigationBarTextStyle": "black",
+        "navigationBarTitleText": "群信息"
+      }
+    },
+    {
+      "path": "pages/groups/groups",
+      "style": {
+        "navigationBarBackgroundColor": "#f2f2f2",
+        "navigationBarTextStyle": "black",
+        "navigationBarTitleText": "群组"
+      }
+    },
+    {
+      "path": "pages/moreMenu/moreMenu",
+      "style": {
+        "navigationBarBackgroundColor": "#f2f2f2",
+        "navigationBarTextStyle": "black",
+        "navigationBarTitleText": "好友配置"
+      }
+    },
+    {
+      "path": "pages/setting_general/setting_general",
+      "style": {
+        "navigationBarBackgroundColor": "#f2f2f2",
+        "navigationBarTextStyle": "black",
+        "navigationBarTitleText": "通用设置"
+      }
+    },
+    {
+      "path": "pages/searchMsg/searchMsg",
+      "style": {
+        "navigationBarBackgroundColor": "#f2f2f2",
+        "navigationBarTextStyle": "black",
+        "navigationBarTitleText": "历史记录"
+      }
+    }
   ],
   "globalStyle": {
     "navigationBarTextStyle": "black",

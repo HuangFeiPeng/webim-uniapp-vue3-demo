@@ -189,7 +189,7 @@ export default {
       loginStore.setLoginStatus(true);
       uni.hideLoading();
       uni.redirectTo({
-        url: '../conversation/conversation?myName=' + myName,
+        url: '../home/index?myName=' + myName,
       });
     };
     //IM断开连接

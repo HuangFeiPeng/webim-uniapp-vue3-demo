@@ -11,3 +11,14 @@ export const CONNECT_CALLBACK_TYPE = {
   DISCONNECT_CALLBACK: 'disconnected',
   RECONNECTING_CALLBACK: 'reconnecting',
 };
+
+export const MESSAGE_TYPE = {
+  IMAGE: 'img',
+  TEXT: 'txt',
+  LOCATION: 'location',
+  VIDEO: 'video',
+  AUDIO: 'audio',
+  EMOJI: 'emoji',
+  FILE: 'file',
+  CUSTOM: 'custom',
+};

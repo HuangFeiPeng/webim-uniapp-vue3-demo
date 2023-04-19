@@ -1,6 +1,6 @@
 <template>
   <view :class="isIPX ? 'chatRoom_tab_X' : 'chatRoom_tab'">
-    <view class="tableBar">
+    <view class="tableBar" @click="changeTab('conversation')">
       <view
         v-if="unReadSpotNum > 0 || unReadSpotNum == '99+'"
         :class="
@@ -27,7 +27,7 @@
       <text :class="tabType === 'contacts' && 'activeText'">联系人</text>
     </view>
 
-    <view class="tableBar">
+    <view class="tableBar" @click="changeTab('me')">
       <image :src="tabType === 'me' ? highlightSettingImg : settingImg"></image>
       <text :class="tabType === 'me' && 'activeText'">我的</text>
     </view>
@@ -51,6 +51,8 @@ const props = defineProps({
     required: true,
   },
 });
+/* emits */
+const emits = defineEmits(['switchHomeComponent']);
 const { tabType } = toRefs(props);
 console.log('tabType', tabType.value);
 const isIPX = ref(false);
@@ -58,30 +60,32 @@ const unReadSpotNum = ref(0);
 const unReadTotalNotNum = ref(0);
 
 const changeTab = (type) => {
+  console.log('tabbar', type);
   const myName = 'hfp';
-  switch (type) {
-    case 'conversation':
-      {
-        uni.redirectTo({
-          url: '../conversation/conversation',
-        });
-      }
-      break;
-    case 'contacts':
-      {
-        uni.redirectTo({
-          url: '../main/main?myName=' + myName,
-        });
-      }
-      break;
-    case 'me': {
-      uni.redirectTo({
-        url: '../setting/setting',
-      });
-    }
-    default:
-      break;
-  }
+  //   switch (type) {
+  //     case 'conversation':
+  //       {
+  //         uni.redirectTo({
+  //           url: '../conversation/conversation',
+  //         });
+  //       }
+  //       break;
+  //     case 'contacts':
+  //       {
+  //         uni.redirectTo({
+  //           url: '../main/main?myName=' + myName,
+  //         });
+  //       }
+  //       break;
+  //     case 'me': {
+  //       uni.redirectTo({
+  //         url: '../setting/setting',
+  //       });
+  //     }
+  //     default:
+  //       break;
+  //   }
+  emits('switchHomeComponent', type);
 };
 </script>
 
