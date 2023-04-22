@@ -9,6 +9,14 @@ export const useConversationStore = defineStore('conversation', {
       conversationList: [],
     };
   },
+  getters: {
+    //排序会话列表
+    sortedConversationList() {
+      return this.conversationList.sort((a, b) => {
+        return b.time - a.time;
+      });
+    },
+  },
   actions: {
     setConversationList(conversationList) {
       conversationList?.length &&

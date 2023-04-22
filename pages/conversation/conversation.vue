@@ -1,5 +1,6 @@
 <template>
   <view>
+    <!-- 搜索框 -->
     <view>
       <view class="search" v-if="conversationState.search_btn">
         <view @tap="openSearch">
@@ -8,8 +9,28 @@
         </view>
       </view>
     </view>
-
-    <!-- <view class="chat_list_wraper" > -->
+    <view class="search_input" v-if="conversationState.search_chats">
+      <view>
+        <icon type="search" size="12"></icon>
+        <input
+          placeholder="搜索"
+          placeholder-style="color:#9B9B9B;line-height:21px;font-size:15px;"
+          auto-focus
+          confirm-type="search"
+          type="text"
+          @confirm="actionSearch"
+          @input="onInput"
+          v-model.trim="conversationState.search_keyword"
+        />
+        <icon
+          type="clear"
+          size="12"
+          @tap.stop="clearSearchInput"
+          v-if="conversationState.show_clear"
+        ></icon>
+      </view>
+      <text @tap="cancelSearch">取消</text>
+    </view>
     <scroll-view
       scroll-y="true"
       :class="
@@ -24,30 +45,8 @@
         'padding-bottom: ' + (conversationState.isIPX ? '270rpx' : '226rpx')
       "
     >
-      <view class="search_input" v-if="conversationState.search_chats">
-        <view>
-          <icon type="search" size="12"></icon>
-          <input
-            placeholder="搜索"
-            placeholder-style="color:#9B9B9B;line-height:21px;font-size:15px;"
-            auto-focus
-            confirm-type="search"
-            type="text"
-            @confirm="onSearch"
-            @input="onInput"
-            v-model="conversationState.input_code"
-          />
-          <icon
-            type="clear"
-            size="12"
-            @tap.stop="clearInput"
-            v-if="conversationState.show_clear"
-          ></icon>
-        </view>
-        <text @tap="cancel">取消</text>
-      </view>
       <view
-        v-for="(item, index) in conversationList"
+        v-for="(item, index) in conversationState.conversationList"
         :key="index"
         class="chat_list"
         :data-item="item"
@@ -90,17 +89,12 @@
               </view>
             </view>
           </view>
-          <view
-            class="tap_mask"
-            @tap.stop="into_chatRoom"
-            :data-item="JSON.stringify(item)"
-            v-else
-          >
+          <view class="tap_mask" :data-item="JSON.stringify(item)" v-else>
             <!-- 消息列表 -->
             <view class="list_box">
               <view class="list_left" :data-username="item.channel_id">
                 <view class="list_pic">
-                  <view class="em-msgNum">
+                  <view class="em-msgNum" v-if="item.unread_num">
                     {{ item.unread_num > 99 ? '99+' : item.unread_num }}</view
                   >
 
@@ -154,11 +148,12 @@
           </view>
         </swipe-delete>
       </view>
+      <view v-if="!conversationList.length" class="chat_noChat">
+        <image class="ctbg" src="/static/images/ctbg.png"></image>
+        暂无聊天消息
+      </view>
     </scroll-view>
-    <view v-if="!conversationList.length" class="chat_noChat">
-      <image class="ctbg" src="/static/images/ctbg.png"></image>
-      暂无聊天消息
-    </view>
+
     <!-- bug: margin-bottom 不生效 需要加一个空标签-->
     <view style="height: 1px"></view>
 
@@ -171,7 +166,7 @@
 </template>
 
 <script setup>
-import { reactive, computed } from 'vue';
+import { reactive, computed, watch } from 'vue';
 import { onLoad, onShow, onUnload } from '@dcloudio/uni-app';
 import swipeDelete from '@/components/swipedelete/swipedelete';
 import { emConversation } from '@/EaseIM/imApis';
@@ -184,18 +179,18 @@ const conversationState = reactive({
   //       msgtype,
   search_btn: true,
   search_chats: false,
+  search_keyword: '',
   show_mask: false,
   yourname: '',
   unReadSpotNum: 0,
   unReadNoticeNum: 0,
   messageNum: 0,
   unReadTotalNotNum: 0,
-  conversationList: [],
+  conversationList: [], //搜索后返回的会话数据,
   show_clear: false,
   member: '',
   isIPX: false,
   gotop: false,
-  input_code: '',
   groupName: {},
   winSize: {},
   popButton: ['删除该聊天'],
@@ -205,6 +200,23 @@ const conversationState = reactive({
   defaultAvatar: '/static/images/theme2x.png',
   defaultGroupAvatar: '/static/images/groupTheme.png',
 });
+//群组名称
+const groupStore = useGroupStore();
+const getGroupName = (groupid) => {
+  const joinedGroupList = groupStore.joinedGroupList;
+  let groupName = '';
+  if (joinedGroupList.length) {
+    joinedGroupList.forEach((item) => {
+      if (item.groupid === groupid) {
+        console.log(item.groupname);
+        return (groupName = item.groupname);
+      }
+    });
+    return groupName;
+  } else {
+    return groupid;
+  }
+};
 /* 会话列表 */
 const conversationStore = useConversationStore();
 const {
@@ -222,10 +234,22 @@ const fetchConversationList = async () => {
 };
 //会话列表数据
 const conversationList = computed(() => {
-  return conversationStore.conversationList;
+  return conversationStore.sortedConversationList;
 });
+watch(
+  conversationList,
+  () => {
+    conversationState.conversationList = Object.assign(
+      [],
+      conversationList.value
+    );
+  },
+  {
+    deep: true,
+    immediate: true,
+  }
+);
 //会话列表name&头像展示处理
-const groupStore = useGroupStore();
 const contactsStore = useContactsStore();
 //好友属性
 const friendUserInfoMap = computed(() => {
@@ -267,7 +291,7 @@ const showConversationName = computed(() => {
       item.chatType === CHAT_TYPE.GROUP_CHAT ||
       item.chatType === 'groupchat'
     ) {
-      return item.channel_id;
+      return getGroupName(item.channel_id);
     }
   };
 });
@@ -298,197 +322,79 @@ const deleteConversation = async (event) => {
     console.log('删除失败', error);
   }
 };
+
+/* 搜索会话相关逻辑 */
+//开启搜索模式
 const openSearch = () => {
   conversationState.search_btn = false;
   conversationState.search_chats = true;
   conversationState.gotop = true;
 };
-const onSearch = (val) => {
-  let searchValue = val.detail.value;
-  var myName = uni.getStorageSync('myUsername');
-  let serchList = [];
-  let conversationList = [];
-  uni.getStorageInfo({
-    success: function (res) {
-      let storageKeys = res.keys;
-      let chatKeys = [];
-      let len = myName.length;
-      storageKeys.forEach((item) => {
-        if (item.slice(-len) == myName) {
-          chatKeys.push(item);
+//执行搜索方法
+const actionSearch = () => {
+  const keyWord = conversationState.search_keyword;
+  let resConversationList = [];
+  if (keyWord) {
+    resConversationList = conversationStore.conversationList.filter((item) => {
+      if (item.chatType === CHAT_TYPE.SINGLE_CHAT || item.chatType === 'chat') {
+        if (
+          friendUserInfoMap.value.has(item.channel_id) &&
+          friendUserInfoMap.value.get(item.channel_id)?.nickname
+        ) {
+          return (
+            item.lastMessage.msg.indexOf(keyWord) > -1 ||
+            item.channel_id.indexOf(keyWord) > -1 ||
+            friendUserInfoMap.value
+              .get(item.channel_id)
+              .nickname.indexOf(keyWord) > -1
+          );
+        } else {
+          return (
+            item.lastMessage.msg.indexOf(keyWord) > -1 ||
+            item.channel_id.indexOf(keyWord) > -1
+          );
         }
-      });
-      chatKeys.forEach((item, index) => {
-        if (item.indexOf(searchValue) != -1) {
-          serchList.push(item);
-        }
-      });
-      let lastChatMsg = '';
-      serchList.forEach((item, index) => {
-        let chatMsgs = uni.getStorageSync(item) || [];
-        if (chatMsgs.length) {
-          lastChatMsg = chatMsgs[chatMsgs.length - 1];
-          conversationList.push(lastChatMsg);
-        }
-      });
-      conversationState.conversationList = conversationList;
-    },
-  });
+      }
+      if (
+        item.chatType === CHAT_TYPE.GROUP_CHAT ||
+        item.chatType === 'groupchat'
+      ) {
+        return (
+          item.channel_id.indexOf(keyWord) > -1 ||
+          getGroupName(item.channel_id).indexOf(keyWord) > -1 ||
+          item.lastMessage.msg.indexOf(keyWord) > -1
+        );
+      }
+    });
+  }
+  console.log('>>>>>执行搜索', resConversationList);
+  conversationState.conversationList = resConversationList;
 };
-const cancel = () => {
-  getLocalConversationlist();
+//取消搜索
+const cancelSearch = () => {
   conversationState.search_btn = true;
   conversationState.search_chats = false;
-  conversationState.unReadSpotNum =
-    getApp().globalData.unReadMessageNum > 99
-      ? '99+'
-      : getApp().globalData.unReadMessageNum;
   conversationState.gotop = false;
+  conversationState.conversationList = conversationList.value;
 };
-const clearInput = () => {
-  conversationState.input_code = '';
+//清空搜索框
+const clearSearchInput = () => {
+  conversationState.search_keyword = '';
   conversationState.show_clear = false;
 };
+//输入框事件触发
 const onInput = (e) => {
   let inputValue = e.detail.value;
   if (inputValue) {
     conversationState.show_clear = true;
   } else {
-    conversationState.show_clear = false;
+    cancelSearch();
   }
-};
-const tab_contacts = () => {
-  uni.redirectTo({
-    url: '../main/main?myName=' + uni.getStorageSync('myUsername'),
-  });
 };
 const close_mask = () => {
   conversationState.search_btn = true;
   conversationState.search_chats = false;
   conversationState.show_mask = false;
-};
-const tab_setting = () => {
-  uni.redirectTo({
-    url: '../setting/setting',
-  });
-};
-const tab_notification = () => {
-  uni.redirectTo({
-    url: '../notification/notification',
-  });
-};
-const into_chatRoom = (event) => {
-  let detail = JSON.parse(event.currentTarget.dataset.item);
-  if (
-    detail.chatType == msgtype.chatType.GROUP_CHAT ||
-    detail.chatType == msgtype.chatType.CHAT_ROOM ||
-    detail.groupName
-  ) {
-    into_groupChatRoom(detail);
-  } else {
-    into_singleChatRoom(detail);
-  }
-};
-// 单聊
-const into_singleChatRoom = (detail) => {
-  var myName = uni.getStorageSync('myUsername');
-  var nameList = {
-    myName: myName,
-    your: detail.username,
-  };
-  const friendUserInfoMap = getApp().globalData.friendUserInfoMap;
-  if (
-    friendUserInfoMap.has(nameList.your) &&
-    friendUserInfoMap.get(nameList.your)?.nickname
-  ) {
-    nameList.yourNickName = friendUserInfoMap.get(nameList.your).nickname;
-  }
-  uni.navigateTo({
-    url:
-      '../singleChatEntry/singleChatEntry?username=' + JSON.stringify(nameList),
-  });
-};
-// 群聊 和 聊天室 （两个概念）
-const into_groupChatRoom = (detail) => {
-  var myName = uni.getStorageSync('myUsername');
-  var nameList = {
-    myName: myName,
-    your: detail.groupName,
-    groupId: detail.info.to,
-  };
-  uni.navigateTo({
-    url:
-      '../groupChatEntry/groupChatEntry?username=' + JSON.stringify(nameList),
-  });
-};
-const into_inform = () => {
-  uni.redirectTo({
-    url: '../notification/notification',
-  });
-};
-
-const removeAndRefresh = (event) => {
-  let removeId = event.currentTarget.dataset.item.info.from;
-  let ary = getApp().globalData.saveFriendList;
-  let idx;
-  if (ary.length > 0) {
-    ary.forEach((v, k) => {
-      if (v.from == removeId) {
-        idx = k;
-      }
-    });
-    getApp().globalData.saveFriendList.splice(idx, 1);
-  }
-  uni.removeStorageSync('INFORM');
-};
-
-const del_chat = (event) => {
-  let detail = event.currentTarget.dataset.item;
-  let nameList = {};
-  // 删除当前选中群组聊天列表
-  if (detail.chatType == 'groupchat' || detail.chatType == 'chatRoom') {
-    nameList = {
-      your: detail.info.to,
-    };
-    //删除当前选中通知列表
-  } else if (detail.chatType === 'INFORM') {
-    nameList = {
-      your: 'INFORM',
-    };
-  }
-  //删除当前选中好友聊天列表
-  else {
-    nameList = {
-      your: detail.username,
-    };
-  }
-  var myName = uni.getStorageSync('myUsername');
-  var currentPage = getCurrentPages();
-
-  uni.showModal({
-    title: '确认删除？',
-    confirmText: '删除',
-    success: function (res) {
-      if (res.confirm) {
-        uni.removeStorageSync(nameList.your + myName);
-        uni.removeStorageSync('rendered_' + nameList.your + myName);
-        nameList.your === 'INFORM' && removeAndRefresh(event);
-        // if (Object.keys(currentPage[0]).length>0) {
-        //   currentPage[0].onShow();
-        // }
-        disp.fire('em.chat.session.remove');
-        getLocalConversationlist();
-      }
-    },
-    fail: function (err) {
-      console.log('删除列表', err);
-    },
-  });
-};
-const removeLocalStorage = (yourname) => {
-  var myName = uni.getStorageSync('myUsername');
-  uni.removeStorageSync(yourname + myName);
-  uni.removeStorageSync('rendered_' + yourname + myName);
 };
 
 /* 获取窗口尺寸 */
@@ -505,9 +411,7 @@ const getWindowSize = () => {
 const hidePop = () => {
   conversationState.showPop = false;
 };
-const pickerMenuChange = () => {
-  del_chat(conversationState.currentVal);
-};
+
 onLoad(() => {
   if (!conversationList.value.length) {
     fetchConversationList();
