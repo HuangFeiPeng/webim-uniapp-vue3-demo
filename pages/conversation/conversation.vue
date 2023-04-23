@@ -155,7 +155,7 @@
 </template>
 
 <script setup>
-import { reactive, computed, watch } from 'vue';
+import { reactive, computed, watch, watchEffect } from 'vue';
 import { onLoad, onShow, onUnload } from '@dcloudio/uni-app';
 import swipeDelete from '@/components/swipedelete/swipedelete';
 import { emConversation } from '@/EaseIM/imApis';
@@ -241,19 +241,26 @@ const fetchConversationList = async () => {
 const conversationList = computed(() => {
   return conversationStore.sortedConversationList;
 });
-watch(
-  conversationList,
-  () => {
-    conversationState.conversationList = Object.assign(
-      [],
-      conversationList.value
-    );
-  },
-  {
-    deep: true,
-    immediate: true,
-  }
-);
+// watch(
+//   conversationList,
+//   () => {
+//     conversationState.conversationList = Object.assign(
+//       [],
+//       conversationList.value
+//     );
+//   },
+//   {
+//     deep: true,
+//     immediate: true,
+//   }
+// );
+watchEffect(() => {
+  console.log('>>>>>执行更新会话列表数据');
+  conversationState.conversationList = Object.assign(
+    [],
+    conversationList.value
+  );
+});
 //会话列表name&头像展示处理
 const contactsStore = useContactsStore();
 //好友属性

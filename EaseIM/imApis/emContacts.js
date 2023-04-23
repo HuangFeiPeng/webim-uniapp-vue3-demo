@@ -12,8 +12,14 @@ const emContacts = () => {
         });
     });
   };
+  const removeContactFromServer = (contactId) => {
+    if (contactId) {
+      EMClient.deleteContact(contactId);
+    }
+  };
   return {
     fetchContactsListFromServer,
+    removeContactFromServer,
   };
 };
 export default emContacts;
