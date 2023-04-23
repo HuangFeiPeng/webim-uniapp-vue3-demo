@@ -18,6 +18,7 @@
 
 <script setup>
 import { ref } from 'vue';
+import { emContactsListenner } from '@/EaseIM/listenner';
 import Tabbar from '@/layout/tabbar';
 import Conversation from '@/pages/conversation/conversation.vue';
 import Contacts from '@/pages/main/main.vue';
@@ -29,6 +30,18 @@ const switchHomeComponent = (type) => {
   console.log('>>>>>执行切换', type);
   isActiveComps.value = type;
 };
+//mount im contacts listener
+const contactsCallback = (params) => {
+  console.log('>>>>>>收到好友关系监听触发回调', params);
+  const { type, from, to, status } = params;
+  switch (type) {
+    case 'subscribe':
+      break;
+    default:
+      break;
+  }
+};
+emContactsListenner(contactsCallback);
 </script>
 
 <style></style>

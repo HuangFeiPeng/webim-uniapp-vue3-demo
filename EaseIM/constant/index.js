@@ -4,6 +4,7 @@ export const CHAT_TYPE = {
 };
 export const HANDLER_EVENT_NAME = {
   CONNECT_EVENT: 'connectEvent',
+  CONTACTS_EVENT: 'contactsEvent',
 };
 
 export const CONNECT_CALLBACK_TYPE = {

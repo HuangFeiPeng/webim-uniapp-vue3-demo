@@ -50,9 +50,8 @@
         :key="index"
         class="chat_list"
         :data-item="item"
-        @tap.stop="deleteConversation"
       >
-        <swipe-delete>
+        <swipe-delete @deleteChatItem="deleteConversation(item)">
           <!-- 通知模块 -->
           <view
             class="tap_mask"
@@ -302,8 +301,8 @@ const handleTime = computed(() => {
   };
 });
 //删除会话
-const deleteConversation = async (event) => {
-  const { channel_id, chatType } = event.currentTarget.dataset.item;
+const deleteConversation = async (eventItem) => {
+  const { channel_id, chatType } = eventItem;
   try {
     const res = await uni.showModal({
       title: '确认删除？',
