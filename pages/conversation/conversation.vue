@@ -45,6 +45,32 @@
         'padding-bottom: ' + (conversationState.isIPX ? '270rpx' : '226rpx')
       "
     >
+      <!-- 系统通知 -->
+      <view class="tap_mask" v-if="lastInformData">
+        <view class="list_box">
+          <view class="list_left">
+            <view class="list_pic">
+              <view v-if="unReadNoticeNum > 0" class="em-msgNum">{{
+                unReadNoticeNum
+              }}</view>
+              <image
+                :class="unReadNoticeNum > 0 ? 'haveSpot' : ''"
+                src="../../static/images/inform.png"
+              ></image>
+            </view>
+            <view class="list_text">
+              <text class="list_user"> 系统通知 </text>
+              <text class="list_word"
+                >申请通知来自：{{ lastInformData.from }}</text
+              >
+            </view>
+          </view>
+          <view class="list_right">
+            <text>{{ handleTime(lastInformData) }}</text>
+          </view>
+        </view>
+      </view>
+      <!-- 普通会话 -->
       <view
         v-for="(item, index) in conversationState.conversationList"
         :key="index"
@@ -52,43 +78,7 @@
         :data-item="item"
       >
         <swipe-delete @deleteChatItem="deleteConversation(item)">
-          <!-- 通知模块 -->
-          <view
-            class="tap_mask"
-            @tap.stop="into_inform"
-            :data-item="item"
-            v-if="item.chatType == 'INFORM'"
-          >
-            <view class="list_box">
-              <view class="list_left">
-                <view class="list_pic">
-                  <view
-                    v-if="conversationState.unReadTotalNotNum > 0"
-                    class="em-unread-spot2"
-                    >{{ conversationState.unReadTotalNotNum }}</view
-                  >
-                  <image
-                    :class="
-                      conversationState.unReadTotalNotNum > 0 ? 'haveSpot' : ''
-                    "
-                    src="../../static/images/inform.png"
-                  ></image>
-                </view>
-                <view class="list_text">
-                  <text class="list_user"> 系统通知 </text>
-                  <text class="list_word" v-if="item.chatType == 'INFORM'"
-                    >申请通知来自：{{ item.info.from }}</text
-                  >
-                </view>
-              </view>
-              <view class="list_right">
-                <text :data-username="item.username">{{
-                  handleTime(item)
-                }}</text>
-              </view>
-            </view>
-          </view>
-          <view class="tap_mask" :data-item="JSON.stringify(item)" v-else>
+          <view class="tap_mask" :data-item="JSON.stringify(item)">
             <!-- 消息列表 -->
             <view class="list_box">
               <view class="list_left" :data-username="item.channel_id">
@@ -174,6 +164,8 @@ import { useConversationStore } from '@/stores/conversation';
 import { useContactsStore } from '@/stores/contacts';
 import { useGroupStore } from '@/stores/group';
 import dateFormater from '@/utils/dateFormater';
+/* store */
+import { useInformStore } from '@/stores/inform';
 const conversationState = reactive({
   //       msgtype,
   search_btn: true,
@@ -216,6 +208,20 @@ const getGroupName = (groupid) => {
     return groupid;
   }
 };
+/* 系统通知 */
+const informStore = useInformStore();
+//最近一条系统通知
+const lastInformData = computed(() => {
+  return (
+    informStore.getAllInformsList[informStore.getAllInformsList.length - 1] ||
+    null
+  );
+});
+//未处理系统通知总数
+const unReadNoticeNum = computed(() => {
+  return informStore.getAllInformsList.filter((inform) => !inform.isHandled)
+    .length;
+});
 /* 会话列表 */
 const conversationStore = useConversationStore();
 const {

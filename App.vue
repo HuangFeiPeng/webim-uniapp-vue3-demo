@@ -3,7 +3,7 @@ import disp from '@/utils/broadcast';
 // import { onGetSilentConfig } from './components/chat/pushStorage';
 /* EaseIM */
 import '@/EaseIM';
-import { emConnectListenner } from '@/EaseIM/listenner';
+import { emConnectListenner, emMountGlobalListenner } from '@/EaseIM/listenner';
 import { emUserInfos, emGroups, emContacts } from '@/EaseIM/imApis';
 import { CONNECT_CALLBACK_TYPE } from '@/EaseIM/constant';
 import { useLoginStore } from '@/stores/login';
@@ -167,6 +167,7 @@ export default {
     const loginStore = useLoginStore();
     const groupStore = useGroupStore();
     const contactsStore = useContactsStore();
+    /* 链接所需监听回调 */
     //传给监听callback回调
     const connectedCallback = (type) => {
       console.log('>>>>>连接成功回调', type);
@@ -240,6 +241,8 @@ export default {
       const profiles = await fetchUserInfoWithLoginId();
       await loginStore.setLoginUserProfiles(profiles[EMClient.user]);
     };
+    //挂载全局所需监听回调【好友关系、消息监听、群组监听】
+    emMountGlobalListenner();
   },
 };
 </script>

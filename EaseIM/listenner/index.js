@@ -1,4 +1,4 @@
 import { emConnectListenner } from './emConnectListenner';
 import { emContactsListenner } from './emContactsListenner';
-
-export { emConnectListenner, emContactsListenner };
+import { emMountGlobalListenner } from './emMountGlobalListenner';
+export { emMountGlobalListenner, emConnectListenner, emContactsListenner };
