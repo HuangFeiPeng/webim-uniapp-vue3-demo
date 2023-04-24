@@ -61,14 +61,14 @@
               ></image>
               <text>系统通知</text>
             </view>
-            <view class="otherItem">
+            <view class="otherItem" @click="entryAddNewFreiend">
               <image
                 src="/static/images/invite_theme2x.png"
                 data-username="name"
               ></image>
               <text>添加好友</text>
             </view>
-            <view class="otherItem">
+            <view class="otherItem" @click="entryGroups">
               <image src="/static/images/groupTheme.png"></image>
               <text>群组</text>
             </view>
@@ -87,22 +87,13 @@
               :data-username="item.name"
             >
               <swipe-delete @deleteChatItem="deleteFriend(item)">
-                <view
-                  class="tap_mask"
-                  @tap.stop="into_room"
-                  :data-username="item.name"
-                >
-                  <view
-                    class="address_bottom"
-                    :data-username="item.name"
-                    @tap.stop="into_room"
-                  >
+                <view class="tap_mask" :data-username="item.name">
+                  <view class="address_bottom" :data-username="item.name">
                     <image
                       :src="showFriendAvatar(item.name)"
-                      @tap.stop="into_room"
                       :data-username="item.name"
                     ></image>
-                    <text @tap.stop="into_room" :data-username="item.name">{{
+                    <text :data-username="item.name">{{
                       showFriendNickname(item.name)
                     }}</text>
                   </view>
@@ -365,6 +356,19 @@ const onSearchContacts = () => {
   getBrands(serchList);
 };
 
+/* 该页面进入其他页面跳转方法 */
+//进入添加好友页面
+const entryAddNewFreiend = () => {
+  uni.navigateTo({
+    url: '../add_new/add_new',
+  });
+};
+//进入群组页面
+const entryGroups = () => {
+  uni.navigateTo({
+    url: '../groups/groups',
+  });
+};
 onShow(() => {
   uni.hideHomeButton && uni.hideHomeButton();
   contactsState.isIPX = true;
