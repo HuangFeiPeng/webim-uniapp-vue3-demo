@@ -303,10 +303,6 @@ const showConversationName = computed(() => {
       item.chatType === CHAT_TYPE.GROUP_CHAT ||
       item.chatType === 'groupchat'
     ) {
-      console.log(
-        'getGroupName(item.channel_id)',
-        getGroupName(item.channel_id)
-      );
       return getGroupName(item.channel_id);
     }
   };

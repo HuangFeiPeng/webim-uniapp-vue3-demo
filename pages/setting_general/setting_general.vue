@@ -7,7 +7,7 @@
       </view>
     </view>
 
-    <view class="setting_list">
+    <!-- <view class="setting_list">
       <view class="setting_listContent">
         <text>开启deBug</text>
         <switch
@@ -16,7 +16,7 @@
           @change="openDebug"
         ></switch>
       </view>
-    </view>
+    </view> -->
 
     <!--  <view class="person" bindtap="person">
 	<view class="setting_list">
@@ -59,26 +59,23 @@
 <script setup>
 import { reactive } from 'vue';
 import { onLoad, onShow, onUnload } from '@dcloudio/uni-app';
+import { EMClient } from '@/EaseIM';
 const WebIM = uni.WebIM;
 const settingGeneralState = reactive({
   username: '',
   switchStatus: '',
   sdkVersion: '',
 });
+
 onLoad(() => {
-  let myUsername = uni.getStorageSync('myUsername');
-  settingGeneralState.username = myUsername;
-  settingGeneralState.switchStatus = WebIM.config.isDebug;
-  settingGeneralState.sdkVersion = WebIM.conn.version;
+  settingGeneralState.sdkVersion = EMClient.version;
 });
-onShow(() => {
-  settingGeneralState.switchStatus = WebIM.config.isDebug;
-});
-const openDebug = (event) => {
-  WebIM.isDebug({
-    isDebug: event.detail.value,
-  });
-};
+
+// const openDebug = (event) => {
+//   WebIM.isDebug({
+//     isDebug: event.detail.value,
+//   });
+// };
 </script>
 <style>
 @import './setting_general.css';
