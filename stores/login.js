@@ -19,13 +19,10 @@ export const useLoginStore = defineStore('login', {
       this.loginStatus = status;
     },
     setLoginUserBaseInfos(baseInfos) {
-      this.loginUserBaseInfos = Object.assign(
-        this.loginUserBaseInfos,
-        baseInfos
-      );
+      this.loginUserBaseInfos = Object.assign({}, baseInfos);
     },
     setLoginUserProfiles(profiles) {
-      this.loginUserProfiles = Object.assign(this.loginUserProfiles, profiles);
+      this.loginUserProfiles = Object.assign({}, profiles);
     },
   },
 });

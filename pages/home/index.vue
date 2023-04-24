@@ -7,7 +7,7 @@
       <Contacts />
     </template>
     <template v-if="isActiveComps === 'me'">
-      <!-- <Me /> -->
+      <Me />
     </template>
     <Tabbar
       :tab-type="isActiveComps"
@@ -22,7 +22,7 @@ import { ref, watchEffect } from 'vue';
 import Tabbar from '@/layout/tabbar';
 import Conversation from '@/pages/conversation/conversation.vue';
 import Contacts from '@/pages/contacts/contacts.vue';
-// import Me from '@/pages/setting/setting.vue';
+import Me from '@/pages/me/me.vue';
 const isActiveComps = ref('conversation');
 const switchHomeComponent = (type) => {
   console.log('>>>>>执行切换', type);
