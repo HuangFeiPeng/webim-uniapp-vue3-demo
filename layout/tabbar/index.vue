@@ -60,30 +60,6 @@ const unReadSpotNum = ref(0);
 const unReadTotalNotNum = ref(0);
 
 const changeTab = (type) => {
-  console.log('tabbar', type);
-  //   switch (type) {
-  //     case 'conversation':
-  //       {
-  //         uni.redirectTo({
-  //           url: '../conversation/conversation',
-  //         });
-  //       }
-  //       break;
-  //     case 'contacts':
-  //       {
-  //         uni.redirectTo({
-  //           url: '../main/main?myName=' + myName,
-  //         });
-  //       }
-  //       break;
-  //     case 'me': {
-  //       uni.redirectTo({
-  //         url: '../setting/setting',
-  //       });
-  //     }
-  //     default:
-  //       break;
-  //   }
   emits('switchHomeComponent', type);
 };
 </script>

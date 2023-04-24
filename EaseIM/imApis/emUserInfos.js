@@ -59,6 +59,22 @@ const emUserInofs = () => {
       }
     });
   };
-  return { fetchUserInfoWithLoginId, fetchOtherInfoFromServer };
+  const updateUserInfosFromServer = (params) => {
+    return new Promise((resolve, reject) => {
+      EMClient.updateUserInfo({ ...params })
+        .then((res) => {
+          const { data } = res;
+          resolve(data);
+        })
+        .catch((error) => {
+          reject(error);
+        });
+    });
+  };
+  return {
+    fetchUserInfoWithLoginId,
+    fetchOtherInfoFromServer,
+    updateUserInfosFromServer,
+  };
 };
 export default emUserInofs;

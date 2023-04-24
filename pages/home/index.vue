@@ -18,12 +18,14 @@
 
 <script setup>
 import { ref, watchEffect } from 'vue';
+import { onLoad } from '@dcloudio/uni-app';
 /* components */
 import Tabbar from '@/layout/tabbar';
 import Conversation from '@/pages/conversation/conversation.vue';
 import Contacts from '@/pages/contacts/contacts.vue';
 import Me from '@/pages/me/me.vue';
 const isActiveComps = ref('conversation');
+
 const switchHomeComponent = (type) => {
   console.log('>>>>>执行切换', type);
   isActiveComps.value = type;
@@ -38,6 +40,12 @@ watchEffect(() => {
   uni.setNavigationBarTitle({
     title: titleMap[isActiveComps.value],
   });
+});
+onLoad((options) => {
+  //通过路由传参的形式可指定该页面展示某个指定组件
+  if (options.page) {
+    switchHomeComponent(options.page);
+  }
 });
 </script>
 
