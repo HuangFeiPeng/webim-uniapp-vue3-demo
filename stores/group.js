@@ -13,5 +13,10 @@ export const useGroupStore = defineStore('group', {
     addNewGroup(params) {
       this.joinedGroupList.unshift(params);
     },
+    removeGroup(groupId) {
+      this.joinedGroupList = this.joinedGroupList.filter(
+        (group) => group.groupid !== groupId
+      );
+    },
   },
 });

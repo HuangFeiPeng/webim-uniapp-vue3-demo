@@ -160,7 +160,7 @@ const edit_group = (event) => {
   const nameList = {
     myName: groupsState.myName,
     groupName: event.currentTarget.dataset.username,
-    roomId: event.currentTarget.dataset.roomid,
+    groupid: event.currentTarget.dataset.roomid,
   };
   uni.navigateTo({
     url: '../groupSetting/groupSetting?groupInfo=' + JSON.stringify(nameList),
