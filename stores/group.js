@@ -10,5 +10,8 @@ export const useGroupStore = defineStore('group', {
         joinedGroupList
       );
     },
+    addNewGroup(params) {
+      this.joinedGroupList.unshift(params);
+    },
   },
 });

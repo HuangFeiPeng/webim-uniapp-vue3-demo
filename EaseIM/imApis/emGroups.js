@@ -14,8 +14,21 @@ const emGroups = () => {
       });
     });
   };
+  const createNewGroup = (params) => {
+    return new Promise((resolve, reject) => {
+      console.log('>>>>开始创建群组');
+      EMClient.createGroup({ data: { ...params } })
+        .then((res) => {
+          resolve(res.data);
+        })
+        .catch((error) => {
+          reject(error);
+        });
+    });
+  };
   return {
     fetchJoinedGroupListFromServer,
+    createNewGroup,
   };
 };
 

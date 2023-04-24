@@ -150,12 +150,10 @@ const into_group_chat = (event) => {
       '../groupChatEntry/groupChatEntry?username=' + JSON.stringify(nameList),
   });
 };
+//创建群
 const build_group = () => {
-  const nameList = {
-    myName: groupsState.myName,
-  };
   uni.navigateTo({
-    url: '../add_groups/add_groups?owner=' + JSON.stringify(nameList),
+    url: '../add_groups/add_groups',
   });
 };
 const edit_group = (event) => {

@@ -5,7 +5,7 @@
     <view class="create_input">
       <view>
         <input
-          @input="getGroupName"
+          v-model.trim="addGroupsState.groupName"
           placeholder="群名称"
           placeholder-style="line-height:20px;font-size:12px;"
           auto-focus
@@ -17,7 +17,7 @@
       <text>群简介</text>
       <view>
         <textarea
-          @input="getGroupDec"
+          v-model="addGroupsState.groupDec"
           placeholder="添加更多备注信息"
           auto-focus
           placeholder-style="line-height:20px;font-size:12px;"
@@ -54,9 +54,14 @@
 </template>
 
 <script setup>
-import { reactive } from 'vue';
+import { reactive, watchEffect } from 'vue';
 import { onLoad, onShow, onUnload } from '@dcloudio/uni-app';
-const WebIM = uni.WebIM;
+/* stores */
+import { useLoginStore } from '@/stores/login';
+import { useContactsStore } from '@/stores/contacts';
+import { useGroupStore } from '@/stores/group';
+/* im api */
+import { emGroups } from '@/EaseIM/imApis';
 const addGroupsState = reactive({
   friendList: [],
   // 好友列表
@@ -76,60 +81,23 @@ const addGroupsState = reactive({
   // 需要加好友ID
   owner: '', // = myName
 });
-onLoad((options) => {
-  addGroupsState.owner = JSON.parse(options.owner).myName;
+const contactsStore = useContactsStore();
+watchEffect(() => {
+  addGroupsState.friendList = contactsStore.friendList;
 });
-onShow(async () => {
-  // 获取当前用户的好友信息
-  //   WebIM.conn.getContacts({
-  //     success: function (roster) {
-  //       let member = [];
-  //       for (let i = 0; i < roster.length; i++) {
-  //         if (roster[i].subscription == 'both') {
-  //           member.push(roster[i]);
-  //         }
-  //       }
+const loginStore = useLoginStore();
+onLoad(() => {
+  addGroupsState.owner = loginStore.loginUserBaseInfos.loginUserId;
+});
 
-  //     },
-  //   });
-  try {
-    const { data } = await WebIM.conn.getContacts();
-    if (data.length) {
-      uni.setStorage({
-        key: 'member',
-        data: [...data],
-      });
-      addGroupsState.friendList = [...data];
-    }
-  } catch (error) {
-    console.log('>>>>>好友列表获取失败', error);
-  }
-});
-const getGroupName = (e) => {
-  addGroupsState.groupName = e.detail.value;
-};
-const getGroupDec = (e) => {
-  addGroupsState.groupDec = e.detail.value;
-};
-const allowJoinFun = (e) => {
-  addGroupsState.allowJoin = Boolean(e.detail.value) || false;
-};
-const allowApproveFun = (e) => {
-  addGroupsState.allowApprove = Boolean(e.detail.value) || false;
-};
-const noAllowJoinFun = (e) => {
-  addGroupsState.noAllowJoin = Boolean(e.detail.value) || false;
-};
-const allowInviteFun = (e) => {
-  addGroupsState.allowInvite = Boolean(e.detail.value) || false;
-};
 const inviteFriendFun = (e) => {
   addGroupsState.inviteFriend = e.detail.value;
 };
 
 // 创建群组
-const createGroup = () => {
-  let allGroups = getApp().globalData.groupList;
+
+const { createNewGroup } = emGroups();
+const createGroup = async () => {
   if (!addGroupsState.groupName.trim()) {
     uni.showModal({
       title: '请输入群名',
@@ -138,73 +106,41 @@ const createGroup = () => {
     });
     return;
   }
-  if (
-    allGroups.reduce(function (result, v, k) {
-      return result || v.name == addGroupsState.groupName;
-    }, false)
-  ) {
-    uni.showModal({
-      title: '群名被占用',
-      confirmText: 'OK',
-      showCancel: false,
-    });
-    return;
-  }
-
-  let options = {
-    data: {
+  try {
+    const params = {
       groupname: addGroupsState.groupName,
       desc: addGroupsState.groupDec,
       members: addGroupsState.inviteFriend,
       public: addGroupsState.allowJoin,
-      // approval: this.data.allowApprove,
-      // allowinvites: this.data.allowInvite,
-      owner: addGroupsState.owner,
-    },
-    success: function (respData) {
-      uni.showToast({
-        title: '添加成功',
-        duration: 2000,
-        success: function (res) {
-          setTimeout(
-            () =>
-              uni.redirectTo({
-                url:
-                  '../groups/groups?myName=' + uni.getStorageSync('myUsername'),
-              }),
-            1000
-          );
-        },
-      });
-    },
-    error: function (err) {
-      uni.showToast({
-        title: err.data.error_description,
-        icon: 'none',
-      });
-    },
-  };
-  WebIM.conn.createGroupNew(options);
+    };
+    const res = await createNewGroup(params);
+    await uni.showToast({
+      title: '新建群组成功！',
+      duration: 2000,
+    });
+    addNewGroupToLocalList(res.groupid);
+    uni.redirectTo({
+      url: '../groups/groups',
+    }),
+      console.log('>>>>群组创建成功');
+  } catch (error) {
+    console.log('error', error);
+    uni.showToast({
+      title: '群组创建失败，请稍后重试！',
+      icon: 'none',
+    });
+  }
 };
-// export default {
-//   data() {
-//     return {
-
-//     };
-//   },
-
-//   // components: {Images},
-//   props: {},
-//   onLoad: function (options) {
-
-//   },
-//   onShow: function () {
-
-//   },
-//   methods: {
-
-//   }
-// };
+//群组列表新增一条数据
+const groupStore = useGroupStore();
+const addNewGroupToLocalList = (groupid) => {
+  const newGroup = {
+    groupname: addGroupsState.groupName,
+    groupid: groupid,
+    disabled: false,
+  };
+  groupStore.addNewGroup(newGroup);
+};
 </script>
 <style>
 @import './add_groups.css';
