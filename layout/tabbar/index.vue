@@ -61,7 +61,6 @@ const unReadTotalNotNum = ref(0);
 
 const changeTab = (type) => {
   console.log('tabbar', type);
-  const myName = 'hfp';
   //   switch (type) {
   //     case 'conversation':
   //       {

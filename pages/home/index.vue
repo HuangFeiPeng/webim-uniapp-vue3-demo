@@ -17,7 +17,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, watchEffect } from 'vue';
 /* components */
 import Tabbar from '@/layout/tabbar';
 import Conversation from '@/pages/conversation/conversation.vue';
@@ -34,8 +34,10 @@ const titleMap = {
   contacts: '联系人',
   me: '我的',
 };
-uni.setNavigationBarTitle({
-  title: titleMap[isActiveComps.value],
+watchEffect(() => {
+  uni.setNavigationBarTitle({
+    title: titleMap[isActiveComps.value],
+  });
 });
 </script>
 

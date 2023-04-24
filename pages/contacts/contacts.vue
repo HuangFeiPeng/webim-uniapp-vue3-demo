@@ -127,7 +127,6 @@
         </view>
       </view>
     </view>
-    <Tabbar />
   </view>
 </template>
 
@@ -136,7 +135,6 @@ import { reactive, computed, watchEffect } from 'vue';
 import { onLoad, onShow, onUnload } from '@dcloudio/uni-app';
 import disp from '@/utils/broadcast';
 import swipeDelete from '@/components/swipedelete/swipedelete';
-import Tabbar from '@/layout/tabbar';
 /* stores */
 import { useContactsStore } from '@/stores/contacts';
 /* im api */
