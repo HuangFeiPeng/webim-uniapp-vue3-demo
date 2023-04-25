@@ -27,11 +27,20 @@ export const useInformStore = defineStore('inform', {
         //此类型通知需要按钮处理
         if (inform.type === 'subscribe') {
           inform.showBtn = true;
+          inform.handleText = '';
         }
         inform.isHandled = false;
-        this.informData.contactsInform.push(inform);
+        this.informData.contactsInform.unshift(inform);
+        return;
       }
       if (informType === 'groups') {
+        if (inform.operation === 'inviteToJoin') {
+          inform.showBtn = true;
+          inform.handleText = '';
+        }
+        inform.isHandled = false;
+        this.informData.groupsInform.unshift(inform);
+        return;
       }
     },
   },

@@ -60,9 +60,7 @@
             </view>
             <view class="list_text">
               <text class="list_user"> 系统通知 </text>
-              <text class="list_word"
-                >申请通知来自：{{ lastInformData.from }}</text
-              >
+              <text class="list_word">来自：{{ lastInformData.from }}</text>
             </view>
           </view>
           <view class="list_right">
@@ -156,7 +154,7 @@
 
 <script setup>
 import { reactive, computed, watch, watchEffect } from 'vue';
-import { onLoad, onShow, onUnload } from '@dcloudio/uni-app';
+import { onLoad, onShow } from '@dcloudio/uni-app';
 import swipeDelete from '@/components/swipedelete/swipedelete';
 import { emConversation } from '@/EaseIM/imApis';
 import { CHAT_TYPE, MESSAGE_TYPE } from '@/EaseIM/constant';
@@ -432,7 +430,6 @@ onLoad(() => {
 onShow(() => {
   uni.hideHomeButton && uni.hideHomeButton();
 });
-onUnload(() => {});
 </script>
 <style>
 @import './conversation.css';

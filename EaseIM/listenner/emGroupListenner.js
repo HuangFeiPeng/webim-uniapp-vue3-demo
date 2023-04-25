@@ -1,6 +1,8 @@
 import { EMClient } from '../index';
 import { HANDLER_EVENT_NAME } from '../constant';
+import { useInformStore } from '@/stores/inform';
 export const emGroupListenner = (callback, listennerEventName) => {
+  const informStore = useInformStore();
   console.log('>>>>群组事件监听挂载');
   const groupListenFunc = {
     onGroupEvent: (event) => {
@@ -72,6 +74,11 @@ export const emGroupListenner = (callback, listennerEventName) => {
           break;
         // 当前用户收到了入群邀请。受邀用户会收到该回调。例如，用户 B 邀请用户 A 入群，则用户 A 会收到该回调。
         case 'inviteToJoin':
+          {
+            const groupsInform = Object.assign({}, event);
+            informStore.addNewInform('groups', groupsInform);
+          }
+
           break;
         // 当前用户的入群申请被拒绝。申请人会收到该回调。例如，用户 B 拒绝用户 A 的入群申请后，用户 A 会收到该回调。
         case 'joinPublicGroupDeclined':

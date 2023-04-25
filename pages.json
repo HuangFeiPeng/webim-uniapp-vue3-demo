@@ -55,7 +55,7 @@
         "navigationBarBackgroundColor": "#ffffff",
         "navigationBarTextStyle": "black",
         "backgroundTextStyle": "light",
-        "navigationBarTitleText": "环信"
+        "navigationBarTitleText": "系统通知"
       }
     },
     {
@@ -63,7 +63,7 @@
       "style": {
         "navigationBarBackgroundColor": "#ffffff",
         "backgroundTextStyle": "light",
-        "navigationBarTitleText": "加群组申请"
+        "navigationBarTitleText": "群组通知"
       }
     },
     {
@@ -72,7 +72,7 @@
         "navigationBarBackgroundColor": "#ffffff",
         "backgroundTextStyle": "light",
         "navigationBarTextStyle": "black",
-        "navigationBarTitleText": "加好友申请"
+        "navigationBarTitleText": "好友通知"
       }
     },
     {

@@ -54,7 +54,7 @@
             <text @tap="cancelSearchContacts">取消</text>
           </view>
           <view class="contain">
-            <view class="otherItem">
+            <view class="otherItem" @click="entryInform">
               <image
                 src="../../static/images/inform.png"
                 data-username="name"
@@ -124,13 +124,11 @@
 <script setup>
 import { reactive, computed, watchEffect } from 'vue';
 import { onLoad, onShow, onUnload } from '@dcloudio/uni-app';
-import disp from '@/utils/broadcast';
 import swipeDelete from '@/components/swipedelete/swipedelete';
 /* stores */
 import { useContactsStore } from '@/stores/contacts';
 /* im api */
 import { emContacts } from '@/EaseIM/imApis';
-const WebIM = uni.WebIM;
 
 let systemReady = false;
 let canPullDownreffesh = true;
@@ -357,6 +355,11 @@ const onSearchContacts = () => {
 };
 
 /* 该页面进入其他页面跳转方法 */
+const entryInform = () => {
+  uni.navigateTo({
+    url: '../notification/notification',
+  });
+};
 //进入添加好友页面
 const entryAddNewFreiend = () => {
   uni.navigateTo({

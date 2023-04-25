@@ -93,6 +93,34 @@ const emGroups = () => {
         });
     });
   };
+  const acceptGroupInvite = (invitee, groupId) => {
+    return new Promise((resolve, reject) => {
+      EMClient.acceptGroupInvite({
+        groupId: groupId,
+        invitee: invitee,
+      })
+        .then((res) => {
+          resolve(res.data);
+        })
+        .catch((error) => {
+          reject(error);
+        });
+    });
+  };
+  const rejectGroupInvite = (invitee, groupId) => {
+    return new Promise((resolve, reject) => {
+      EMClient.rejectGroupInvite({
+        groupId: groupId,
+        invitee: invitee,
+      })
+        .then((res) => {
+          resolve(res.data);
+        })
+        .catch((error) => {
+          reject(error);
+        });
+    });
+  };
   return {
     fetchJoinedGroupListFromServer,
     createNewGroup,
@@ -101,6 +129,8 @@ const emGroups = () => {
     inviteUsersToGroup,
     leaveGroupFromServer,
     destroyGroupFromServer,
+    acceptGroupInvite,
+    rejectGroupInvite,
   };
 };
 

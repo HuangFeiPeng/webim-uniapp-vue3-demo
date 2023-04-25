@@ -17,9 +17,27 @@ const emContacts = () => {
       EMClient.deleteContact(contactId);
     }
   };
+  const addContact = (contactId, applyMsg) => {
+    if (contactId) {
+      EMClient.addContact(contactId, applyMsg);
+    }
+  };
+  const acceptContactInvite = (contactId) => {
+    if (contactId) {
+      EMClient.acceptContactInvite(contactId);
+    }
+  };
+  const declineContactInvite = (contactId) => {
+    if (contactId) {
+      EMClient.declineContactInvite(contactId);
+    }
+  };
   return {
     fetchContactsListFromServer,
     removeContactFromServer,
+    acceptContactInvite,
+    declineContactInvite,
+    addContact,
   };
 };
 export default emContacts;

@@ -1,142 +1,119 @@
 <template>
   <view class="inform">
-    <text class="defaultText" v-if="!friendDetailState.friendList.length > 0"
+    <text class="defaultText" v-if="!contactsInformNoticList.length"
       >暂时没有新的通知</text
     >
 
     <view
-      v-for="(item, from) in friendDetailState.friendList"
-      :key="from"
+      v-for="(item, index) in contactsInformNoticList"
+      :key="index"
       class="itemBar"
     >
-      <view class="notInfoDetContent">
-        <view class="headContent">
-          <image src="/static/images/theme2x.png"></image>
+      <!-- 需要按钮处理类型通知 -->
+      <template v-if="item.showBtn">
+        <view class="notInfoDetContent">
+          <view class="headContent">
+            <image src="/static/images/theme2x.png"></image>
+          </view>
+          <view class="infoContent">
+            <text class="itemName">{{ item.from }}</text>
+            <text v-show="item.type === 'subscribe'">申请添加您为好友</text>
+          </view>
         </view>
-        <view class="infoContent">
-          <text class="itemName">{{ item.from }}</text>
-          <text>申请添加您为好友</text>
+        <view class="buttonContent">
+          <view
+            v-if="!item.handleText"
+            :data-from="item.from"
+            class="rejectBtn"
+            @tap="rejectApply(item)"
+            >拒绝</view
+          >
+          <view v-if="!item.handleText" class="centerLine"></view>
+          <view
+            v-if="!item.handleText"
+            :data-from="item.from"
+            class="agreeBtn"
+            @tap="agreeApply(item)"
+            >同意</view
+          >
+          <view v-if="item.handleText" class="actionDone">{{
+            item.handleText
+          }}</view>
         </view>
-      </view>
-
-      <view class="buttonContent">
-        <view
-          v-if="!item.typeText"
-          :data-from="item.from"
-          class="rejectBtn"
-          @tap="reject"
-          >拒绝</view
-        >
-        <view v-if="!item.typeText" class="centerLine"></view>
-        <view
-          v-if="!item.typeText"
-          :data-from="item.from"
-          class="agreeBtn"
-          @tap="agree"
-          >同意</view
-        >
-        <view v-if="item.typeText" class="actionDone">{{ item.typeText }}</view>
-      </view>
-    </view>
-    <view class="black">
-      <button type="primary" @click="into_chat">返回</button>
+      </template>
+      <template v-else>
+        <view class="notInfoDetContent">
+          <view class="headContent">
+            <image src="/static/images/theme2x.png"></image>
+          </view>
+          <view class="infoContent">
+            <text class="itemName">{{ item.from }}</text>
+            <text>其他系统通知</text>
+          </view>
+        </view>
+      </template>
     </view>
   </view>
 </template>
 
 <script setup>
-import { reactive } from 'vue';
+import { reactive, computed } from 'vue';
 import { onLoad, onShow, onUnload } from '@dcloudio/uni-app';
-import disp from '@/utils/broadcast';
-const WebIM = uni.WebIM;
-// var WebIM = require('../../utils/WebIM')['default'];
-// let disp = require('../../utils/broadcast'); // 好友邀请提醒
+/* stores */
+import { useInformStore } from '@/stores/inform';
+import { useContactsStore } from '@/stores/contacts';
+/* im apis */
+import { emContacts, emUserInfos } from '@/EaseIM/imApis';
 const friendDetailState = reactive({
   friendList: [],
   myName: '',
 });
-
-onLoad(() => {
-  disp.on('em.subscribe', onFriendDetailPageSubscribe);
-  friendDetailState.myName = uni.getStorageSync('myUsername');
-  friendDetailState.friendList = uni.getStorageSync('friendNotiData');
+const informStore = useInformStore();
+const contactsInformNoticList = computed(() => {
+  return informStore.informData.contactsInform;
 });
+
 onShow(() => {
   uni.hideHomeButton && uni.hideHomeButton();
 });
-const removeAndRefresh = (removeId) => {
-  var idx;
-  friendDetailState.friendList.forEach(function (v, k) {
-    if (v.from === removeId) {
-      idx = k;
-    }
-  });
-  friendDetailState.friendList.splice(idx, 1);
-  getApp().globalData.saveFriendList.splice(idx, 1); // if(!this.data.friendList.length){
-};
-const agree = (event) => {
+const contactsStore = useContactsStore();
+const {
+  fetchContactsListFromServer,
+  acceptContactInvite,
+  declineContactInvite,
+} = emContacts();
+const { fetchOtherInfoFromServer } = emUserInfos();
+const agreeApply = async (sourceItem) => {
   // 同意（无回调）
-  WebIM.conn.acceptContactInvite(event.currentTarget.dataset.from);
-  friendDetailState.friendList.forEach((item) => {
-    if (item.from == event.currentTarget.dataset.from) {
-      item.type = 'subscribed';
-      item.typeText = '已同意';
-      uni.setStorageSync('friendNotiData', friendDetailState.friendList); //getApp().globalData.saveFriendList = this.data.friendList;
-      friendDetailState.friendList = friendDetailState.friendList;
-    }
+  //此处直接取的stores中的对象引用，因此直接进行了修改，同时引用对象中的内容也同步进行了变化。
+  acceptContactInvite(sourceItem.from);
+  sourceItem.type = 'subscribed';
+  sourceItem.handleText = '已同意';
+  sourceItem.isHandled = true;
+  uni.showToast({
+    title: '已同意对方的好友申请',
+    icon: 'none',
   });
-  removeAndRefresh(event.currentTarget.dataset.from);
-  getRoster();
+  //调用好友接口并更新好友列表以及用户属性等数据。
+  const friendList = await fetchContactsListFromServer();
+  await contactsStore.setFriendList(friendList);
+  if (friendList.length) {
+    //获取好友用户属性
+    const friendProfiles = await fetchOtherInfoFromServer(friendList);
+    contactsStore.setFriendUserInfotoMap(friendProfiles);
+  }
 };
 
-const getRoster = () => {
-  let rosters = {
-    success(roster) {
-      let member = [];
-      for (let i = 0; i < roster.length; i++) {
-        if (roster[i].subscription == 'both') {
-          member.push(roster[i]);
-        }
-      }
-
-      uni.setStorage({
-        key: 'member',
-        data: member,
-      });
-    },
-
-    error(err) {
-      console.log(err);
-    },
-  };
-  WebIM.conn.getContacts(rosters);
-};
-const reject = (event) => {
-  WebIM.conn.declineContactInvite(event.currentTarget.dataset.from);
-  friendDetailState.friendList.forEach((item) => {
-    if (item.from == event.currentTarget.dataset.from) {
-      item.type = 'unsubscribed';
-      item.typeText = '已拒绝';
-      uni.setStorageSync('friendNotiData', friendDetailState.friendList); //getApp().globalData.saveFriendList = this.data.friendList;
-
-      friendDetailState.friendList = friendDetailState.friendList;
-    }
-  });
-  removeAndRefresh(event.currentTarget.dataset.from);
-};
-const into_chat = () => {
-  uni.redirectTo({
-    url: '../conversation/conversation',
+const rejectApply = (sourceItem) => {
+  declineContactInvite(sourceItem.from);
+  sourceItem.type = 'unsubscribed';
+  sourceItem.handleText = '已拒绝';
+  sourceItem.isHandled = true;
+  uni.showToast({
+    title: '已拒绝对方的好友申请',
+    icon: 'none',
   });
 };
-
-const onFriendDetailPageSubscribe = () => {
-  friendDetailState.friendList = getApp().globalData.saveFriendList;
-  uni.setStorageSync('friendNotiData', getApp().globalData.saveFriendList);
-};
-onUnload(() => {
-  disp.off('em.subscribe', onFriendDetailPageSubscribe);
-});
 </script>
 <style>
 @import './friendDetail.css';
