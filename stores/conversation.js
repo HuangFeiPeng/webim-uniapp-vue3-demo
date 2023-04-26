@@ -34,6 +34,7 @@ export const useConversationStore = defineStore('conversation', {
           const chatType =
             (regexp.test(channel_id) && CHAT_TYPE.SINGLE_CHAT) ||
             CHAT_TYPE.GROUP_CHAT; //判断是单聊会话还是群组或聊天室会话
+          console.log('chatType+++++++', chatType);
           conversationBody.channel_id = getEMKey(
             EMClient.user,
             from,
@@ -54,6 +55,20 @@ export const useConversationStore = defineStore('conversation', {
             this.conversationList.splice(index, 1);
           }
         });
+    },
+    updateConversationLastMessage(channel_id, message) {
+      const { time, from, to } = message;
+      this.conversationList.forEach((channel) => {
+        if (channel.channel_id === channel_id) {
+          console.log('>>>>找到了要更新的会话', channel);
+          if (from !== EMClient.user) {
+            channel.unread_num = channel.unread_num + 1;
+          }
+          channel.time = time;
+          channel.lastMessage = message;
+          return;
+        }
+      });
     },
   },
 });

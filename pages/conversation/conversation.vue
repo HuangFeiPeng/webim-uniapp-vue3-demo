@@ -272,7 +272,7 @@ const friendUserInfoMap = computed(() => {
 //会话列表头像
 const showConversationAvatar = computed(() => {
   return (item) => {
-    if (item.chatType === CHAT_TYPE.SINGLE_CHAT || item.chatType === 'chat') {
+    if (item.chatType === CHAT_TYPE.SINGLE_CHAT) {
       if (
         friendUserInfoMap.value.has(item.channel_id) &&
         friendUserInfoMap.value.get(item.channel_id)?.avatarurl
@@ -281,10 +281,7 @@ const showConversationAvatar = computed(() => {
       } else {
         return conversationState.defaultAvatar;
       }
-    } else if (
-      item.chatType.toLowerCase() === 'groupchat' ||
-      item.chatType === CHAT_TYPE.GROUP_CHAT
-    ) {
+    } else if (item.chatType === CHAT_TYPE.GROUP_CHAT) {
       return conversationState.defaultGroupAvatar;
     }
   };
@@ -292,7 +289,7 @@ const showConversationAvatar = computed(() => {
 //会话列表名称
 const showConversationName = computed(() => {
   return (item) => {
-    if (item.chatType === CHAT_TYPE.SINGLE_CHAT || item.chatType === 'chat') {
+    if (item.chatType === CHAT_TYPE.SINGLE_CHAT) {
       if (
         friendUserInfoMap.value.has(item.channel_id) &&
         friendUserInfoMap.value.get(item.channel_id)?.nickname
@@ -301,10 +298,7 @@ const showConversationName = computed(() => {
       } else {
         return item.channel_id;
       }
-    } else if (
-      item.chatType === CHAT_TYPE.GROUP_CHAT ||
-      item.chatType === 'groupchat'
-    ) {
+    } else if (item.chatType === CHAT_TYPE.GROUP_CHAT) {
       return getGroupName(item.channel_id);
     }
   };
@@ -356,16 +350,16 @@ const actionSearch = () => {
           friendUserInfoMap.value.get(item.channel_id)?.nickname
         ) {
           return (
-            item.lastMessage.msg.indexOf(keyWord) > -1 ||
-            item.channel_id.indexOf(keyWord) > -1 ||
+            item.lastMessage.msg?.indexOf(keyWord) > -1 ||
+            item.channel_id?.indexOf(keyWord) > -1 ||
             friendUserInfoMap.value
               .get(item.channel_id)
-              .nickname.indexOf(keyWord) > -1
+              .nickname?.indexOf(keyWord) > -1
           );
         } else {
           return (
-            item.lastMessage.msg.indexOf(keyWord) > -1 ||
-            item.channel_id.indexOf(keyWord) > -1
+            item.lastMessage.msg?.indexOf(keyWord) > -1 ||
+            item.channel_id?.indexOf(keyWord) > -1
           );
         }
       }

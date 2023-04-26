@@ -3,4 +3,12 @@ import emContacts from './emContacts';
 import emGroups from './emGroups';
 import emSendReadAck from './emReadAck';
 import emConversation from './emConversation';
-export { emUserInfos, emContacts, emGroups, emSendReadAck, emConversation };
+import emMessages from './emMessages';
+export {
+  emUserInfos,
+  emContacts,
+  emGroups,
+  emSendReadAck,
+  emConversation,
+  emMessages,
+};

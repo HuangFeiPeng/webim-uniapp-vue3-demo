@@ -4,6 +4,7 @@ export const CHAT_TYPE = {
 };
 export const HANDLER_EVENT_NAME = {
   CONNECT_EVENT: 'connectEvent',
+  MESSAGES_EVENT: 'messagesEvent',
   CONTACTS_EVENT: 'contactsEvent',
   GROUP_EVENT: 'groupEvent',
 };
