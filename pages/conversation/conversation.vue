@@ -76,7 +76,11 @@
         :data-item="item"
       >
         <swipe-delete @deleteChatItem="deleteConversation(item)">
-          <view class="tap_mask" :data-item="JSON.stringify(item)">
+          <view
+            class="tap_mask"
+            :data-item="JSON.stringify(item)"
+            @click="entryemChat(item)"
+          >
             <!-- 消息列表 -->
             <view class="list_box">
               <view class="list_left" :data-username="item.channel_id">
@@ -421,7 +425,12 @@ const getWindowSize = () => {
 const hidePop = () => {
   conversationState.showPop = false;
 };
-
+const entryemChat = (params) => {
+  console.log('params', params);
+  uni.navigateTo({
+    url: `../emChatContainer/index?targetId=${params.channel_id}&chatType=${params.chatType}`,
+  });
+};
 onLoad(() => {
   if (!conversationList.value.length) {
     fetchConversationList();

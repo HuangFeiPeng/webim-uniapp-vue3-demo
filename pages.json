@@ -187,6 +187,26 @@
         "navigationBarTextStyle": "black",
         "navigationBarTitleText": "历史记录"
       }
+    },
+    {
+      "path": "pages/emChatContainer/index",
+      "style": {
+        "navigationBarTitleText": "emChat",
+        "backgroundTextStyle": "dark",
+        "enablePullDownRefresh": true,
+        "app-plus": {
+          "titleNView": {
+            "buttons": [
+              {
+                "text": "...",
+                "fontSrc": "./static/iconfont/iconfont.ttf",
+                "fontSize": "24",
+                "float": "right"
+              }
+            ]
+          }
+        }
+      }
     }
   ],
   "globalStyle": {
