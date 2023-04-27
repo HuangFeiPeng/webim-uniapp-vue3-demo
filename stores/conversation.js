@@ -67,6 +67,8 @@ export const useConversationStore = defineStore('conversation', {
           channel.time = time;
           channel.lastMessage = message;
           return;
+        } else {
+          console.log('>>>>没找到要更新的会话', channel);
         }
       });
     },

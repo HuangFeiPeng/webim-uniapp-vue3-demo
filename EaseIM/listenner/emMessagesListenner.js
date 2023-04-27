@@ -16,12 +16,6 @@ export const emMessagesListenner = (callback, listennerEventName) => {
       message.to,
       message.chatType
     );
-    // if (message.chatType === CHAT_TYPE.SINGLE_CHAT) {
-    //   key = message.from;
-    // }
-    // if (message.chatType === CHAT_TYPE.GROUP_CHAT) {
-    //   key = message.to;
-    // }
     messageStore.updateMessageCollection(key, message);
     conversationStore.updateConversationLastMessage(key, message);
   };

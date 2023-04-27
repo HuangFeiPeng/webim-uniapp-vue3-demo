@@ -1,9 +1,13 @@
 <template>
-  <div>消息组件</div>
+  <view>
+    <message-list />
+  </view>
 </template>
 
 <script setup>
 import { inject } from 'vue';
+/* component */
+import MessageList from './messageList';
 const injectTargetId = inject('targetId');
 console.log('>>>>>', injectTargetId);
 </script>
