@@ -1,6 +1,7 @@
 <template>
   <view>
     <message-list />
+    <input-bar />
   </view>
 </template>
 
@@ -8,6 +9,7 @@
 import { inject } from 'vue';
 /* component */
 import MessageList from './messageList';
+import InputBar from './inputBar';
 const injectTargetId = inject('targetId');
 console.log('>>>>>', injectTargetId);
 </script>

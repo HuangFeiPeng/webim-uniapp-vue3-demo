@@ -242,7 +242,6 @@ const getMoreHistoryMessages = async () => {
   const sourceMessage =
     messageStore.messageCollection[injectTargetId.value] || [];
   const cursorMsgId = (sourceMessage.length && sourceMessage[0]?.id) || -1;
-  console.log('cursorMsgId', cursorMsgId);
   const params = {
     targetId: injectTargetId.value,
     chatType: injectChatType.value,

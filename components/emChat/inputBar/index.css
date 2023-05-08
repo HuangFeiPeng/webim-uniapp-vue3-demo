@@ -1,0 +1,11 @@
+.input_bar_container {
+	width: 100%;
+	height: auto;
+	border-top: 1px solid rgba(0 0 0 0.5);
+	position: fixed;
+	bottom: 0;
+	right: 0;
+	z-index: 1;
+	background-color: #FFFFFF;
+	/* transform: translateZ(1000px); */
+}
