@@ -16,5 +16,13 @@ export const useMessageStore = defineStore('message', {
         this.messageCollection[key].push(message);
       }
     },
+    fetchHistoryPushToMsgCollection(key, messageData) {
+      if (this.messageCollection[key]) {
+        this.messageCollection[key].unshift(...messageData);
+      } else {
+        this.messageCollection[key] = [];
+        this.messageCollection[key].push(...messageData);
+      }
+    },
   },
 });

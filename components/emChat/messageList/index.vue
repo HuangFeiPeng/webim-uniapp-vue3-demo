@@ -46,7 +46,7 @@
       >本应用仅用于环信产品功能开发测试，请勿用于非法用途。任何涉及转账、汇款、裸聊、网恋、网购退款、投资理财等统统都是诈骗，请勿相信！</view
     >
     <view
-      @click="actionAleartReportMsg(msgBody)"
+      @longtap="actionAleartReportMsg(msgBody)"
       class="message"
       v-for="(msgBody, index) in messageList"
       :key="msgBody.id + index + ''"
@@ -172,6 +172,7 @@ import {
   inject,
   nextTick,
 } from 'vue';
+import { onPullDownRefresh, onNavigationBarButtonTap } from '@dcloudio/uni-app';
 /* EaseIM */
 import parseEmoji from '@/EaseIM/utils/paseEmoji';
 import { CHAT_TYPE, MESSAGE_TYPE } from '@/EaseIM/constant';
@@ -189,6 +190,7 @@ import AudioMsg from './type/audio/audio';
 const msglistState = reactive({
   isIPX: false,
   toView: 0,
+  //漫游当前游标
   view: 'wrap',
   title: '消息举报',
   list: [
@@ -223,12 +225,47 @@ const msglistState = reactive({
   defaultGroupAvatar: '/static/images/groupTheme.png',
 });
 const injectTargetId = inject('targetId');
+const injectChatType = inject('chatType');
 /* 消息相关逻辑处理 */
+const { reportMessages, fetchHistoryMessagesFromServer } = emMessages();
 //该用户当前的聊天记录
 const messageStore = useMessageStore();
 const messageList = computed(() => {
-  return messageStore.messageCollection[injectTargetId.value] || [];
+  return (
+    messageStore.messageCollection[injectTargetId.value] ||
+    getMoreHistoryMessages() ||
+    []
+  );
 });
+//获取更多历史消息
+const getMoreHistoryMessages = async () => {
+  const sourceMessage =
+    messageStore.messageCollection[injectTargetId.value] || [];
+  const cursorMsgId = (sourceMessage.length && sourceMessage[0]?.id) || -1;
+  console.log('cursorMsgId', cursorMsgId);
+  const params = {
+    targetId: injectTargetId.value,
+    chatType: injectChatType.value,
+    cursor: cursorMsgId,
+  };
+  try {
+    let res = await fetchHistoryMessagesFromServer(params);
+    if (res.messages.length) {
+      messageStore.fetchHistoryPushToMsgCollection(
+        injectTargetId.value,
+        res.messages.reverse()
+      );
+    } else {
+      uni.showToast({ title: '暂无更多历史记录', icon: 'none' });
+    }
+    uni.stopPullDownRefresh();
+  } catch (error) {
+    uni.stopPullDownRefresh();
+    uni.showToast('历史消息获取失败...');
+    console.log('>>>>>返回失败', error);
+  }
+};
+
 //监听消息内容改变，滚动列表
 watch(
   messageList,
@@ -321,6 +358,7 @@ const entryProfilePage = (userInfo) => {
     });
   }
 };
+
 /* 举报消息 */
 //弹出举报
 const alertReport = ref(null);
@@ -356,7 +394,7 @@ const inputReportReason = ref(null);
 const actionAleartReportReason = (item) => {
   inputReportReason.value.open();
 };
-const { reportMessages } = emMessages();
+
 const reportMsg = async () => {
   if (msglistState.reason === '') {
     uni.showToast({ title: '请填写举报原因', icon: 'none' });
@@ -379,6 +417,10 @@ const reportMsg = async () => {
     msglistState.rptMsgId = '';
   }
 };
+onPullDownRefresh(() => {
+  getMoreHistoryMessages();
+  console.log('>>>>>开始了下拉页面');
+});
 </script>
 
 <style scoped>
