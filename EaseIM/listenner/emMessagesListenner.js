@@ -66,7 +66,7 @@ export const emMessagesListenner = (callback, listennerEventName) => {
     },
     // 当前用户发送的消息被接收方收到。
     onReceivedMessage: function (message) {
-      handleReciveDisPlayMessages({ ...message });
+      handleReciveAckMessages({ ...message });
     },
     // 当前用户收到消息送达回执。
     onDeliveredMessage: function (message) {

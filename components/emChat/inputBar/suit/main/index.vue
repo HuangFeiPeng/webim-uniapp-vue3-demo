@@ -37,10 +37,36 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, inject } from 'vue';
+import { emMessages } from '@/EaseIM/imApis';
 const inputContent = ref('');
-const sendTextMessage = () => {
-  console.log('>>>>>调用发送文本消息', inputContent.value);
+//发送文本消息
+const { sendDisplayMessages } = emMessages();
+const injectTargetId = inject('targetId');
+const injeactChatType = inject('chatType');
+const sendTextMessage = async () => {
+  const params = {
+    // 消息类型。
+    type: 'txt',
+    // 消息内容。
+    msg: inputContent.value,
+    // 消息接收方：单聊为对方用户 ID，群聊和聊天室分别为群组 ID 和聊天室 ID。
+    to: injectTargetId.value,
+    // 会话类型：单聊、群聊和聊天室分别为 `singleChat`、`groupChat` 和 `chatRoom`。
+    chatType: injeactChatType.value,
+  };
+  try {
+    const res = await sendDisplayMessages({ ...params });
+    console.log('>>>>>文本消息发送成功', res);
+  } catch (error) {
+    console.log('>>>>>文本消息发送失败', error);
+    uni.showToast({
+      title: '消息发送失败',
+      icon: 'none',
+    });
+  } finally {
+    inputContent.value = '';
+  }
 };
 </script>
 <style>

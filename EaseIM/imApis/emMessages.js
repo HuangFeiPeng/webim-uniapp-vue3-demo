@@ -1,5 +1,11 @@
-import { EMClient } from '../index';
+import { EaseSDK, EMClient } from '../index';
+import { useMessageStore } from '@/stores/message';
+import { useConversationStore } from '@/stores/conversation';
+import { getEMKey } from '@/EaseIM/utils';
 const emMessages = () => {
+  const messageStore = useMessageStore();
+  const conversationStore = useConversationStore();
+
   const reportMessages = (params) => {
     const { reportType, reportReason, messageId } = params;
     return new Promise((resolve, reject) => {
@@ -41,9 +47,35 @@ const emMessages = () => {
         });
     });
   };
+  const sendDisplayMessages = (messageBody) => {
+    messageBody.from = EMClient.user;
+    const key = getEMKey(
+      EMClient.user,
+      messageBody.from,
+      messageBody.to,
+      messageBody.chatType
+    );
+    console.log('>>>>要发送的消息key', key);
+    return new Promise((resolve, reject) => {
+      const msg = EaseSDK.message.create(messageBody);
+      EMClient.send(msg)
+        .then((res) => {
+          resolve(res);
+          msg.id = res.serverMsgId;
+          messageStore.updateMessageCollection(key, msg);
+          conversationStore.updateConversationLastMessage(key, msg);
+          console.log('>>>>>发送成功', msg);
+        })
+        .catch((err) => {
+          reject(err);
+          console.log('>>>>>发送失败', err);
+        });
+    });
+  };
   return {
     reportMessages,
     fetchHistoryMessagesFromServer,
+    sendDisplayMessages,
   };
 };
 export default emMessages;

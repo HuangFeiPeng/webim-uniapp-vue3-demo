@@ -27,19 +27,14 @@
 </template>
 
 <script setup>
-import { reactive, toRefs, onUnmounted } from 'vue';
-import msgType from '../../../msgtype';
-import msgStorage from '../../../msgstorage';
+import { reactive, toRefs, onUnmounted, inject } from 'vue';
+const injectTargetId = inject('targetId');
+const injeactChatType = inject('chatType');
+// import msgType from '../../../msgtype';
+// import msgStorage from '../../../msgstorage';
 import { RecordStatus, RecordDesc } from './record_status';
-import disp from '@/utils/broadcast';
+// import disp from '@/utils/broadcast';
 const WebIM = uni.WebIM;
-// let WebIM = require("../../../../../utils/WebIM")["default"];
-// let msgType = require('../../../msgtype');
-// let RECORD_CONST = require('./record_status');
-// let RecordStatus = RECORD_CONST.RecordStatus;
-// let RecordDesc = RECORD_CONST.RecordDesc;
-// let disp = require('../../../../../utils/broadcast');
-// let msgStorage = require('../../../msgstorage');
 let RunAnimation = false;
 let recordTimeInterval = null;
 let waveTimer = null;

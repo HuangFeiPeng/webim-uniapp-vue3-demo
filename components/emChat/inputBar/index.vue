@@ -1,11 +1,13 @@
 <template>
   <view class="input_bar_container">
+    <!-- <input-audio /> -->
     <input-main />
   </view>
 </template>
 
 <script setup>
-import inputMain from './suit/main';
+// import InputAudio from './suit/audio';
+import InputMain from './suit/main';
 </script>
 
 <style scoped>
