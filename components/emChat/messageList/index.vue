@@ -264,7 +264,14 @@ const getMoreHistoryMessages = async () => {
     console.log('>>>>>返回失败', error);
   }
 };
-
+onMounted(() => {
+  nextTick(() => {
+    uni.pageScrollTo({
+      scrollTop: 100000,
+      duration: 50,
+    });
+  });
+});
 //监听消息内容改变，滚动列表
 watch(
   messageList,

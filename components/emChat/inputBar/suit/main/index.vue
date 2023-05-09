@@ -2,7 +2,7 @@
   <form class="text-input">
     <view class="f-row">
       <!-- 发送语音 -->
-      <view>
+      <view @click="emits('toggleRecordModal')">
         <image class="icon-mic" src="/static/images/voice.png"></image>
       </view>
       <!-- 输入框 -->
@@ -39,6 +39,8 @@
 <script setup>
 import { ref, inject } from 'vue';
 import { emMessages } from '@/EaseIM/imApis';
+/* emits */
+const emits = defineEmits(['toggleRecordModal']);
 const inputContent = ref('');
 //发送文本消息
 const { sendDisplayMessages } = emMessages();

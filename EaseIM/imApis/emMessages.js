@@ -58,13 +58,13 @@ const emMessages = () => {
     console.log('>>>>要发送的消息key', key);
     return new Promise((resolve, reject) => {
       const msg = EaseSDK.message.create(messageBody);
+      console.log('>>>>构建的消息msg', msg);
       EMClient.send(msg)
         .then((res) => {
           resolve(res);
           msg.id = res.serverMsgId;
           messageStore.updateMessageCollection(key, msg);
           conversationStore.updateConversationLastMessage(key, msg);
-          console.log('>>>>>发送成功', msg);
         })
         .catch((err) => {
           reject(err);

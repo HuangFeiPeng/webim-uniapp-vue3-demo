@@ -4,7 +4,9 @@
     @tap="audioPlay"
     :style="'opacity: ' + audioState.opcity"
   >
-    <text class="time">语音消息 {{ audioState.time }}</text>
+    <text class="time"
+      >语音消息 {{ msg.length + '′′' || msg.body.length + '′′' }}</text
+    >
     <view class="controls play-btn">
       <image
         :src="
@@ -18,7 +20,7 @@
 </template>
 
 <script setup>
-import { reactive, toRefs, computed, onMounted, onUnmounted } from 'vue';
+import { reactive, toRefs, computed, onMounted, onBeforeUnmount } from 'vue';
 /* stores */
 import { useLoginStore } from '@/stores/login';
 import audioCtxFc from './audioCtxFactory';
@@ -31,6 +33,7 @@ const props = defineProps({
   },
 });
 const { msg } = toRefs(props);
+console.log('<>>>>>audio msg', msg.value);
 const loginStore = useLoginStore();
 //判消息来源是否为自己
 const isSelf = computed(() => {
@@ -49,8 +52,6 @@ const audioState = reactive({
 });
 let obeyMuteSwitch = false;
 let autoplay = true;
-
-audioState.time = msg.value.length + "''";
 
 onMounted(() => {
   let curl = '';
@@ -119,14 +120,16 @@ const addEvent = () => {
 
 const delEvent = () => {
   let audioCtx = audioState.__comps__.audioCtx;
-  audioCtx.offPlay(onPlaying);
-  audioCtx.offPause(onPause);
-  audioCtx.offWaiting(onPause);
-  audioCtx.offStop(onDone);
-  audioCtx.offEnded(onDone);
-  audioCtx.offError(onDone);
-  audioCtx.offWaiting(onWait); // 多次播放会丢失这个回调，所以不用卸载
-  // audioCtx.offTimeUpdate(this.onTimeUpdate);
+  console.log('delEvent audioCtx', audioCtx);
+  //暂未发现该方法在实际使用的时候生效，且会导致错误产生。
+  //   audioCtx.offPlay(onPlaying);
+  //   audioCtx.offPause(onPause);
+  //   audioCtx.offWaiting(onPause);
+  //     audioCtx.offStop(onDone);
+  //     audioCtx.offEnded(onDone);
+  //     audioCtx.offError(onDone);
+  //     audioCtx.offWaiting(onWait); // 多次播放会丢失这个回调，所以不用卸载
+  //     // audioCtx.offTimeUpdate(this.onTimeUpdate);
 };
 const onPlaying = () => {
   //console.log("onPlaying", JSON.stringify(this.data));
@@ -166,7 +169,9 @@ const onWait = () => {
     duration: 1000,
   });
 };
-onUnmounted(() => {
+
+onBeforeUnmount(() => {
+  console.log('>>>>>组件卸载前');
   let audioCtx = (audioState.__comps__.audioCtx = audioCtxFc.getCtx(
     msg.value.id
   ));

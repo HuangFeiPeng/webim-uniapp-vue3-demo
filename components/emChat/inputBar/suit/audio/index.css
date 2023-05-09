@@ -1,3 +1,8 @@
+.record_container{
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.132);
+}
 .modal {
 	position: absolute;
 	top: 0;
@@ -29,7 +34,7 @@
 }
 
 .modal-record .desc {
-	color: rgb(112, 126, 137);
+	/* color: rgba(112, 126, 137, 0.153); */
 	font-size: 13px;
 	margin-bottom: 40rpx;
 	display: block;
@@ -70,4 +75,13 @@
   height: 160rpx;
   background-color: #aaa;
   float: left;
+}
+.mask {
+	/* background-color: black; */
+	opacity: 0.4;
+	position: absolute;
+	top: 40px;
+	left: 0;
+	right: 0;
+	bottom: 0;
 }

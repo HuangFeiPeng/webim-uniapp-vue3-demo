@@ -1,40 +1,45 @@
 <template>
   <view
+    class="record_container"
     v-if="audioState.recordStatus != RecordStatus.HIDE"
-    class="modal modal-record"
-    @tap="toggleRecordModal"
   >
-    <view class="modal-body" @tap.stop>
-      <view class="sound-waves">
+    <view class="modal modal-record" @tap="toggleRecordModal">
+      <view class="modal-body" @tap.stop>
+        <view class="sound-waves">
+          <view
+            v-for="(item, index) in audioState.radomHeight"
+            :key="index"
+            :style="'height:' + item + 'rpx;margin-top:-' + item / 2 + 'rpx'"
+          ></view>
+          <view style="clear: both; width: 0; height: 0"></view>
+        </view>
+        <text class="desc">{{ RecordDesc[audioState.recordStatus] }}</text>
         <view
-          v-for="(item, index) in audioState.radomHeight"
-          :key="index"
-          :style="'height:' + item + 'rpx;margin-top:-' + item / 2 + 'rpx'"
-        ></view>
-        <view style="clear: both; width: 0; height: 0"></view>
-      </view>
-      <text class="desc">{{ RecordDesc[audioState.recordStatus] }}</text>
-      <view
-        class="dot"
-        @touchstart="handleRecording"
-        @touchmove="handleRecordingMove"
-        @touchend="handleRecordingCancel"
-      >
-        <image class="icon-mic" src="/static/images/send.png"></image>
+          class="dot"
+          @touchstart="handleRecording"
+          @touchmove="handleRecordingMove"
+          @touchend="handleRecordingCancel"
+        >
+          <image class="icon-mic" src="/static/images/send.png"></image>
+        </view>
       </view>
     </view>
+    <view
+      class="mask"
+      v-if="audioState.recordStatus != RecordStatus.HIDE"
+    ></view>
   </view>
 </template>
 
 <script setup>
-import { reactive, toRefs, onUnmounted, inject } from 'vue';
+import { reactive, onUnmounted, inject } from 'vue';
+/* EaseIM */
+import { EMClient } from '@/EaseIM';
+import { emMessages } from '@/EaseIM/imApis';
+/* inject */
 const injectTargetId = inject('targetId');
 const injeactChatType = inject('chatType');
-// import msgType from '../../../msgtype';
-// import msgStorage from '../../../msgstorage';
 import { RecordStatus, RecordDesc } from './record_status';
-// import disp from '@/utils/broadcast';
-const WebIM = uni.WebIM;
 let RunAnimation = false;
 let recordTimeInterval = null;
 let waveTimer = null;
@@ -42,20 +47,7 @@ const InitHeight = [
   50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50,
   50, 50, 50,
 ];
-/* props */
-const props = defineProps({
-  chatParams: {
-    type: Object,
-    default: () => ({}),
-    required: true,
-  },
-  chatType: {
-    type: String,
-    default: msgType.chatType.SINGLE_CHAT,
-    required: true,
-  },
-});
-const { chatParams, chatType } = toRefs(props);
+
 const audioState = reactive({
   changedTouches: null,
   recordStatus: RecordStatus.HIDE,
@@ -309,55 +301,108 @@ const isGroupChat = () => {
 const getSendToParam = () => {
   return isGroupChat() ? chatParams.value.groupId : chatParams.value.your;
 };
-const uploadRecord = (tempFilePath, dur) => {
-  var str = WebIM.config.appkey.split('#');
-  var token = WebIM.conn.context.accessToken;
-  uni.uploadFile({
-    url: 'https://a1.easemob.com/' + str[0] + '/' + str[1] + '/chatfiles',
+//发送录音消息
+const { sendDisplayMessages } = emMessages();
+const sendAudioMessage = async (res, durations) => {
+  const dataObj = JSON.parse(res.data); // 接收消息对象
+  const bodys = {
+    url: dataObj.uri + '/' + dataObj.entities[0].uuid,
+    filename: `${new Date().getTime()}.mp3`,
+    filetype: 'mp3',
+    length: Math.ceil(durations / 1000),
+  };
+  const params = {
+    // 消息类型。
+    type: 'audio',
+    body: { ...bodys },
+    filename: bodys.filename,
+    // 消息接收方：单聊为对方用户 ID，群聊和聊天室分别为群组 ID 和聊天室 ID。
+    to: injectTargetId.value,
+    // 会话类型：单聊、群聊和聊天室分别为 `singleChat`、`groupChat` 和 `chatRoom`。
+    chatType: injeactChatType.value,
+  };
+  try {
+    const res = await sendDisplayMessages({ ...params });
+    console.log('>>>>>>已发送', res);
+  } catch (error) {
+    console.log('>>>>>语音消息发送失败', error);
+    uni.showToast({
+      title: '消息发送失败',
+      icon: 'none',
+    });
+  }
+};
+//上传录音附件资源至环信服务器
+const uploadRecord = async (tempFilePath, durations) => {
+  if (!tempFilePath) return;
+  const apiUrl = EMClient.apiUrl;
+  const orgName = EMClient.orgName;
+  const appName = EMClient.appName;
+  const uploadTargetUrl = `${apiUrl}/${orgName}/${appName}/chatfiles`;
+  const accessToken = EMClient.token;
+  const requestParams = {
+    url: uploadTargetUrl,
     filePath: tempFilePath,
     fileType: 'audio',
     name: 'file',
     header: {
-      Authorization: 'Bearer ' + token,
+      Authorization: 'Bearer ' + accessToken,
     },
-
-    success(res) {
-      var id = WebIM.conn.getUniqueId();
-      var msg = new WebIM.message(msgType.AUDIO, id);
-      var dataObj = JSON.parse(res.data); // 接收消息对象
-
-      msg.set({
-        apiUrl: WebIM.config.apiURL,
-        accessToken: token,
-        body: {
-          type: msgType.AUDIO,
-          url: dataObj.uri + '/' + dataObj.entities[0].uuid,
-          filetype: '',
-          filename: `${new Date().getTime()}.mp3`,
-          accessToken: token,
-          length: Math.ceil(dur / 1000),
-        },
-        from: WebIM.conn.user,
-        to: getSendToParam(),
-        roomType: false,
-        chatType: isGroupChat() ? chatType.GROUP_CHAT : chatType.SINGLE_CHAT,
-        success: function (argument) {
-          disp.fire('em.chat.sendSuccess', id);
-        },
-      });
-      msg.body.length = Math.ceil(dur / 1000); //console.log('发送的语音消息', msg.body)
-      WebIM.conn.send(msg.body);
-      let obj = {
-        msg: msg,
-        type: msgType.AUDIO,
-      };
-      saveSendMsg(obj);
+    success: (res) => {
+      console.log('>>>>>录音上传成功', res);
+      uni.showToast({ title: '音源已上传...', icon: 'none' });
+      sendAudioMessage(res, durations);
     },
-  });
+    fail: (e) => {
+      console.log('>>>>>上传失败', e);
+      uni.showToast({ title: '录音上传失败', icon: 'none' });
+    },
+  };
+  uni.uploadFile(requestParams);
+  //   uni.uploadFile({
+  //     url: 'https://a1.easemob.com/' + str[0] + '/' + str[1] + '/chatfiles',
+  //     filePath: tempFilePath,
+  //     fileType: 'audio',
+  //     name: 'file',
+  //     header: {
+  //       Authorization: 'Bearer ' + token,
+  //     },
+
+  //     success(res) {
+  //       var id = WebIM.conn.getUniqueId();
+  //       var msg = new WebIM.message(msgType.AUDIO, id);
+  //       var dataObj = JSON.parse(res.data); // 接收消息对象
+
+  //       msg.set({
+  //         apiUrl: WebIM.config.apiURL,
+  //         accessToken: token,
+  //         body: {
+  //           type: msgType.AUDIO,
+  //           url: dataObj.uri + '/' + dataObj.entities[0].uuid,
+  //           filetype: '',
+  //           filename: `${new Date().getTime()}.mp3`,
+  //           accessToken: token,
+  //           length: Math.ceil(dur / 1000),
+  //         },
+  //         from: WebIM.conn.user,
+  //         to: getSendToParam(),
+  //         roomType: false,
+  //         chatType: isGroupChat() ? chatType.GROUP_CHAT : chatType.SINGLE_CHAT,
+  //         success: function (argument) {
+  //           disp.fire('em.chat.sendSuccess', id);
+  //         },
+  //       });
+  //       msg.body.length = Math.ceil(dur / 1000); //console.log('发送的语音消息', msg.body)
+  //       WebIM.conn.send(msg.body);
+  //       let obj = {
+  //         msg: msg,
+  //         type: msgType.AUDIO,
+  //       };
+  //       saveSendMsg(obj);
+  //     },
+  //   });
 };
-const saveSendMsg = (evt) => {
-  msgStorage.saveMsg(evt.msg, evt.type);
-};
+
 // 波纹动画
 const startWave = () => {
   var _radomHeight = [...audioState.radomHeight];
