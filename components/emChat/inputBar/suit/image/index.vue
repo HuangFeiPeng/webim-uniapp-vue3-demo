@@ -2,11 +2,7 @@
   <view></view>
 </template>
 <script setup>
-import { reactive, toRefs, inject } from 'vue';
-import msgType from '@/components/chat/msgtype';
-import msgStorage from '@/components/chat/msgstorage';
-import disp from '@/utils/broadcast';
-const WebIM = uni.WebIM;
+import { inject } from 'vue';
 /* EaseIM */
 import { EMClient } from '@/EaseIM';
 import { MESSAGE_TYPE } from '@/EaseIM/constant';
