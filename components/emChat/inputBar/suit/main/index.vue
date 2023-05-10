@@ -12,13 +12,14 @@
         cursor-spacing="65"
         confirm-type="send"
         v-model.trim="inputContent"
+        @focus="inputFocus"
         @confirm="sendTextMessage"
         :confirm-hold="true"
         auto-height
         :show-confirm-bar="false"
         maxlength="300"
       />
-      <view>
+      <view @click="emits('openEmojiModal')">
         <image class="icon-mic" src="/static/images/Emoji.png"></image>
       </view>
       <view v-show="!inputContent">
@@ -40,8 +41,29 @@
 import { ref, inject } from 'vue';
 import { emMessages } from '@/EaseIM/imApis';
 /* emits */
-const emits = defineEmits(['toggleRecordModal']);
+const emits = defineEmits([
+  'toggleRecordModal',
+  'openEmojiModal',
+  'closeEmojiModal',
+]);
 const inputContent = ref('');
+//删除输入内容中的emojiMapStr
+const delEmojiMapString = () => {
+  if (!inputContent.value) return;
+  let newInputContent = '';
+  let inputContentlength = inputContent.value.length - 1;
+
+  let start = inputContent.value.lastIndexOf('[');
+  let end = inputContent.value.lastIndexOf(']');
+  let len = end - start;
+
+  if (end != -1 && end == inputContentlength && len >= 3 && len <= 4) {
+    newInputContent = inputContent.value.slice(0, start);
+  } else {
+    newInputContent = inputContent.value.slice(0, inputContentlength);
+  }
+  inputContent.value = newInputContent;
+};
 //发送文本消息
 const { sendDisplayMessages } = emMessages();
 const injectTargetId = inject('targetId');
@@ -70,6 +92,14 @@ const sendTextMessage = async () => {
     inputContent.value = '';
   }
 };
+const inputFocus = () => {
+  console.log('>>>>输入框聚焦');
+  emits('closeEmojiModal');
+};
+defineExpose({
+  inputContent,
+  delEmojiMapString,
+});
 </script>
 <style>
 @import './index.css';
