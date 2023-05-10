@@ -14,15 +14,15 @@
       @appendEmojiMapString="appendEmojiMapString"
       @deleteEmojiMapString="deleteEmojiMapString"
     />
-    <input-image />
+    <input-image ref="inputImageComp" />
     <!-- 更多功能 -->
     <view v-if="isShowFunModal" :class="'showFunModal'">
       <view :class="'other_func'">
-        <view class="open_camera">
+        <view class="open_camera" @click="openCamera">
           <image src="/static/images/camora.png"></image>
           相机
         </view>
-        <view class="menu_wrap">
+        <view class="menu_wrap" @click="openPhotoAlbum">
           <image src="/static/images/pic.png"></image>
           相册
         </view>
@@ -112,6 +112,16 @@ const closeAllModal = () => {
   closeEmojiModal();
   closeFunModal();
 };
+//点击拍照
+const inputImageComp = ref(null);
+const openCamera = () => {
+  inputImageComp.value.openCamera();
+};
+//从相册选择
+const openPhotoAlbum = () => {
+  inputImageComp.value.openPhotoAlbum();
+};
+
 //用户卡片相关
 const inputUserCardComp = ref(null);
 const openUserCardModal = () => {

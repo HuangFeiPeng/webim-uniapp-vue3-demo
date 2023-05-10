@@ -38,7 +38,7 @@ import { EMClient } from '@/EaseIM';
 import { emMessages } from '@/EaseIM/imApis';
 /* inject */
 const injectTargetId = inject('targetId');
-const injeactChatType = inject('chatType');
+const injectChatType = inject('chatType');
 import { RecordStatus, RecordDesc } from './record_status';
 let RunAnimation = false;
 let recordTimeInterval = null;
@@ -295,12 +295,6 @@ const handleRecordingCancel = () => {
     recorderManager.stop();
   }
 };
-const isGroupChat = () => {
-  return chatType.value == msgType.chatType.CHAT_ROOM;
-};
-const getSendToParam = () => {
-  return isGroupChat() ? chatParams.value.groupId : chatParams.value.your;
-};
 //发送录音消息
 const { sendDisplayMessages } = emMessages();
 const sendAudioMessage = async (res, durations) => {
@@ -319,7 +313,7 @@ const sendAudioMessage = async (res, durations) => {
     // 消息接收方：单聊为对方用户 ID，群聊和聊天室分别为群组 ID 和聊天室 ID。
     to: injectTargetId.value,
     // 会话类型：单聊、群聊和聊天室分别为 `singleChat`、`groupChat` 和 `chatRoom`。
-    chatType: injeactChatType.value,
+    chatType: injectChatType.value,
   };
   try {
     const res = await sendDisplayMessages({ ...params });
@@ -359,48 +353,6 @@ const uploadRecord = async (tempFilePath, durations) => {
     },
   };
   uni.uploadFile(requestParams);
-  //   uni.uploadFile({
-  //     url: 'https://a1.easemob.com/' + str[0] + '/' + str[1] + '/chatfiles',
-  //     filePath: tempFilePath,
-  //     fileType: 'audio',
-  //     name: 'file',
-  //     header: {
-  //       Authorization: 'Bearer ' + token,
-  //     },
-
-  //     success(res) {
-  //       var id = WebIM.conn.getUniqueId();
-  //       var msg = new WebIM.message(msgType.AUDIO, id);
-  //       var dataObj = JSON.parse(res.data); // 接收消息对象
-
-  //       msg.set({
-  //         apiUrl: WebIM.config.apiURL,
-  //         accessToken: token,
-  //         body: {
-  //           type: msgType.AUDIO,
-  //           url: dataObj.uri + '/' + dataObj.entities[0].uuid,
-  //           filetype: '',
-  //           filename: `${new Date().getTime()}.mp3`,
-  //           accessToken: token,
-  //           length: Math.ceil(dur / 1000),
-  //         },
-  //         from: WebIM.conn.user,
-  //         to: getSendToParam(),
-  //         roomType: false,
-  //         chatType: isGroupChat() ? chatType.GROUP_CHAT : chatType.SINGLE_CHAT,
-  //         success: function (argument) {
-  //           disp.fire('em.chat.sendSuccess', id);
-  //         },
-  //       });
-  //       msg.body.length = Math.ceil(dur / 1000); //console.log('发送的语音消息', msg.body)
-  //       WebIM.conn.send(msg.body);
-  //       let obj = {
-  //         msg: msg,
-  //         type: msgType.AUDIO,
-  //       };
-  //       saveSendMsg(obj);
-  //     },
-  //   });
 };
 
 // 波纹动画
