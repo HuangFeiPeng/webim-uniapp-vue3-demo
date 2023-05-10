@@ -22,7 +22,7 @@
       <view @click="emits('openEmojiModal')">
         <image class="icon-mic" src="/static/images/Emoji.png"></image>
       </view>
-      <view v-show="!inputContent">
+      <view v-show="!inputContent" @click="emits('openFunModal')">
         <image class="icon-mic" src="/static/images/ad.png"></image>
       </view>
       <button
@@ -44,7 +44,8 @@ import { emMessages } from '@/EaseIM/imApis';
 const emits = defineEmits([
   'toggleRecordModal',
   'openEmojiModal',
-  'closeEmojiModal',
+  'openFunModal',
+  'closeAllModal',
 ]);
 const inputContent = ref('');
 //删除输入内容中的emojiMapStr
@@ -94,7 +95,7 @@ const sendTextMessage = async () => {
 };
 const inputFocus = () => {
   console.log('>>>>输入框聚焦');
-  emits('closeEmojiModal');
+  emits('closeAllModal');
 };
 defineExpose({
   inputContent,

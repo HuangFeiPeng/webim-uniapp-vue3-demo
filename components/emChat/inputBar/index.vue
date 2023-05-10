@@ -6,20 +6,73 @@
       @toggleRecordModal="toggleRecordModal"
       @openEmojiModal="openEmojiModal"
       @closeEmojiModal="closeEmojiModal"
+      @openFunModal="openFunModal"
+      @closeAllModal="closeAllModal"
     />
     <input-emoji
       ref="inputEmojiComp"
       @appendEmojiMapString="appendEmojiMapString"
       @deleteEmojiMapString="deleteEmojiMapString"
     />
+    <input-image />
+    <!-- 更多功能 -->
+    <view v-if="isShowFunModal" :class="'showFunModal'">
+      <view :class="'other_func'">
+        <view class="open_camera">
+          <image src="/static/images/camora.png"></image>
+          相机
+        </view>
+        <view class="menu_wrap">
+          <image src="/static/images/pic.png"></image>
+          相册
+        </view>
+        <!-- #ifdef APP-PLUS -->
+        <view class="menu_wrap">
+          <input-attach
+            :chatParams="chatParams"
+            :chatType="chatType"
+            @closeAllModal="closeAllModal"
+          >
+            <image
+              style="background-color: #fff"
+              src="/static/images/file.png"
+            ></image>
+            附件
+          </input-attach>
+        </view>
+        <!-- #endif -->
+        <view
+          class="menu_wrap"
+          @tap="edit_group"
+          v-show="injectChatType === 'groupChat'"
+        >
+          <image src="/static/images/pic.png"></image>
+          群信息
+        </view>
+        <view class="menu_wrap">
+          <view class="account_box" @tap="openUserCardModal">
+            <image src="/static/images/pic.png"></image>
+          </view>
+          用户名片
+        </view>
+      </view>
+    </view>
+    <input-user-card ref="inputUserCardComp" />
   </view>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, inject } from 'vue';
+/* components */
 import InputAudio from './suit/audio';
 import InputMain from './suit/main';
 import InputEmoji from './suit/emoji';
+//附件
+import InputAttach from './suit/attach';
+import InputImage from './suit/image';
+import InputUserCard from './suit/userCard';
+/* inject */
+const injectChatType = inject('chatType');
 //核心文本输入相关
 const inputMainComp = ref(null);
 
@@ -42,6 +95,39 @@ const appendEmojiMapString = (emoji) => {
 };
 const deleteEmojiMapString = () => {
   inputMainComp.value.delEmojiMapString();
+};
+
+/* 更多功能相关 */
+const isShowFunModal = ref(false);
+const openFunModal = () => {
+  console.log('>>>>打开更多功能');
+  isShowFunModal.value = true;
+  closeEmojiModal();
+};
+const closeFunModal = () => {
+  isShowFunModal.value = false;
+  closeEmojiModal();
+};
+const closeAllModal = () => {
+  closeEmojiModal();
+  closeFunModal();
+};
+//用户卡片相关
+const inputUserCardComp = ref(null);
+const openUserCardModal = () => {
+  inputUserCardComp.value.showModal = true;
+};
+//编辑群组相关信息
+const edit_group = () => {
+  const nameList = {
+    myName: chatParams.value.myName,
+    groupName: chatParams.value.your,
+    roomId: chatParams.value.groupId,
+  };
+  console.log('>>>>>群信息', nameList);
+  uni.navigateTo({
+    url: '../groupSetting/groupSetting?groupInfo=' + JSON.stringify(nameList),
+  });
 };
 </script>
 
