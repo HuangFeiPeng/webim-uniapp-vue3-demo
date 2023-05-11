@@ -119,7 +119,6 @@ const addEvent = () => {
 
 const delEvent = () => {
   let audioCtx = audioState.__comps__.audioCtx;
-  console.log('delEvent audioCtx', audioCtx);
   //暂未发现该方法在实际使用的时候生效，且会导致错误产生。
   //   audioCtx.offPlay(onPlaying);
   //   audioCtx.offPause(onPause);
@@ -170,7 +169,6 @@ const onWait = () => {
 };
 
 onBeforeUnmount(() => {
-  console.log('>>>>>组件卸载前');
   let audioCtx = (audioState.__comps__.audioCtx = audioCtxFc.getCtx(
     msg.value.id
   ));

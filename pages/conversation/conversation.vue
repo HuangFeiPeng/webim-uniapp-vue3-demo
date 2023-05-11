@@ -272,34 +272,28 @@ const friendUserInfoMap = computed(() => {
 //会话列表头像
 const showConversationAvatar = computed(() => {
   return (item) => {
-    if (item.chatType === CHAT_TYPE.SINGLE_CHAT) {
-      if (
-        friendUserInfoMap.value.has(item.channel_id) &&
-        friendUserInfoMap.value.get(item.channel_id)?.avatarurl
-      ) {
-        return friendUserInfoMap.value.get(item.channel_id).avatarurl;
-      } else {
-        return conversationState.defaultAvatar;
-      }
-    } else if (item.chatType === CHAT_TYPE.GROUP_CHAT) {
-      return conversationState.defaultGroupAvatar;
+    switch (item.chatType) {
+      case CHAT_TYPE.SINGLE_CHAT:
+        const friendInfo = friendUserInfoMap.value.get(item.channel_id) || {};
+        return friendInfo.avatarurl ?? conversationState.defaultAvatar;
+      case CHAT_TYPE.GROUP_CHAT:
+        return conversationState.defaultGroupAvatar;
+      default:
+        return null;
     }
   };
 });
 //会话列表名称
 const showConversationName = computed(() => {
   return (item) => {
-    if (item.chatType === CHAT_TYPE.SINGLE_CHAT) {
-      if (
-        friendUserInfoMap.value.has(item.channel_id) &&
-        friendUserInfoMap.value.get(item.channel_id)?.nickname
-      ) {
-        return friendUserInfoMap.value.get(item.channel_id).nickname;
-      } else {
-        return item.channel_id;
-      }
-    } else if (item.chatType === CHAT_TYPE.GROUP_CHAT) {
-      return getGroupName(item.channel_id);
+    switch (item.chatType) {
+      case CHAT_TYPE.SINGLE_CHAT:
+        const friendInfo = friendUserInfoMap.value.get(item.channel_id);
+        return friendInfo?.nickname || item.channel_id;
+      case CHAT_TYPE.GROUP_CHAT:
+        return getGroupName(item.channel_id);
+      default:
+        return null;
     }
   };
 });
