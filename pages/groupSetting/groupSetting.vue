@@ -66,7 +66,7 @@
 </template>
 
 <script setup>
-import { reactive, watchEffect } from 'vue';
+import { reactive } from 'vue';
 import { onLoad, onShow, onUnload } from '@dcloudio/uni-app';
 /* stores */
 import { useLoginStore } from '@/stores/login';
@@ -95,12 +95,15 @@ const groupSettingState = reactive({
 });
 const loginStore = useLoginStore();
 onLoad((options) => {
-  groupSettingState.groupid = JSON.parse(options.groupInfo).groupid;
-  groupSettingState.groupName = JSON.parse(options.groupInfo).groupName;
+  console.log('>>>>触发onLoad');
+  const groupid = JSON.parse(options.groupInfo).groupid;
+  groupSettingState.groupid = groupid;
   groupSettingState.currentName = loginStore.loginUserBaseInfos.loginUserId;
+  getGroupName(groupid);
   getGroupMember();
   getGroupInfo();
 });
+const groupStore = useGroupStore();
 const {
   getGroupInfosFromServer,
   getGroupMembersFromServer,
@@ -134,7 +137,16 @@ const getGroupInfo = async () => {
     console.log('>>>>群组详情获取失败', error);
   }
 };
-
+//获取群id对应的群组名
+const getGroupName = (groupid) => {
+  if (groupStore.joinedGroupList.length) {
+    groupStore.joinedGroupList.forEach((group) => {
+      if (group.groupid == groupid) {
+        groupSettingState.groupName = group.groupname;
+      }
+    });
+  }
+};
 // 加好友入群
 const addGroupMembers = async () => {
   try {
@@ -171,7 +183,7 @@ const addGroupMembers = async () => {
     }
   }
 };
-const groupStore = useGroupStore();
+
 //主动退出群组
 const leaveTheGroup = async () => {
   if (!groupSettingState.groupid) return;

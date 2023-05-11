@@ -33,7 +33,6 @@ const props = defineProps({
   },
 });
 const { msg } = toRefs(props);
-console.log('<>>>>>audio msg', msg.value);
 const loginStore = useLoginStore();
 //判消息来源是否为自己
 const isSelf = computed(() => {

@@ -72,6 +72,7 @@ import InputAttach from './suit/attach';
 import InputImage from './suit/image';
 import InputUserCard from './suit/userCard';
 /* inject */
+const injectTargetId = inject('targetId');
 const injectChatType = inject('chatType');
 //核心文本输入相关
 const inputMainComp = ref(null);
@@ -134,11 +135,8 @@ const openUserCardModal = () => {
 //编辑群组相关信息
 const edit_group = () => {
   const nameList = {
-    myName: chatParams.value.myName,
-    groupName: chatParams.value.your,
-    roomId: chatParams.value.groupId,
+    groupid: injectTargetId.value,
   };
-  console.log('>>>>>群信息', nameList);
   uni.navigateTo({
     url: '../groupSetting/groupSetting?groupInfo=' + JSON.stringify(nameList),
   });
