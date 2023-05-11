@@ -124,7 +124,7 @@
                     class="list_word"
                     v-if="item.lastMessage.type == MESSAGE_TYPE.CUSTOM"
                   >
-                    <text v-if="item.customEvent === 'userCard'"
+                    <text v-if="item.lastMessage.customEvent === 'userCard'"
                       >[个人名片]</text
                     >
                   </text>

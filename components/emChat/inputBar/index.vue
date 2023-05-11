@@ -85,6 +85,9 @@ const toggleRecordModal = () => {
 const inputEmojiComp = ref(null);
 const openEmojiModal = () => {
   inputEmojiComp.value.openEmoji();
+  if (isShowFunModal.value) {
+    closeFunModal();
+  }
 };
 const closeEmojiModal = () => {
   inputEmojiComp.value.cancelEmoji();
@@ -106,7 +109,7 @@ const openFunModal = () => {
 };
 const closeFunModal = () => {
   isShowFunModal.value = false;
-  closeEmojiModal();
+  //   closeEmojiModal();
 };
 const closeAllModal = () => {
   closeEmojiModal();
