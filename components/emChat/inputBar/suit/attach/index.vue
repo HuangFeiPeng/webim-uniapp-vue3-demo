@@ -21,13 +21,7 @@
 </template>
 
 <script setup>
-import { reactive, toRefs, inject } from 'vue';
-import msgType from '@/components/chat/msgtype';
-import msgStorage from '@/components/chat/msgstorage';
-import disp from '@/utils/broadcast';
-const WebIM = uni.WebIM;
-const str = WebIM.config.appkey.split('#');
-const token = WebIM.conn.context.accessToken;
+import { reactive, inject } from 'vue';
 /* inject */
 const injectTargetId = inject('targetId');
 const injectChatType = inject('chatType');
@@ -35,23 +29,13 @@ const injectChatType = inject('chatType');
 import { EMClient } from '@/EaseIM';
 import { MESSAGE_TYPE } from '@/EaseIM/constant';
 import { emMessages } from '@/EaseIM/imApis';
-/* props */
-const props = defineProps({
-  chatParams: {
-    type: Object,
-    default: () => ({}),
-  },
-  chatType: {
-    type: String,
-    default: msgType.chatType.SINGLE_CHAT,
-  },
-});
-const { chatParams, chatType } = toRefs(props);
+
 /* emits */
 const $emits = defineEmits(['closeAllModal']);
 const apiUrl = EMClient.apiUrl;
 const orgName = EMClient.orgName;
 const appName = EMClient.appName;
+const token = EMClient.token;
 const uploadTargetUrl = `${apiUrl}/${orgName}/${appName}/chatfiles`;
 const options = reactive({
   url: uploadTargetUrl,
@@ -73,16 +57,6 @@ const attachState = reactive({
   debug: true,
 });
 
-const getSendToParam = () => {
-  return isGroupChat() ? chatParams.value.groupId : chatParams.value.your;
-};
-const isGroupChat = () => {
-  return chatType.value == msgType.chatType.CHAT_ROOM;
-};
-
-const saveSendMsg = (evt) => {
-  msgStorage.saveMsg(evt.msg, evt.type);
-};
 //onProgress
 const checkedFile = (evt) => {
   uni.showLoading({ title: '文件上传中，请稍后' });
