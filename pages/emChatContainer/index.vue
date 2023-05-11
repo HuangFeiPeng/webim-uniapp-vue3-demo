@@ -8,6 +8,9 @@
 import { toRefs, reactive, provide, readonly, computed } from 'vue';
 import EmChat from '@/components/emChat';
 import { onLoad, onUnload, onNavigationBarButtonTap } from '@dcloudio/uni-app';
+import { useContactsStore } from '@/stores/contacts';
+import { useGroupStore } from '@/stores/group';
+import { CHAT_TYPE } from '@/EaseIM/constant';
 const props = defineProps({
   targetId: {
     type: String,
@@ -26,8 +29,43 @@ console.log(targetId, chatType);
 provide('targetId', readonly(targetId));
 provide('chatType', readonly(chatType));
 
+/* 处理NavigationBarTitle展示 */
+//群组名称
+const groupStore = useGroupStore();
+const getGroupName = (groupid) => {
+  const joinedGroupList = groupStore.joinedGroupList;
+  let groupName = '';
+  if (joinedGroupList.length) {
+    joinedGroupList.forEach((item) => {
+      if (item.groupid === groupid) {
+        console.log(item.groupname);
+        return (groupName = item.groupname);
+      }
+    });
+    return groupName;
+  } else {
+    return groupid;
+  }
+};
+const contactsStore = useContactsStore();
+//好友属性
+const friendUserInfoMap = computed(() => {
+  return contactsStore.friendUserInfoMap;
+});
+//会话列表名称
+const getTheIdName = (chatType, targetId) => {
+  switch (chatType) {
+    case CHAT_TYPE.SINGLE_CHAT:
+      const friendInfo = friendUserInfoMap.value.get(targetId);
+      return friendInfo?.nickname || targetId;
+    case CHAT_TYPE.GROUP_CHAT:
+      return getGroupName(targetId);
+    default:
+      return null;
+  }
+};
 uni.setNavigationBarTitle({
-  title: targetId.value,
+  title: getTheIdName(chatType.value, targetId.value),
 });
 </script>
 
