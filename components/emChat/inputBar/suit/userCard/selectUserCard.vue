@@ -18,100 +18,77 @@
 </template>
 
 <script setup>
-import { ref, reactive, watch, onMounted, toRefs } from 'vue';
-const props = defineProps({
-  showModal: {
-    type: Boolean,
-    default: false,
-  },
-});
+import { ref, reactive, watch, computed } from 'vue';
+/* pinia */
+import { useContactsStore } from '@/stores/contacts';
 const $emits = defineEmits(['sendUserCardMessage', 'changeShowModal']);
-const { showModal } = toRefs(props);
 const selectUserCardState = reactive({
-  showSelectUserModal: false,
   friendList: [],
   value: '',
 });
-onMounted(() => {
-  selectUserCardState.showSelectUserModal = showModal.value;
-});
-watch(showModal, (newVal) => {
-  console.log('>>>>监听到showModal', newVal);
+const showSelectUserModal = ref(false);
+watch(showSelectUserModal, (newVal) => {
   if (newVal) {
     initFriendList();
   }
-  selectUserCardState.showSelectUserModal = newVal;
   handleModal();
 });
 const selectUserCard = ref(null);
 const handleModal = () => {
-  if (selectUserCardState.showSelectUserModal) {
+  if (showSelectUserModal.value) {
     selectUserCard.value.open();
   } else {
     selectUserCard.value.close();
   }
 };
+const contactsStore = useContactsStore();
+const membersList = computed(() => {
+  return contactsStore.friendList;
+});
+const friendInfosMap = computed(() => {
+  return contactsStore.friendUserInfoMap;
+});
 const initFriendList = () => {
-  const friendUserInfos = getApp().globalData.friendUserInfoMap;
-  const membersList = uni.getStorageSync('member');
+  const friendInfos = Object.fromEntries(friendInfosMap.value);
   let friendList = [];
-  membersList.length &&
-    membersList.map((userId) => {
+  if (membersList.value.length) {
+    for (const userId of membersList.value) {
       const member = {
         text: '',
         value: '',
       };
       member.value = userId;
-      if (friendUserInfos.has(userId) && friendUserInfos.get(userId).nickname) {
-        member.text = friendUserInfos.get(userId).nickname;
+      if (userId in friendInfos && friendInfos[userId].nickname) {
+        member.text = friendInfos[userId].nickname;
       } else {
         member.text = userId;
       }
       console.log('member', member);
-      return friendList.push(member);
-    });
+      friendList.push(member);
+    }
+  }
   selectUserCardState.friendList = friendList;
   console.log('friendList', friendList);
 };
-
 const confirmPicked = () => {
+  console.log('>>>>>触发确认', selectUserCardState.value);
+  if (!selectUserCardState.value) {
+    uni.showToast({ title: '没有选择好友名片~', icon: 'none' });
+  }
+  showSelectUserModal.value = false;
   const callback = () => {
     selectUserCardState.value = '';
   };
   $emits('sendUserCardMessage', selectUserCardState.value, callback);
 };
 const cannelPick = () => {
-  selectUserCardState.showSelectUserModal = false;
-  $emits('changeShowModal');
+  showSelectUserModal.value = false;
 };
-// export default {
-//   props: {
-
-//   },
-//   data() {
-//     return {
-
-//     };
-//   },
-//   watch: {
-//     showModal(newVal, oldVal) {
-//
-//     },
-//   },
-//   methods: {
-
-//   },
-// };
+defineExpose({
+  showSelectUserModal,
+});
 </script>
 <style lang="scss" scoped>
-// .slot-content {
-//   font-size: 28rpx;
-//   color: $u-content-color;
-//   padding-left: 30rpx;
-// }
-// /deep/ .u-mode-center-box {
-//   padding: 0 50rpx;
-// }
 :deep(.checklist-box) {
   width: 100%;
 }

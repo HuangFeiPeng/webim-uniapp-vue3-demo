@@ -57,7 +57,7 @@
         </view>
       </view>
     </view>
-    <input-user-card ref="inputUserCardComp" />
+    <input-user-card ref="inputUserCardComp" @closeAllModal="closeAllModal" />
   </view>
 </template>
 
@@ -125,7 +125,8 @@ const openPhotoAlbum = () => {
 //用户卡片相关
 const inputUserCardComp = ref(null);
 const openUserCardModal = () => {
-  inputUserCardComp.value.showModal = true;
+  console.log('>>>>执行打开好友卡片');
+  inputUserCardComp.value.alertUserCardModal();
 };
 //编辑群组相关信息
 const edit_group = () => {
