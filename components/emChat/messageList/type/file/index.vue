@@ -2,7 +2,8 @@
   <view class="attach-msg" @tap="previewFile">
     <image class="fileIcon" src="/static/images/msgFile.png" />
     <text class="time"
-      >{{ msg.filename }}{{ formatMoney(msg.file_length) }}</text
+      >{{ msg.filename || msg.body.filename
+      }}{{ formatMoney(msg.file_length || msg.body.file_length) }}</text
     >
   </view>
 </template>

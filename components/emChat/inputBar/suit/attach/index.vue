@@ -21,13 +21,20 @@
 </template>
 
 <script setup>
-import { reactive, toRefs } from 'vue';
+import { reactive, toRefs, inject } from 'vue';
 import msgType from '@/components/chat/msgtype';
 import msgStorage from '@/components/chat/msgstorage';
 import disp from '@/utils/broadcast';
 const WebIM = uni.WebIM;
 const str = WebIM.config.appkey.split('#');
 const token = WebIM.conn.context.accessToken;
+/* inject */
+const injectTargetId = inject('targetId');
+const injectChatType = inject('chatType');
+/* EaseIM */
+import { EMClient } from '@/EaseIM';
+import { MESSAGE_TYPE } from '@/EaseIM/constant';
+import { emMessages } from '@/EaseIM/imApis';
 /* props */
 const props = defineProps({
   chatParams: {
@@ -42,11 +49,15 @@ const props = defineProps({
 const { chatParams, chatType } = toRefs(props);
 /* emits */
 const $emits = defineEmits(['closeAllModal']);
+const apiUrl = EMClient.apiUrl;
+const orgName = EMClient.orgName;
+const appName = EMClient.appName;
+const uploadTargetUrl = `${apiUrl}/${orgName}/${appName}/chatfiles`;
 const options = reactive({
-  url: `https://a1.easemob.com/${str[0]}/${str[1]}/chatfiles `,
+  url: uploadTargetUrl,
   name: 'file',
   header: {
-    Authorization: `Bearer${token}`,
+    Authorization: `Bearer ${token}`,
   },
 });
 const attachState = reactive({
@@ -76,38 +87,54 @@ const saveSendMsg = (evt) => {
 const checkedFile = (evt) => {
   uni.showLoading({ title: '文件上传中，请稍后' });
 };
+//发送附件消息
+const { sendDisplayMessages } = emMessages();
+const sendFileMessage = async (payload) => {
+  console.log('>>>>>sendFileMessage payload', payload);
+  const { dataObj, filename, file_length } = payload;
+  let params = {
+    // 消息类型。
+    type: MESSAGE_TYPE.FILE,
+    // 单聊、群聊和聊天室分别为 `singleChat`、`groupChat` 和 `chatRoom`。
+    chatType: injectChatType.value,
+    // 消息接收方：单聊为对方用户 ID，群聊和聊天室分别为群组 ID 和聊天室 ID。
+    to: injectTargetId.value,
+    body: {
+      // 文件 URL。
+      url: dataObj.uri + '/' + dataObj.entities[0].uuid,
+      // 文件类型。
+      type: 'filetype',
+      // 文件名称。
+      filename: filename,
+      // 文件大小。
+      file_length: file_length,
+    },
+  };
+  // 发送消息。
+  console.log('>>>>>要发送的消息params', params);
+  try {
+    await sendDisplayMessages(params);
+    console.log('>>>>>文件发送成功');
+    uni.hideLoading();
+    $emits('closeAllModal');
+  } catch (error) {
+    console.log('>>>>>文件消息发送失败', error);
+    uni.showToast({
+      title: '消息发送失败',
+      icon: 'none',
+    });
+  }
+};
 //onUploadEnd
 const onUploadEnd = (res) => {
   console.log(res);
-  let id = WebIM.conn.getUniqueId();
-  let msg = new WebIM.message(msgType.FILE, id);
-  let dataObj = JSON.parse(res.responseText); // 接收上传文件对象
-  msg.set({
-    apiUrl: WebIM.config.apiURL,
-    accessToken: token,
-    body: {
-      type: msgType.FILE,
-      url: dataObj.uri + '/' + dataObj.entities[0].uuid,
-      filename: res.name,
-      accessToken: token,
-      file_length: res.size,
-    },
-    from: WebIM.conn.user,
-    to: getSendToParam(),
-    chatType: isGroupChat()
-      ? msgType.chatType.GROUP_CHAT
-      : msgType.chatType.SINGLE_CHAT,
-    success: function (argument) {
-      disp.fire('em.chat.sendSuccess', id);
-    },
-  });
-
-  WebIM.conn.send(msg.body);
-  let obj = {
-    msg: msg,
-    type: msgType.FILE,
+  const dataObj = JSON.parse(res.responseText); // 接收上传文件对象
+  const payload = {
+    dataObj,
+    filename: res.name,
+    file_length: res.size,
   };
-  saveSendMsg(obj);
+  sendFileMessage(payload);
   uni.hideLoading();
   $emits('closeAllModal');
 };
