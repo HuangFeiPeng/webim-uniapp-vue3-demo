@@ -87,7 +87,11 @@
               :data-username="item.name"
             >
               <swipe-delete @deleteChatItem="deleteFriend(item)">
-                <view class="tap_mask" :data-username="item.name">
+                <view
+                  class="tap_mask"
+                  :data-username="item.name"
+                  @click="entryemChat(item)"
+                >
                   <view class="address_bottom" :data-username="item.name">
                     <image
                       :src="showFriendAvatar(item.name)"
@@ -128,6 +132,7 @@ import swipeDelete from '@/components/swipedelete/swipedelete';
 /* stores */
 import { useContactsStore } from '@/stores/contacts';
 /* im api */
+import { CHAT_TYPE } from '@/EaseIM/constant';
 import { emContacts } from '@/EaseIM/imApis';
 
 let systemReady = false;
@@ -355,6 +360,13 @@ const onSearchContacts = () => {
 };
 
 /* 该页面进入其他页面跳转方法 */
+//进入到聊天页面
+const entryemChat = (params) => {
+  const chatType = CHAT_TYPE.SINGLE_CHAT;
+  uni.navigateTo({
+    url: `../emChatContainer/index?targetId=${params.name}&chatType=${chatType}`,
+  });
+};
 const entryInform = () => {
   uni.navigateTo({
     url: '../notification/notification',
