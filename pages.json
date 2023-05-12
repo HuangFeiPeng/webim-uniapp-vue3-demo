@@ -18,30 +18,6 @@
       }
     },
     {
-      "path": "pages/conversation/conversation",
-      "style": {
-        "navigationBarBackgroundColor": "#f2f2f2",
-        "navigationBarTextStyle": "black",
-        "navigationBarTitleText": "会话列表"
-      }
-    },
-    {
-      "path": "pages/contacts/contacts",
-      "style": {
-        "navigationBarBackgroundColor": "#f2f2f2",
-        "navigationBarTextStyle": "black",
-        "navigationBarTitleText": "联系人"
-      }
-    },
-    {
-      "path": "pages/me/me",
-      "style": {
-        "navigationBarBackgroundColor": "#f2f2f2",
-        "navigationBarTextStyle": "black",
-        "navigationBarTitleText": "我的"
-      }
-    },
-    {
       "path": "pages/inform/inform",
       "style": {
         "navigationBarBackgroundColor": "#f2f2f2",

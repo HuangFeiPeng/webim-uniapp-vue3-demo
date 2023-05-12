@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <view>
     <template v-if="isActiveComps === 'conversation'">
       <Conversation />
     </template>
@@ -13,7 +13,7 @@
       :tab-type="isActiveComps"
       @switchHomeComponent="switchHomeComponent"
     />
-  </div>
+  </view>
 </template>
 
 <script setup>
