@@ -67,6 +67,12 @@ const getTheIdName = (chatType, targetId) => {
 uni.setNavigationBarTitle({
   title: getTheIdName(chatType.value, targetId.value),
 });
+
+onNavigationBarButtonTap(() => {
+  uni.navigateTo({
+    url: `/pages/moreMenu/moreMenu?username=${targetId.value}&type=${chatType.value}`,
+  });
+});
 </script>
 
 <style scoped>

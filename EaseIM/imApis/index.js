@@ -4,6 +4,7 @@ import emGroups from './emGroups';
 import emSendReadAck from './emReadAck';
 import emConversation from './emConversation';
 import emMessages from './emMessages';
+import emSilent from './emSilent';
 export {
   emUserInfos,
   emContacts,
@@ -11,4 +12,5 @@ export {
   emSendReadAck,
   emConversation,
   emMessages,
+  emSilent,
 };
