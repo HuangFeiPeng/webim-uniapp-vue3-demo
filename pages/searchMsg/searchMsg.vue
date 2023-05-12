@@ -157,7 +157,7 @@ const showMessageListAvatar = computed(() => {
         friendMap.get(item.from)?.avatarurl || searchMsgState.defaultAvatar
       );
     } else {
-      return myUserInfos?.avatarurl || searchMsgState.defaultAvatar;
+      return myUserInfos.value?.avatarurl || searchMsgState.defaultAvatar;
     }
   };
 });
