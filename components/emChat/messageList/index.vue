@@ -304,37 +304,22 @@ const isSelf = computed(() => {
     return item.from === loginStore.loginUserBaseInfos.loginUserId;
   };
 });
+
 const showMessageListAvatar = computed(() => {
+  const friendMap = friendUserInfoMap.value;
   return (item) => {
     if (item.from !== loginStore.loginUserBaseInfos.loginUserId) {
-      if (
-        friendUserInfoMap.value.has(item.from) &&
-        friendUserInfoMap.value.get(item.from)?.avatarurl
-      ) {
-        return friendUserInfoMap.value.get(item.from).avatarurl;
-      } else {
-        return msglistState.defaultAvatar;
-      }
+      return friendMap.get(item.from)?.avatarurl || msglistState.defaultAvatar;
     } else {
-      if (myUserInfos?.avatarurl) {
-        return myUserInfos.avatarurl;
-      } else {
-        return msglistState.defaultAvatar;
-      }
+      return myUserInfos.value?.avatarurl || msglistState.defaultAvatar;
     }
   };
 });
 //消息列表昵称显示
 const showMessageListNickname = computed(() => {
+  const friendMap = friendUserInfoMap.value;
   return (hxId) => {
-    if (
-      friendUserInfoMap.value.has(hxId) &&
-      friendUserInfoMap.value.get(hxId)?.nickname
-    ) {
-      return friendUserInfoMap.value.get(hxId).nickname;
-    } else {
-      return hxId;
-    }
+    return friendMap.get(hxId)?.nickname || hxId;
   };
 });
 //处理时间显示
