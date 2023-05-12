@@ -76,26 +76,6 @@
       }
     },
     {
-      "path": "pages/singleChatEntry/singleChatEntry",
-      "style": {
-        "navigationBarTitleText": "chatting",
-        "backgroundTextStyle": "dark",
-        "enablePullDownRefresh": true,
-        "app-plus": {
-          "titleNView": {
-            "buttons": [
-              {
-                "text": "...",
-                "fontSrc": "./static/iconfont/iconfont.ttf",
-                "fontSize": "24",
-                "float": "right"
-              }
-            ]
-          }
-        }
-      }
-    },
-    {
       "path": "pages/profile/profile",
       "style": {
         "navigationBarBackgroundColor": "#f2f2f2",
@@ -111,27 +91,7 @@
         "navigationBarTitleText": "选择头像"
       }
     },
-    {
-      "path": "pages/groupChatEntry/groupChatEntry",
-      "style": {
-        "navigationBarBackgroundColor": "#f2f2f2",
-        "navigationBarTextStyle": "black",
-        "navigationBarTitleText": "群聊",
-        "enablePullDownRefresh": true,
-        "app-plus": {
-          "titleNView": {
-            "buttons": [
-              {
-                "text": "...",
-                "fontSrc": "./static/iconfont/iconfont.ttf",
-                "fontSize": "24",
-                "float": "right"
-              }
-            ]
-          }
-        }
-      }
-    },
+
     {
       "path": "pages/add_new/add_new",
       "style": {
