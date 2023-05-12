@@ -72,5 +72,12 @@ export const useConversationStore = defineStore('conversation', {
         }
       });
     },
+    clearConversationUnReadNum(channel_id) {
+      this.conversationList.forEach((channel) => {
+        if (channel.channel_id === channel_id) {
+          channel.unread_num = 0;
+        }
+      });
+    },
   },
 });

@@ -415,6 +415,9 @@ const hidePop = () => {
 };
 const entryemChat = (params) => {
   console.log('params', params);
+  //发送channelack 清除服务端该会话未读数，并且清除本地未读红点
+  sendChannelAck(params.channel_id, params.chatType);
+  conversationStore.clearConversationUnReadNum(params.channel_id);
   uni.navigateTo({
     url: `../emChatContainer/index?targetId=${params.channel_id}&chatType=${params.chatType}`,
   });
