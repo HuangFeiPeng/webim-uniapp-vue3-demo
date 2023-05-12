@@ -73,8 +73,7 @@ import { useLoginStore } from '@/stores/login';
 import { useGroupStore } from '@/stores/group';
 /* im apis */
 import { emGroups } from '@/EaseIM/imApis';
-import Image from '../../components/chat/inputbar/suit/image/image.vue';
-
+import Image from '@/components/emChat/inputBar/suit/image';
 const groupSettingState = reactive({
   groupid: '',
   // 群id
