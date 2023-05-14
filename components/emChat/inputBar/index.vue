@@ -14,7 +14,7 @@
       @appendEmojiMapString="appendEmojiMapString"
       @deleteEmojiMapString="deleteEmojiMapString"
     />
-    <input-image ref="inputImageComp" />
+    <input-image ref="inputImageComp" @closeAllModal="closeAllModal" />
     <!-- 更多功能 -->
     <view v-if="isShowFunModal" :class="'showFunModal'">
       <view :class="'other_func'">
