@@ -56,16 +56,15 @@
 </template>
 
 <script setup>
-import { reactive, ref, computed } from 'vue';
-import { onLoad, onShow, onUnload } from '@dcloudio/uni-app';
+import { ref, computed } from 'vue';
+import { onShow } from '@dcloudio/uni-app';
 /* stores */
 import { useLoginStore } from '@/stores/login';
 import { useInformStore } from '@/stores/inform';
 import { useGroupStore } from '@/stores/group';
 /* im apis */
 import { emGroups } from '@/EaseIM/imApis';
-import disp from '@/utils/broadcast';
-const WebIM = uni.WebIM;
+
 let groupList = ref([]);
 const informStore = useInformStore();
 const groupsInformNoticList = computed(() => {
