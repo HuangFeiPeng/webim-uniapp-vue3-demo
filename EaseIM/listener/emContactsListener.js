@@ -1,7 +1,7 @@
 import { EMClient } from '../index';
 import { HANDLER_EVENT_NAME } from '../constant';
 import { useInformStore } from '@/stores/inform';
-export const emContactsListenner = (callback, listennerEventName) => {
+export const emContactsListener = (callback, listenerEventName) => {
   const informStore = useInformStore();
   console.log('>>>>>好友关系监听挂载');
   const contactsListenFunc = {
@@ -29,10 +29,10 @@ export const emContactsListenner = (callback, listennerEventName) => {
     },
   };
   EMClient.removeEventHandler(
-    listennerEventName || HANDLER_EVENT_NAME.CONTACTS_EVENT
+    listenerEventName || HANDLER_EVENT_NAME.CONTACTS_EVENT
   );
   EMClient.addEventHandler(
-    listennerEventName || HANDLER_EVENT_NAME.CONTACTS_EVENT,
+    listenerEventName || HANDLER_EVENT_NAME.CONTACTS_EVENT,
     contactsListenFunc
   );
 };

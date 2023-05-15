@@ -3,7 +3,7 @@ import { useMessageStore } from '@/stores/message';
 import { useConversationStore } from '@/stores/conversation';
 import { CHAT_TYPE, HANDLER_EVENT_NAME } from '../constant';
 import { getEMKey } from '@/EaseIM/utils';
-export const emMessagesListenner = (callback, listennerEventName) => {
+export const emMessagesListener = (callback, listenerEventName) => {
   console.log('消息监听已挂载');
   const messageStore = useMessageStore();
   const conversationStore = useConversationStore();
@@ -82,10 +82,10 @@ export const emMessagesListenner = (callback, listennerEventName) => {
     },
   };
   EMClient.removeEventHandler(
-    listennerEventName || HANDLER_EVENT_NAME.MESSAGES_EVENT
+    listenerEventName || HANDLER_EVENT_NAME.MESSAGES_EVENT
   );
   EMClient.addEventHandler(
-    listennerEventName || HANDLER_EVENT_NAME.MESSAGES_EVENT,
+    listenerEventName || HANDLER_EVENT_NAME.MESSAGES_EVENT,
     messagesListenFunc
   );
 };

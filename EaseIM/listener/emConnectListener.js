@@ -1,6 +1,6 @@
 import { EMClient } from '../index';
 import { CONNECT_CALLBACK_TYPE, HANDLER_EVENT_NAME } from '../constant';
-export const emConnectListenner = (callback, listennerEventName) => {
+export const emConnectListener = (callback, listenerEventName) => {
   console.log('>>>>连接监听已挂载');
   const connectListenFunc = {
     onConnected: () => {
@@ -16,10 +16,10 @@ export const emConnectListenner = (callback, listennerEventName) => {
     },
   };
   EMClient.removeEventHandler(
-    listennerEventName || HANDLER_EVENT_NAME.CONNECT_EVENT
+    listenerEventName || HANDLER_EVENT_NAME.CONNECT_EVENT
   );
   EMClient.addEventHandler(
-    listennerEventName || HANDLER_EVENT_NAME.CONNECT_EVENT,
+    listenerEventName || HANDLER_EVENT_NAME.CONNECT_EVENT,
     connectListenFunc
   );
 };

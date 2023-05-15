@@ -1,7 +1,7 @@
 <script>
 /* EaseIM */
 import '@/EaseIM';
-import { emConnectListenner, emMountGlobalListenner } from '@/EaseIM/listenner';
+import { emConnectListener, emMountGlobalListener } from '@/EaseIM/listener';
 import { emUserInfos, emGroups, emContacts } from '@/EaseIM/imApis';
 import { CONNECT_CALLBACK_TYPE } from '@/EaseIM/constant';
 import { useLoginStore } from '@/stores/login';
@@ -42,8 +42,8 @@ export default {
     };
     //IM断开连接
     const onDisconnect = () => {
-      console.log('>>>>处理断开连接监听');
-      if (!loginStore.status) {
+      console.log('>>>>处理断开连接监听', loginStore.loginStatus);
+      if (!loginStore.loginStatus) {
         uni.showToast({
           title: '退出登录',
           icon: 'none',
@@ -53,6 +53,8 @@ export default {
           url: '../login/login',
         });
         EMClient.close();
+      } else {
+        console.log('>>>>执行重新补登录');
       }
     };
     //IM重连中
@@ -63,7 +65,7 @@ export default {
       });
     };
     //挂载IM websocket连接成功监听
-    emConnectListenner(connectedCallback);
+    emConnectListener(connectedCallback);
     const { fetchUserInfoWithLoginId, fetchOtherInfoFromServer } =
       emUserInfos();
     const { fetchJoinedGroupListFromServer } = emGroups();
@@ -89,7 +91,7 @@ export default {
       await loginStore.setLoginUserProfiles(profiles[EMClient.user]);
     };
     //挂载全局所需监听回调【好友关系、消息监听、群组监听】
-    emMountGlobalListenner();
+    emMountGlobalListener();
   },
 };
 </script>

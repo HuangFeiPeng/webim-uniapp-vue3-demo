@@ -1,7 +1,7 @@
 import { EMClient } from '../index';
 import { HANDLER_EVENT_NAME } from '../constant';
 import { useInformStore } from '@/stores/inform';
-export const emGroupListenner = (callback, listennerEventName) => {
+export const emGroupListener = (callback, listenerEventName) => {
   const informStore = useInformStore();
   console.log('>>>>群组事件监听挂载');
   const groupListenFunc = {
@@ -101,10 +101,10 @@ export const emGroupListenner = (callback, listennerEventName) => {
     },
   };
   EMClient.removeEventHandler(
-    listennerEventName || HANDLER_EVENT_NAME.GROUP_EVENT
+    listenerEventName || HANDLER_EVENT_NAME.GROUP_EVENT
   );
   EMClient.addEventHandler(
-    listennerEventName || HANDLER_EVENT_NAME.GROUP_EVENT,
+    listenerEventName || HANDLER_EVENT_NAME.GROUP_EVENT,
     groupListenFunc
   );
 };
