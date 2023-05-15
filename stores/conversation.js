@@ -58,19 +58,29 @@ export const useConversationStore = defineStore('conversation', {
     },
     updateConversationLastMessage(channel_id, message) {
       const { time, from, to } = message;
+      let foundChannel = false;
       this.conversationList.forEach((channel) => {
         if (channel.channel_id === channel_id) {
-          console.log('>>>>找到了要更新的会话', channel);
           if (from !== EMClient.user) {
             channel.unread_num = channel.unread_num + 1;
           }
           channel.time = time;
           channel.lastMessage = message;
+          foundChannel = true;
           return;
-        } else {
-          console.log('>>>>没找到要更新的会话', channel);
         }
       });
+      // 如果没有找到要更新的会话，则新增一个会话对象
+      if (!foundChannel) {
+        const conversationBody = {
+          channel_id: channel_id,
+          chatType: message.chatType,
+          lastMessage: message,
+          unread_num: message.from !== EMClient.user ? 1 : 0,
+          time: time,
+        };
+        this.conversationList.push(conversationBody);
+      }
     },
     clearConversationUnReadNum(channel_id) {
       this.conversationList.forEach((channel) => {
