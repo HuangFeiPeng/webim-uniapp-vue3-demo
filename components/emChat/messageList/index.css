@@ -30,7 +30,6 @@
 .message {
 	width: 100%;
 	height: auto;
-	/* padding: 0 30rpx; */
 	position: relative;
 
 }
@@ -123,7 +122,10 @@
 	border: 6px solid transparent;
 	border-right-color: #EDEDED;
 }*/
-
+.main{
+    margin: 0 25rpx;
+    padding-bottom: 70rpx;
+}
 .self {
 	text-align: right;
 }
