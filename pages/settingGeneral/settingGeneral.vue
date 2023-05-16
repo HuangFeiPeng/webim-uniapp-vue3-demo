@@ -58,9 +58,8 @@
 
 <script setup>
 import { reactive } from 'vue';
-import { onLoad, onShow, onUnload } from '@dcloudio/uni-app';
+import { onLoad } from '@dcloudio/uni-app';
 import { EMClient } from '@/EaseIM';
-const WebIM = uni.WebIM;
 const settingGeneralState = reactive({
   username: '',
   switchStatus: '',
@@ -70,12 +69,6 @@ const settingGeneralState = reactive({
 onLoad(() => {
   settingGeneralState.sdkVersion = EMClient.version;
 });
-
-// const openDebug = (event) => {
-//   WebIM.isDebug({
-//     isDebug: event.detail.value,
-//   });
-// };
 </script>
 <style>
 @import './settingGeneral.css';

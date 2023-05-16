@@ -37,13 +37,11 @@
 
 <script setup>
 import { reactive, computed } from 'vue';
-import { onLoad, onShow, onUnload } from '@dcloudio/uni-app';
 /* stores */
 import { useLoginStore } from '@/stores/login';
 import { useContactsStore } from '@/stores/contacts';
 /* im apis */
 import { emContacts } from '@/EaseIM/imApis';
-const WebIM = uni.WebIM;
 const addNewState = reactive({
   friend_name: '',
   search_btn: true,
