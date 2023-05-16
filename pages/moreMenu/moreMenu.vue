@@ -110,5 +110,5 @@ const onClearSilent = async () => {
 };
 </script>
 <style>
-@import '../setting_general/setting_general.css';
+@import '../settingGeneral/settingGeneral.css';
 </style>

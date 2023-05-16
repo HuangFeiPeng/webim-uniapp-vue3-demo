@@ -111,5 +111,5 @@ const add_friend = () => {
 };
 </script>
 <style>
-@import './add_new.css';
+@import './addNewFriend.css';
 </style>

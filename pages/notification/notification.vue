@@ -50,12 +50,12 @@ onShow(() => {
 });
 const into_friendNot = () => {
   uni.navigateTo({
-    url: '../notification_friendDetail/friendDetail',
+    url: '../notificationFriendDetail/friendDetail',
   });
 };
 const into_groupNot = () => {
   uni.navigateTo({
-    url: '../notification_groupDetail/groupDetail',
+    url: '../notificationGroupDetail/groupDetail',
   });
 };
 </script>

@@ -50,7 +50,7 @@ demo 包含以下核心功能
     |-notificaton_groupDetail 加群组通知页
     |-profile 用户属性展示页
     |-searchMsg 消息搜索页面
-    |-setting_general 设置功能
+    |-settingGeneral 设置功能
 |-utils 工具类和sdk的一些配置
 |-stores pinia store 全局状态管理
 |-uni_modules uni插件包

@@ -143,5 +143,5 @@ const addNewGroupToLocalList = (groupid) => {
 };
 </script>
 <style>
-@import './add_groups.css';
+@import './addGroups.css';
 </style>

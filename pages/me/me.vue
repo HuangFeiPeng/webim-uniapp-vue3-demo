@@ -76,7 +76,7 @@ watchEffect(() => {
 //跳转至系统设置
 const goGeneralSetting = () => {
   uni.navigateTo({
-    url: '../setting_general/setting_general',
+    url: '../settingGeneral/settingGeneral',
   });
 };
 /* 退出操作 */

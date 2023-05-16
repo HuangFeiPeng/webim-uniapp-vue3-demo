@@ -35,7 +35,7 @@
       }
     },
     {
-      "path": "pages/notification_groupDetail/groupDetail",
+      "path": "pages/notificationGroupDetail/groupDetail",
       "style": {
         "navigationBarBackgroundColor": "#ffffff",
         "backgroundTextStyle": "light",
@@ -43,7 +43,7 @@
       }
     },
     {
-      "path": "pages/notification_friendDetail/friendDetail",
+      "path": "pages/notificationFriendDetail/friendDetail",
       "style": {
         "navigationBarBackgroundColor": "#ffffff",
         "backgroundTextStyle": "light",
@@ -69,7 +69,7 @@
     },
 
     {
-      "path": "pages/add_new/add_new",
+      "path": "pages/addNewFriend/addNewFriend",
       "style": {
         "navigationBarBackgroundColor": "#f2f2f2",
         "navigationBarTextStyle": "black",
@@ -77,7 +77,7 @@
       }
     },
     {
-      "path": "pages/add_groups/add_groups",
+      "path": "pages/addGroups/addGroups",
       "style": {
         "navigationBarBackgroundColor": "#f2f2f2",
         "navigationBarTextStyle": "black",
@@ -109,7 +109,7 @@
       }
     },
     {
-      "path": "pages/setting_general/setting_general",
+      "path": "pages/settingGeneral/settingGeneral",
       "style": {
         "navigationBarBackgroundColor": "#f2f2f2",
         "navigationBarTextStyle": "black",

@@ -78,5 +78,5 @@ onLoad(() => {
 // };
 </script>
 <style>
-@import './setting_general.css';
+@import './settingGeneral.css';
 </style>

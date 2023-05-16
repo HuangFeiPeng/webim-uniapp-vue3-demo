@@ -375,7 +375,7 @@ const entryInform = () => {
 //进入添加好友页面
 const entryAddNewFreiend = () => {
   uni.navigateTo({
-    url: '../add_new/add_new',
+    url: '../addNewFriend/addNewFriend',
   });
 };
 //进入群组页面

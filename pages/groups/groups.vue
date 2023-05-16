@@ -153,7 +153,7 @@ const into_group_chat = (event) => {
 //创建群
 const build_group = () => {
   uni.navigateTo({
-    url: '../add_groups/add_groups',
+    url: '../addGroups/addGroups',
   });
 };
 const edit_group = (event) => {
