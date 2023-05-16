@@ -44,6 +44,7 @@ import { onLoad, onShow, onUnload } from '@dcloudio/uni-app';
 import { useLoginStore } from '@/stores/login';
 import { useConversationStore } from '@/stores/conversation';
 import { useInformStore } from '@/stores/inform';
+import { useMessageStore } from '@/stores/message';
 import { EMClient } from '@/EaseIM';
 const settingState = reactive({
   yourname: '',
@@ -81,11 +82,14 @@ const goGeneralSetting = () => {
 };
 /* 退出操作 */
 //初始化pinia
-const informStore = useConversationStore();
+const informStore = useInformStore();
 const conversationStore = useConversationStore();
+const messageStore = useMessageStore();
 const initPinia = async () => {
+  loginStore.$reset();
   informStore.$reset();
   conversationStore.$reset();
+  messageStore.$reset();
 };
 //退出登录
 const logout = () => {

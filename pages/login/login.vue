@@ -238,6 +238,7 @@ const loginWithPhoneNumber = async () => {
         key: 'myUsername',
         data: chatUserName,
       });
+      setUserTokenToStorage(chatUserName, token);
     } else if (res.statusCode == 400) {
       if (res.data.errorInfo) {
         switch (res.data.errorInfo) {
@@ -289,12 +290,17 @@ const loginWithPhoneNumber = async () => {
 };
 const loginWithUserId = async () => {
   try {
-    await EMClient.open({ user: loginState.name, pwd: loginState.psd });
+    const res = await EMClient.open({
+      user: loginState.name,
+      pwd: loginState.psd,
+    });
     uni.setStorage({
       key: 'myUsername',
       data: loginState.name.toLowerCase(),
     });
+
     loginStore.setLoginUserBaseInfos({ loginUserId: loginState.name });
+    setUserTokenToStorage(loginState.name.toLowerCase(), res.accessToken);
   } catch (error) {
     console.log('>>>>>>', error);
     uni.showToast({
@@ -305,6 +311,13 @@ const loginWithUserId = async () => {
     loginState.name = '';
     loginState.psd = '';
   }
+};
+const setUserTokenToStorage = (userId, token) => {
+  const params = {
+    key: `EM_${userId}_TOKEN`,
+    data: { token: token },
+  };
+  uni.setStorage({ ...params });
 };
 </script>
 <style>

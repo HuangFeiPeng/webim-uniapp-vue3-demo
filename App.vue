@@ -42,7 +42,7 @@ export default {
     };
     //IM断开连接
     const onDisconnect = () => {
-      console.log('>>>>处理断开连接监听', loginStore.loginStatus);
+      //断开回调触发后，如果业务登录状态为true则说明异常断开需要重新登录
       if (!loginStore.loginStatus) {
         uni.showToast({
           title: '退出登录',
@@ -54,7 +54,11 @@ export default {
         });
         EMClient.close();
       } else {
-        console.log('>>>>执行重新补登录');
+        //执行通过token机型重新登录
+        const loginUserId = uni.getStorageSync('myUsername');
+        const loginUserToken =
+          loginUserId && uni.getStorageSync(`EM_${loginUserId}_TOKEN`);
+        EMClient.open({ user: loginUserId, accessToken: loginUserToken.token });
       }
     };
     //IM重连中
