@@ -47,7 +47,7 @@
     >
       <!-- 系统通知 -->
       <view class="tap_mask" v-if="lastInformData">
-        <view class="list_box">
+        <view class="list_box" @click="entryInform">
           <view class="list_left">
             <view class="list_pic">
               <view v-if="unReadNoticeNum > 0" class="em-msgNum">{{
@@ -412,6 +412,11 @@ const getWindowSize = () => {
 };
 const hidePop = () => {
   conversationState.showPop = false;
+};
+const entryInform = () => {
+  uni.navigateTo({
+    url: '../notification/notification',
+  });
 };
 const entryemChat = (params) => {
   console.log('params', params);
