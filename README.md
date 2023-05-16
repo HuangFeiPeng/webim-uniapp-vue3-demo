@@ -43,11 +43,13 @@ demo 包含以下核心功能
     |-contacts 联系人页
     |-me 我的页面
     |-addNewFriend 加好友页
+    |-addGroups 创建新群
     |-groups 群组列表页
     |-groupSetting 群组设置页
     |-notificaton 通知入口页（群组、单人通知）
-    |-notificaton_friendDetail 加好友通知页
-    |-notificaton_groupDetail 加群组通知页
+    |-notificatonFriendDetail 加好友通知页
+    |-notificatonGroupDetail 加群组通知页
+    |-moreMenu 更多功能页面
     |-profile 用户属性展示页
     |-searchMsg 消息搜索页面
     |-settingGeneral 设置功能
