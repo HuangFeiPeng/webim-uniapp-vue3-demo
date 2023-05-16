@@ -55,7 +55,7 @@
             class="nbr_body"
             :data-username="item.groupname"
             :data-roomid="item.groupid"
-            @tap="into_group_chat"
+            @click="entryemChat(item)"
           >
             <text :data-username="item.groupname">{{ item.groupname }}</text>
           </view>
@@ -79,9 +79,9 @@
 </template>
 
 <script setup>
-import { reactive, computed, watchEffect } from 'vue';
-import { onLoad, onShow, onUnload } from '@dcloudio/uni-app';
-/* sotores */
+import { reactive, watchEffect } from 'vue';
+import { CHAT_TYPE } from '@/EaseIM/constant';
+/* stores */
 import { useGroupStore } from '@/stores/group';
 const groupsState = reactive({
   search_btn: true,
@@ -138,16 +138,13 @@ const close_mask = () => {
 };
 
 /* 其他页面跳转 */
-const into_group_chat = (event) => {
-  const nameList = {
-    myName: groupsState.myName,
-    your: event.currentTarget.dataset.username,
-    groupId: event.currentTarget.dataset.roomid,
-  };
-  uni.username = nameList;
+//进入到聊天页面
+const entryemChat = (params) => {
+  console.log('>>>>', params);
+  const { groupid } = params;
+  const chatType = CHAT_TYPE.GROUP_CHAT;
   uni.navigateTo({
-    url:
-      '../groupChatEntry/groupChatEntry?username=' + JSON.stringify(nameList),
+    url: `../emChatContainer/index?targetId=${groupid}&chatType=${chatType}`,
   });
 };
 //创建群
