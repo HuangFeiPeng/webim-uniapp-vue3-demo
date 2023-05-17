@@ -5,7 +5,14 @@
     :style="'opacity: ' + audioState.opcity"
   >
     <text class="time"
-      >语音消息 {{ msg.length + '′′' || msg.body.length + '′′' }}</text
+      >语音消息
+      {{
+        msg.length
+          ? msg.length + '′′'
+          : msg.body.length
+          ? msg.body.length + '′′'
+          : ''
+      }}</text
     >
     <view class="controls play-btn">
       <image
@@ -33,6 +40,7 @@ const props = defineProps({
   },
 });
 const { msg } = toRefs(props);
+console.log('.>>>>>>>>传递过来的语音消息数据', msg.value);
 const loginStore = useLoginStore();
 //判消息来源是否为自己
 const isSelf = computed(() => {
@@ -74,7 +82,7 @@ const audioPlay = () => {
   let audioCtx = audioState.__comps__.audioCtx;
   var curl = '';
   uni.downloadFile({
-    url: msg.value.url,
+    url: msg.value?.url ? msg.value.url : msg.value?.body?.url,
     header: {
       'X-Requested-With': 'XMLHttpRequest',
       Accept: 'audio/mp3',
