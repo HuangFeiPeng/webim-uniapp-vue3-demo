@@ -27,7 +27,6 @@ import Me from '@/pages/me/me.vue';
 const isActiveComps = ref('conversation');
 
 const switchHomeComponent = (type) => {
-  console.log('>>>>>执行切换', type);
   isActiveComps.value = type;
 };
 /* 设置当前标题 */

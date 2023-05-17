@@ -54,7 +54,6 @@ const props = defineProps({
 /* emits */
 const emits = defineEmits(['switchHomeComponent']);
 const { tabType } = toRefs(props);
-console.log('tabType', tabType.value);
 const isIPX = ref(false);
 const unReadSpotNum = ref(0);
 const unReadTotalNotNum = ref(0);

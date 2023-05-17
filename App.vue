@@ -30,14 +30,14 @@ export default {
     };
     //IM连接成功
     const onConnectedSuccess = () => {
-      const myName = 'hfp';
+      const loginUserId = loginStore.loginUserBaseInfos.loginUserId;
       if (!loginStore.loginStatus) {
         fetchLoginUserNeedData();
       }
       loginStore.setLoginStatus(true);
       uni.hideLoading();
       uni.redirectTo({
-        url: '../home/index?myName=' + myName,
+        url: '../home/index?myName=' + loginUserId,
       });
     };
     //IM断开连接
@@ -81,13 +81,11 @@ export default {
       await contactsStore.setFriendList(friendList);
       //获取群组列表
       const joinedGroupList = await fetchJoinedGroupListFromServer();
-      console.log('>>>>>>>拿到加入的群组列表', joinedGroupList);
       joinedGroupList.length &&
         (await groupStore.setJoinedGroupList(joinedGroupList));
       if (friendList.length) {
         //获取好友用户属性
         const friendProfiles = await fetchOtherInfoFromServer(friendList);
-        console.log('friendProfiles', friendProfiles);
         contactsStore.setFriendUserInfotoMap(friendProfiles);
       }
       //获取当前登录用户好友信息
