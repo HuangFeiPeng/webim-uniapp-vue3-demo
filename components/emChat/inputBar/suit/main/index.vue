@@ -82,6 +82,7 @@ const sendTextMessage = async () => {
   };
   try {
     const res = await sendDisplayMessages({ ...params });
+    emits('closeAllModal');
     console.log('>>>>>文本消息发送成功', res);
   } catch (error) {
     console.log('>>>>>文本消息发送失败', error);
@@ -91,6 +92,7 @@ const sendTextMessage = async () => {
     });
   } finally {
     inputContent.value = '';
+    uni.hideKeyboard();
   }
 };
 const inputFocus = () => {

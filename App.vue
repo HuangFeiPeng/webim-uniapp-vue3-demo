@@ -64,8 +64,8 @@ export default {
     //IM重连中
     const onReconnecting = () => {
       uni.showToast({
-        title: '重连中...',
-        duration: 2000,
+        title: 'IM 重连中...',
+        icon: 'none',
       });
     };
     //挂载IM websocket连接成功监听
