@@ -1,13 +1,13 @@
 <template>
   <div>
-    <em-chat :id="props.id" :chatType="props.chatType" />
+    <em-chat />
   </div>
 </template>
 
 <script setup>
 import { toRefs, reactive, provide, readonly, computed } from 'vue';
 import EmChat from '@/components/emChat';
-import { onLoad, onUnload, onNavigationBarButtonTap } from '@dcloudio/uni-app';
+import { onNavigationBarButtonTap } from '@dcloudio/uni-app';
 import { useContactsStore } from '@/stores/contacts';
 import { useGroupStore } from '@/stores/group';
 import { CHAT_TYPE } from '@/EaseIM/constant';
