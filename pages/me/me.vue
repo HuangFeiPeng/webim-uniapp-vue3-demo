@@ -53,6 +53,7 @@ const settingState = reactive({
   defaultAvatar: '/static/images/theme2x.png',
   userInfoFromServer: {},
 });
+const loginStore = useLoginStore();
 const loginUserAvactar = computed(() => {
   if (settingState.userInfoFromServer?.avatarurl) {
     return settingState.userInfoFromServer.avatarurl;
@@ -62,12 +63,12 @@ const loginUserAvactar = computed(() => {
 });
 const loginUserNickname = computed(() => {
   if (settingState.userInfoFromServer?.nickname) {
-    return `${settingState.userInfoFromServer?.nickname}(${settingState.yourname})`;
+    return `${settingState.userInfoFromServer?.nickname}(${loginStore.loginUserBaseInfos.loginUserId})`;
   } else {
-    return settingState.yourname;
+    return loginStore.loginUserBaseInfos.loginUserId;
   }
 });
-const loginStore = useLoginStore();
+
 watchEffect(() => {
   settingState.userInfoFromServer = Object.assign(
     settingState.userInfoFromServer,
