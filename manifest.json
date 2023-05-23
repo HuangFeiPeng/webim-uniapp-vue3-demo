@@ -80,6 +80,11 @@
     "h5" : {
         "router" : {
             "base" : "./"
+        },
+        "optimization" : {
+            "treeShaking" : {
+                "enable" : false
+            }
         }
     }
 }
