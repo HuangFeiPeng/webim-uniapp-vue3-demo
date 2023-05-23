@@ -1,7 +1,7 @@
 <template>
   <view
     class="audio-player"
-    @tap="audioPlay"
+    @tap="playAudioMessage"
     :style="'opacity: ' + audioState.opcity"
   >
     <text class="time"
@@ -27,11 +27,9 @@
 </template>
 
 <script setup>
-import { reactive, toRefs, computed, onMounted, onBeforeUnmount } from 'vue';
+import { reactive, toRefs, computed, onBeforeUnmount } from 'vue';
 /* stores */
 import { useLoginStore } from '@/stores/login';
-import audioCtxFc from './audioCtxFactory';
-import playStatus from './playStatus';
 /* props */
 const props = defineProps({
   msg: {
@@ -49,38 +47,32 @@ const isSelf = computed(() => {
   };
 });
 const audioState = reactive({
-  time: "0'",
   opcity: 1,
-  __comps__: {
-    audioCtx: null,
-  },
   style: '',
-  curStatus: '',
 });
-let obeyMuteSwitch = false;
-let autoplay = true;
-
-onMounted(() => {
-  let curl = '';
-  let audioCtx = (audioState.__comps__.audioCtx = audioCtxFc.getCtx(
-    msg.value.id
-  ));
-  audioCtx.autoplay = false;
-  audioCtx.loop = false; //
-  addEvent();
+let playAnimation = null;
+const innerAudioContext = uni.createInnerAudioContext({
+  obeyMuteSwitch: false,
 });
-const audioPlay = () => {
-  if (uni.getSystemInfo().app === 'alipay') {
-    // https://forum.alipay.com/mini-app/post/7301031?ant_source=opendoc_recommend
-    uni.showToast({
-      duration: 2000,
-      title: '支付宝小程序不支持音频消息',
-    });
-    return;
-  }
-  uni.inter && clearInterval(uni.inter);
-  let audioCtx = audioState.__comps__.audioCtx;
-  var curl = '';
+innerAudioContext.onPlay(() => {
+  console.log('>>>>>音频播放事件触发');
+  playAnimation && clearInterval(playAnimation);
+  playAnimation = setInterval(() => {
+    let opcity = audioState.opcity;
+    audioState.opcity = opcity == 1 ? 0.4 : 1;
+  }, 500);
+});
+innerAudioContext.onEnded(() => {
+  console.log('>>>音频播放结束');
+  playAnimation && clearInterval(playAnimation);
+  audioState.opcity = 1;
+});
+innerAudioContext.onError((res) => {
+  console.log(res.errMsg);
+  console.log(res.errCode);
+  uni.showToast({ title: '播放失败', icon: 'none' });
+});
+const formatAudioToMp3 = () => {
   uni.downloadFile({
     url: msg.value?.url ? msg.value.url : msg.value?.body?.url,
     header: {
@@ -90,11 +82,12 @@ const audioPlay = () => {
     },
 
     success(res) {
-      curl = res.tempFilePath;
-      console.log('音频本地', audioCtx); //renderableMsg.msg.url = res.tempFilePath;
-
-      audioCtx.src = curl;
-      audioCtx.play();
+      const tempFilePath = res.tempFilePath;
+      console.log('>>>>>>音频下载完成', tempFilePath);
+      innerAudioContext.src = tempFilePath;
+      if (innerAudioContext?.src) {
+        innerAudioContext.play();
+      }
     },
 
     fail(e) {
@@ -106,82 +99,13 @@ const audioPlay = () => {
     },
   });
 };
-
-const audioPause = (auCtx) => {
-  //let audioCtx = this.data.__comps__.audioCtx;
-  let audioCtx = (audioState.__comps__.audioCtx =
-    audioCtxFc.getCtx(msg.value.id) || auCtx);
-  audioCtx && audioCtx.pause();
-};
-
-const addEvent = () => {
-  let audioCtx = audioState.__comps__.audioCtx;
-  audioCtx.onPlay(onPlaying);
-  audioCtx.onPause(onPause);
-  audioCtx.onWaiting(onPause);
-  audioCtx.onStop(onDone);
-  audioCtx.onEnded(onDone);
-  audioCtx.onError(onDone);
-  audioCtx.onWaiting(onWait); //audioCtx.onTimeUpdate(this.onTimeUpdate);
-};
-
-const delEvent = () => {
-  let audioCtx = audioState.__comps__.audioCtx;
-  //暂未发现该方法在实际使用的时候生效，且会导致错误产生。
-  //   audioCtx.offPlay(onPlaying);
-  //   audioCtx.offPause(onPause);
-  //   audioCtx.offWaiting(onPause);
-  //     audioCtx.offStop(onDone);
-  //     audioCtx.offEnded(onDone);
-  //     audioCtx.offError(onDone);
-  //     audioCtx.offWaiting(onWait); // 多次播放会丢失这个回调，所以不用卸载
-  //     // audioCtx.offTimeUpdate(this.onTimeUpdate);
-};
-const onPlaying = () => {
-  //console.log("onPlaying", JSON.stringify(this.data));
-  audioState.curStatus = playStatus.PLAYING;
-  uni.inter && clearInterval(uni.inter);
-  uni.inter = setInterval(() => {
-    let opcity = audioState.opcity;
-    audioState.opcity = opcity == 1 ? 0.4 : 1;
-  }, 500);
-};
-
-const onPause = () => {
-  // console.log("onPause", JSON.stringify(this.data));
-  // 第二次播放会立即抛出一个异常的 onPause
-  if (parseInt(audioState.time, 10) < 1) {
-    return;
-  }
-
-  audioState.curStatus = playStatus.PAUSE;
-  audioState.opcity = 1;
-};
-
-const onDone = () => {
-  // console.log("onDone", JSON.stringify(this.data));
-  audioState.curStatus = playStatus.STOP;
-  audioState.opcity = 1;
-  clearInterval(uni.inter);
-}; // 多次播放会丢失这个回调
-
-const onTimeUpdate = () => {
-  audioState.time = (audioCtx.currentTime >> 0) + "'";
-};
-
-const onWait = () => {
-  uni.showToast({
-    title: '下载中...',
-    duration: 1000,
-  });
+const playAudioMessage = () => {
+  formatAudioToMp3();
 };
 
 onBeforeUnmount(() => {
-  let audioCtx = (audioState.__comps__.audioCtx = audioCtxFc.getCtx(
-    msg.value.id
-  ));
-  audioPause(audioCtx);
-  delEvent(); //audioCtx.destroy();
+  //离开页面卸载音频播放实例
+  innerAudioContext.destroy();
 });
 </script>
 <style>
