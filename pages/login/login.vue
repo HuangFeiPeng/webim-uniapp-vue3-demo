@@ -69,12 +69,12 @@
 
 <script setup>
 import { reactive } from 'vue';
-import { EMClient } from '@/EaseIM';
+import { emConnect } from '@/EaseIM/imApis';
 import { useLoginStore } from '@/stores/login';
 let times = 60;
 let timer;
 const loginState = reactive({
-  usePwdLogin: false, //是否用户名+手机号方式登录
+  usePwdLogin: true, //是否用户名+密码方式登录
   name: '',
   psd: '',
   grant_type: 'password',
@@ -174,6 +174,7 @@ const getSmsCode = () => {
 };
 //登录IM
 const loginStore = useLoginStore();
+const { loginWithPassword, loginWithAccessToken } = emConnect();
 const loginEaseIM = async () => {
   if (loginState.usePwdLogin) {
     if (!loginState.name) {
@@ -226,10 +227,7 @@ const loginWithPhoneNumber = async () => {
     });
     if (res.statusCode == 200) {
       const { phoneNumber, token, chatUserName } = res.data;
-      await EMClient.open({
-        user: chatUserName,
-        accessToken: token,
-      });
+      await loginWithAccessToken(chatUserName, token);
       loginStore.setLoginUserBaseInfos({
         loginUserId: chatUserName,
         phoneNumber: phoneNumber,
@@ -290,10 +288,7 @@ const loginWithPhoneNumber = async () => {
 };
 const loginWithUserId = async () => {
   try {
-    const res = await EMClient.open({
-      user: loginState.name,
-      pwd: loginState.psd,
-    });
+    const res = await loginWithPassword(loginState.name, loginState.psd);
     uni.setStorage({
       key: 'myUsername',
       data: loginState.name.toLowerCase(),

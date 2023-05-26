@@ -46,6 +46,7 @@ import { useConversationStore } from '@/stores/conversation';
 import { useInformStore } from '@/stores/inform';
 import { useMessageStore } from '@/stores/message';
 import { EMClient } from '@/EaseIM';
+import { emConnect } from '@/EaseIM/imApis';
 const settingState = reactive({
   yourname: '',
   isIPX: false,
@@ -93,13 +94,14 @@ const initPinia = async () => {
   messageStore.$reset();
 };
 //退出登录
+const { closeEaseIM } = emConnect();
 const logout = () => {
   uni.showModal({
     title: '是否退出登录',
     success: function (res) {
       if (res.confirm) {
         uni.setStorageSync('INFORM', []);
-        EMClient.close(); // uni.closeSocket()
+        closeEaseIM();
         setTimeout(() => {
           initPinia();
           uni.redirectTo({

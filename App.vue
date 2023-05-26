@@ -2,7 +2,7 @@
 /* EaseIM */
 import '@/EaseIM';
 import { emConnectListener, emMountGlobalListener } from '@/EaseIM/listener';
-import { emUserInfos, emGroups, emContacts } from '@/EaseIM/imApis';
+import { emConnect, emUserInfos, emGroups, emContacts } from '@/EaseIM/imApis';
 import { CONNECT_CALLBACK_TYPE } from '@/EaseIM/constant';
 import { useLoginStore } from '@/stores/login';
 import { useGroupStore } from '@/stores/group';
@@ -29,6 +29,7 @@ export default {
       }
     };
     //IM连接成功
+    const { loginWithAccessToken, closeEaseIM } = emConnect();
     const onConnectedSuccess = () => {
       const loginUserId = loginStore.loginUserBaseInfos.loginUserId;
       if (!loginStore.loginStatus) {
@@ -52,13 +53,13 @@ export default {
         uni.redirectTo({
           url: '../login/login',
         });
-        EMClient.close();
+        closeEaseIM();
       } else {
-        //执行通过token机型重新登录
+        //执行通过token进行重新登录
         const loginUserId = uni.getStorageSync('myUsername');
         const loginUserToken =
           loginUserId && uni.getStorageSync(`EM_${loginUserId}_TOKEN`);
-        EMClient.open({ user: loginUserId, accessToken: loginUserToken.token });
+        loginWithAccessToken(loginUserId, loginUserToken.token);
       }
     };
     //IM重连中
