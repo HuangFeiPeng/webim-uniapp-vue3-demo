@@ -16,6 +16,10 @@ export const useConversationStore = defineStore('conversation', {
         return b.time - a.time;
       });
     },
+    //会话未读总数
+    calcAllUnReadNumFromConversation() {
+      return this.conversationList.reduce((a, c) => a + c.unread_num, 0);
+    },
   },
   actions: {
     setConversationList(conversationList) {

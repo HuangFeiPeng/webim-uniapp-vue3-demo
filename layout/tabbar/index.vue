@@ -2,15 +2,15 @@
   <view :class="isIPX ? 'chatRoom_tab_X' : 'chatRoom_tab'">
     <view class="tableBar" @click="changeTab('conversation')">
       <view
-        v-if="unReadSpotNum > 0 || unReadSpotNum == '99+'"
+        v-if="allConversationUnReadNum > 0"
         :class="
           'em-unread-spot ' +
-          (unReadSpotNum == '99+' ? 'em-unread-spot-litleFont' : '')
+          (allConversationUnReadNum > 99 ? 'em-unread-spot-litleFont' : '')
         "
-        >{{ unReadSpotNum + unReadTotalNotNum }}</view
+        >{{ allConversationUnReadNum }}</view
       >
       <image
-        :class="unReadSpotNum > 0 || unReadSpotNum == '99+' ? 'haveSpot' : ''"
+        :class="allConversationUnReadNum > 0 ? 'haveSpot' : ''"
         :src="
           tabType === 'conversation'
             ? highlightConversationImg
@@ -35,7 +35,10 @@
 </template>
 
 <script setup>
-import { ref, toRefs } from 'vue';
+import { ref, toRefs, computed } from 'vue';
+/* stores */
+import { useConversationStore } from '@/stores/conversation';
+import { useInformStore } from '@/stores/inform';
 /* images */
 const conversationImg = '/static/images/session2x.png';
 const highlightConversationImg = '/static/images/sessionhighlight2x.png';
@@ -55,9 +58,20 @@ const props = defineProps({
 const emits = defineEmits(['switchHomeComponent']);
 const { tabType } = toRefs(props);
 const isIPX = ref(false);
-const unReadSpotNum = ref(0);
-const unReadTotalNotNum = ref(0);
 
+//未处理系统通知总数
+const informStore = useInformStore();
+const unReadNoticeNum = computed(() => {
+  return informStore.getAllInformsList.filter((inform) => !inform.isHandled)
+    .length;
+});
+//会话未读总数
+const conversationStore = useConversationStore();
+const allConversationUnReadNum = computed(() => {
+  return (
+    unReadNoticeNum.value + conversationStore.calcAllUnReadNumFromConversation
+  );
+});
 const changeTab = (type) => {
   emits('switchHomeComponent', type);
 };
