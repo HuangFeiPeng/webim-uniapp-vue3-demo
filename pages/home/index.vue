@@ -19,6 +19,7 @@
 <script setup>
 import { ref, watchEffect } from 'vue';
 import { onLoad } from '@dcloudio/uni-app';
+import emHandleReconnect from '@/EaseIM/utils/emHandleReconnect';
 /* components */
 import Tabbar from '@/layout/tabbar';
 import Conversation from '@/pages/conversation/conversation.vue';
@@ -40,10 +41,16 @@ watchEffect(() => {
     title: titleMap[isActiveComps.value],
   });
 });
+const { getEMClientSocketState, actionEMReconnect } = emHandleReconnect();
 onLoad((options) => {
   //通过路由传参的形式可指定该页面展示某个指定组件
   if (options.page) {
     switchHomeComponent(options.page);
+  }
+  //根据当前SDK状态判断是否需要重连
+
+  if (!getEMClientSocketState()) {
+    actionEMReconnect();
   }
 });
 </script>

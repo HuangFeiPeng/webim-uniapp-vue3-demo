@@ -3,6 +3,7 @@
 import '@/EaseIM';
 import { emConnectListener, emMountGlobalListener } from '@/EaseIM/listener';
 import { emConnect, emUserInfos, emGroups, emContacts } from '@/EaseIM/imApis';
+import emHandleReconnect from '@/EaseIM/utils/emHandleReconnect';
 import { CONNECT_CALLBACK_TYPE } from '@/EaseIM/constant';
 import { useLoginStore } from '@/stores/login';
 import { useGroupStore } from '@/stores/group';
@@ -29,19 +30,22 @@ export default {
       }
     };
     //IM连接成功
-    const { loginWithAccessToken, closeEaseIM } = emConnect();
+    const { closeEaseIM } = emConnect();
     const onConnectedSuccess = () => {
-      const loginUserId = loginStore.loginUserBaseInfos.loginUserId;
+      const { loginUserId } = loginStore.loginUserBaseInfos || {};
+      const finalLoginUserId = loginUserId || EMClient.user;
       if (!loginStore.loginStatus) {
         fetchLoginUserNeedData();
       }
+      loginStore.setLoginUserBaseInfos({ loginUserId: finalLoginUserId });
       loginStore.setLoginStatus(true);
       uni.hideLoading();
       uni.redirectTo({
-        url: '../home/index?myName=' + loginUserId,
+        url: '../home/index?myName=' + finalLoginUserId,
       });
     };
     //IM断开连接
+    const { actionEMReconnect } = emHandleReconnect();
     const onDisconnect = () => {
       //断开回调触发后，如果业务登录状态为true则说明异常断开需要重新登录
       if (!loginStore.loginStatus) {
@@ -56,10 +60,7 @@ export default {
         closeEaseIM();
       } else {
         //执行通过token进行重新登录
-        const loginUserId = uni.getStorageSync('myUsername');
-        const loginUserToken =
-          loginUserId && uni.getStorageSync(`EM_${loginUserId}_TOKEN`);
-        loginWithAccessToken(loginUserId, loginUserToken.token);
+        actionEMReconnect();
       }
     };
     //IM重连中
