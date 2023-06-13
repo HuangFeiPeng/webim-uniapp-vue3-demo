@@ -7,6 +7,7 @@ export const HANDLER_EVENT_NAME = {
   MESSAGES_EVENT: 'messagesEvent',
   CONTACTS_EVENT: 'contactsEvent',
   GROUP_EVENT: 'groupEvent',
+  ERROR_EVENT: 'errorEvent',
 };
 
 export const CONNECT_CALLBACK_TYPE = {
