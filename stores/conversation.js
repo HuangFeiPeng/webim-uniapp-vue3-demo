@@ -6,6 +6,7 @@ import { getEMKey } from '@/EaseIM/utils';
 export const useConversationStore = defineStore('conversation', {
   state: () => {
     return {
+      chattingId: '', //进入聊天页面聊天中的目标聊天用户信息
       conversationList: [],
     };
   },
@@ -22,6 +23,9 @@ export const useConversationStore = defineStore('conversation', {
     },
   },
   actions: {
+    setChattingUserId(channel_id) {
+      this.chattingId = channel_id;
+    },
     setConversationList(conversationList) {
       conversationList?.length &&
         conversationList.map((channel) => {
@@ -65,7 +69,8 @@ export const useConversationStore = defineStore('conversation', {
       let foundChannel = false;
       this.conversationList.forEach((channel) => {
         if (channel.channel_id === channel_id) {
-          if (from !== EMClient.user) {
+          //要更新的lastmsg消息来源不为当前id，且不为正在会话中的id则累加未读数。
+          if (from !== EMClient.user && this.chattingId !== channel_id) {
             channel.unread_num = channel.unread_num + 1;
           }
           channel.time = time;

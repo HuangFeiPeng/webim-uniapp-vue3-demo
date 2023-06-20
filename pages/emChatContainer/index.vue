@@ -5,11 +5,19 @@
 </template>
 
 <script setup>
-import { toRefs, reactive, provide, readonly, computed } from 'vue';
+import {
+  toRefs,
+  reactive,
+  provide,
+  readonly,
+  computed,
+  onUnmounted,
+} from 'vue';
 import EmChat from '@/components/emChat';
 import { onNavigationBarButtonTap } from '@dcloudio/uni-app';
 import { useContactsStore } from '@/stores/contacts';
 import { useGroupStore } from '@/stores/group';
+import { useConversationStore } from '@/stores/conversation';
 import { CHAT_TYPE } from '@/EaseIM/constant';
 const props = defineProps({
   targetId: {
@@ -72,6 +80,12 @@ onNavigationBarButtonTap(() => {
   uni.navigateTo({
     url: `/pages/moreMenu/moreMenu?username=${targetId.value}&type=${chatType.value}`,
   });
+});
+//处理离开聊天组件清除当前会话中id信息
+const conversationStore = useConversationStore();
+onUnmounted(() => {
+  console.log('>>>聊天组件卸载');
+  conversationStore.setChattingUserId('');
 });
 </script>
 
