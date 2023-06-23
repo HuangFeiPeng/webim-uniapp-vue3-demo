@@ -5,10 +5,7 @@ export const useGroupStore = defineStore('group', {
   }),
   actions: {
     setJoinedGroupList(joinedGroupList) {
-      this.joinedGroupList = Object.assign(
-        this.joinedGroupList,
-        joinedGroupList
-      );
+      this.joinedGroupList = Object.assign([], joinedGroupList);
     },
     addNewGroup(params) {
       this.joinedGroupList.unshift(params);

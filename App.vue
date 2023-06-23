@@ -4,9 +4,10 @@ import '@/EaseIM';
 import { emConnectListener, emMountGlobalListener } from '@/EaseIM/listener';
 import { emConnect, emUserInfos, emGroups, emContacts } from '@/EaseIM/imApis';
 import emHandleReconnect from '@/EaseIM/utils/emHandleReconnect';
-import { CONNECT_CALLBACK_TYPE } from '@/EaseIM/constant';
+import { CONNECT_CALLBACK_TYPE, HANDLER_EVENT_NAME } from '@/EaseIM/constant';
 import { useLoginStore } from '@/stores/login';
 import { useGroupStore } from '@/stores/group';
+import { useConversationStore } from '@/stores/conversation';
 import { useContactsStore } from '@/stores/contacts';
 import { EMClient } from './EaseIM';
 
@@ -81,10 +82,7 @@ export default {
       //获取好友列表
       const friendList = await fetchContactsListFromServer();
       await contactsStore.setFriendList(friendList);
-      //获取群组列表
-      const joinedGroupList = await fetchJoinedGroupListFromServer();
-      joinedGroupList.length &&
-        (await groupStore.setJoinedGroupList(joinedGroupList));
+      fetchJoinedGroupList();
       if (friendList.length) {
         //获取好友用户属性
         const friendProfiles = await fetchOtherInfoFromServer(friendList);
@@ -94,8 +92,62 @@ export default {
       const profiles = await fetchUserInfoWithLoginId();
       await loginStore.setLoginUserProfiles(profiles[EMClient.user]);
     };
+    //获取加入的群组列表
+    const fetchJoinedGroupList = async () => {
+      //获取群组列表
+      const joinedGroupList = await fetchJoinedGroupListFromServer();
+      console.log('>>>>>>>>>joinedGroupList', joinedGroupList);
+      await groupStore.setJoinedGroupList(joinedGroupList);
+    };
     //挂载全局所需监听回调【好友关系、消息监听、群组监听】
-    emMountGlobalListener();
+    /* 退群解散群逻辑 */
+    const conversationStore = useConversationStore();
+    const globaleventcallback = (listenerType, event) => {
+      //群组事件监听
+      if (listenerType === HANDLER_EVENT_NAME.GROUP_EVENT) {
+        const { operation, id } = event;
+        console.log('>>>>>触发群组事件回调。');
+        switch (operation) {
+          case 'directJoined':
+            {
+              uni.showToast({ icon: 'none', title: `被拉入群组${id}` });
+              fetchJoinedGroupList();
+            }
+            break;
+          case 'removeMember':
+            {
+              uni.showToast({ icon: 'none', title: `从${id}群中被移出` });
+              fetchJoinedGroupList();
+              //删除该群相关会话
+              conversationStore.deleteConversation(id);
+              //如果在该群会话中则退出会话
+              if (conversationStore.chattingId === id) {
+                uni.reLaunch({
+                  url: '../home/index',
+                });
+              }
+            }
+            break;
+          case 'destroy':
+            {
+              uni.showToast({ icon: 'none', title: `${id}已解散` });
+              fetchJoinedGroupList();
+              conversationStore.deleteConversation(id);
+              //如果在该群会话中则退出会话
+              if (conversationStore.chattingId === id) {
+                console.log('>>>>会话中退出聊天页面');
+                uni.reLaunch({
+                  url: '../home/index',
+                });
+              }
+            }
+            break;
+          default:
+            break;
+        }
+      }
+    };
+    emMountGlobalListener(globaleventcallback);
   },
 };
 </script>

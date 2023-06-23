@@ -6,8 +6,9 @@ export const emGroupListener = (callback, listenerEventName) => {
   console.log('>>>>群组事件监听挂载');
   const groupListenFunc = {
     onGroupEvent: (event) => {
-      console.log('>>>>群组事件监听触发');
+      console.log('>>>>群组事件监听触发', event);
       const { operation } = event;
+      callback(HANDLER_EVENT_NAME.GROUP_EVENT, event);
       switch (operation) {
         // 有新群组创建。群主的其他设备会收到该回调。
         case 'create':
