@@ -79,16 +79,26 @@ const groupStore = useGroupStore();
 const { fetchJoinedGroupListFromServer, acceptGroupInvite, rejectGroupInvite } =
   emGroups();
 const agreeJoinTheGroup = async (sourceItem) => {
-  await acceptGroupInvite(
-    loginStore.loginUserBaseInfos.loginUserId,
-    sourceItem.id
-  );
-  sourceItem.isHandled = true;
-  sourceItem.handleText = '已同意入群';
-  //同意入群后再调用加入的群组列表
-  const joinedGroupList = await fetchJoinedGroupListFromServer();
-  joinedGroupList.length &&
-    (await groupStore.setJoinedGroupList(joinedGroupList));
+  try {
+    await acceptGroupInvite(
+      loginStore.loginUserBaseInfos.loginUserId,
+      sourceItem.id
+    );
+    sourceItem.isHandled = true;
+    sourceItem.handleText = '已同意入群';
+    //同意入群后再调用加入的群组列表
+    const joinedGroupList = await fetchJoinedGroupListFromServer();
+    joinedGroupList.length &&
+      (await groupStore.setJoinedGroupList(joinedGroupList));
+  } catch (error) {
+    console.log('>>>>>>同意入群失败', error.data.error_description);
+    if (error?.data?.error_description.includes('not exist!')) {
+      sourceItem.isHandled = true;
+      sourceItem.handleText = '该群已解散';
+    } else {
+      uni.showToast({ title: '操作失败', icon: 'none' });
+    }
+  }
 };
 const rejectJoinTheGroup = async (sourceItem) => {
   await rejectGroupInvite(
