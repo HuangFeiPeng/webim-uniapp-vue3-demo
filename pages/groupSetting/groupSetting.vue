@@ -67,10 +67,11 @@
 
 <script setup>
 import { reactive } from 'vue';
-import { onLoad, onShow, onUnload } from '@dcloudio/uni-app';
+import { onLoad } from '@dcloudio/uni-app';
 /* stores */
 import { useLoginStore } from '@/stores/login';
 import { useGroupStore } from '@/stores/group';
+import { useConversationStore } from '@/stores/conversation';
 /* im apis */
 import { emGroups } from '@/EaseIM/imApis';
 import Image from '@/components/emChat/inputBar/suit/image';
@@ -182,9 +183,12 @@ const addGroupMembers = async () => {
     }
   }
 };
-
+/* 退群解散群逻辑 */
+//会话列表
+const conversationStore = useConversationStore();
 //主动退出群组
 const leaveTheGroup = async () => {
+  console.log('>>>>>触发了退出群组');
   if (!groupSettingState.groupid) return;
   try {
     await leaveGroupFromServer(groupSettingState.groupid);
@@ -193,8 +197,10 @@ const leaveTheGroup = async () => {
       duration: 2000,
     });
     await groupStore.removeGroup(groupSettingState.groupid);
-    uni.navigateBack({
-      url: '../groups/groups',
+    //删除该群相关会话
+    await conversationStore.deleteConversation(groupSettingState.groupid);
+    uni.reLaunch({
+      url: '../home/index',
     });
   } catch (error) {
     console.log('>>>>>退出群组失败', error);
@@ -210,11 +216,13 @@ const dissolveGroup = async () => {
     try {
       await destroyGroupFromServer(groupSettingState.groupid);
       await groupStore.removeGroup(groupSettingState.groupid);
+      //删除该群相关会话
+      await conversationStore.deleteConversation(groupSettingState.groupid);
       uni.showToast({
         title: '解散群组成功',
         duration: 2000,
       });
-      uni.redirectTo({
+      uni.reLaunch({
         url: '../groups/groups',
       });
     } catch (error) {
