@@ -9,7 +9,7 @@ import { useLoginStore } from '@/stores/login';
 import { useGroupStore } from '@/stores/group';
 import { useConversationStore } from '@/stores/conversation';
 import { useContactsStore } from '@/stores/contacts';
-import { EMClient } from './EaseIM';
+import { EMClient, EaseSDK } from './EaseIM';
 
 export default {
   setup() {
@@ -140,6 +140,22 @@ export default {
                   url: '../home/index',
                 });
               }
+            }
+            break;
+          default:
+            break;
+        }
+      }
+      if (listenerType === HANDLER_EVENT_NAME.ERROR_EVENT) {
+        const { type } = event;
+        switch (type) {
+          case 206:
+            {
+              uni.showToast({
+                icon: 'none',
+                title: '有其他用户登录，断开连接！',
+              });
+              loginStore.setLoginStatus(false);
             }
             break;
           default:
