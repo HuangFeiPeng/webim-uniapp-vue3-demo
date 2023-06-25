@@ -1,5 +1,5 @@
 import { EMClient } from '../index';
-import { HANDLER_EVENT_NAME } from '../constant';
+import { HANDLER_EVENT_NAME, CONNECT_CALLBACK_TYPE } from '../constant';
 export const emErrorListener = (callback, listenerEventName) => {
   console.log('>>>>error监听已挂载');
   const errorListenFunc = {

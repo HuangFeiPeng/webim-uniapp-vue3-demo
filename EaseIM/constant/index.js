@@ -14,6 +14,7 @@ export const CONNECT_CALLBACK_TYPE = {
   CONNECT_CALLBACK: 'connected',
   DISCONNECT_CALLBACK: 'disconnected',
   RECONNECTING_CALLBACK: 'reconnecting',
+  ERROR_CALLBACK: 'onerror',
 };
 
 export const MESSAGE_TYPE = {
